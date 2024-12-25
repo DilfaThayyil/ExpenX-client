@@ -4,13 +4,14 @@ import './App.css'
 // import LandingPage from './pages/user/LandingPage'
 // import FinancialAdvisorLoginPage from './components/advisor/LoginForm'
 // import AdvisorRegisterPage from './components/advisor/RegisterForm'
-import AdminLogin from './components/admin/Login'
+// import AdminLogin from './components/admin/Login'
+import AdminRegister from './components/admin/Register'
 
 function App() {
 
   return (
     <>
-    <AdminLogin/>
+    <AdminRegister/>
     </>
   )
 }
