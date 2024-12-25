@@ -5,13 +5,14 @@ import './App.css'
 // import FinancialAdvisorLoginPage from './components/advisor/LoginForm'
 // import AdvisorRegisterPage from './components/advisor/RegisterForm'
 // import AdminLogin from './components/admin/Login'
-import AdminRegister from './components/admin/Register'
+// import AdminRegister from './components/admin/Register'
+import OTPVerification from './components/user/Otp'
 
 function App() {
 
   return (
     <>
-    <AdminRegister/>
+    <OTPVerification/>
     </>
   )
 }
