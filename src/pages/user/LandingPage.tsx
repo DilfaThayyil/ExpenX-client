@@ -1,4 +1,3 @@
-import React from 'react';
 import { Wallet, Users, Calculator, Receipt, ChevronRight, MessageSquare, PieChart, Shield, Clock } from 'lucide-react';
 
 const LandingPage = () => {
