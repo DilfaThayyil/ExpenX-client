@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AlertCircle, Wallet, CheckCircle2 } from 'lucide-react';
-// import toastr from 'toastr';
+import toastr from 'toastr';
 // import {
 //   createUser,
 //   otpGenerate,
