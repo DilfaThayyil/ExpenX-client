@@ -32,7 +32,7 @@ const RegisterPage = () => {
     confirmPassword: '',
   })
   const [loading, setLoading] = useState<boolean>(false)
-  // const [otpSent, setOtpSent] = useState<boolean>(false)
+  const [otpSent, setOtpSent] = useState<boolean>(false)
 
   const handleChange = (e: React.ChangeEvent<any>) => {
     setFormData({...formData,[e.target.name]: e.target.value,})}
@@ -63,7 +63,7 @@ const RegisterPage = () => {
     return errors;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLInputElement>) => {
     e.preventDefault();
 
     if (
@@ -83,7 +83,7 @@ const RegisterPage = () => {
     const errors = validateForm();
 
     if (errors.length > 0) {
-      errors.forEach((error) => Toaster(error, 'error', true));
+      errors.forEach((error) => (error, 'error', true));
       setFormSubmitted(false);
       return;
     }
@@ -91,9 +91,10 @@ const RegisterPage = () => {
     try {
       setLoading(true);
       const response = await createUser({
-        email: formData.email,
-        password: formData.password,
-      });
+        username : formData.username,
+        email : formData.email,
+        password : formData.password
+      })
 
       if (response === 'Email is already in use') {
         toastr.error(response);
@@ -107,8 +108,7 @@ const RegisterPage = () => {
         confirmPassword: formData.confirmPassword,
       });
 
-      const res = await otpGenerate(formData.email);
-      setLoading(false);
+      const res = await generate
 
       if (res.message === 'OTP sent successfully') {
         toastr.success('OTP sent successfully');
