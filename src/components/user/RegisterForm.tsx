@@ -11,56 +11,53 @@ import toastr from 'toastr';
 // } from '../../../utility/Validator';
 // import useShowToast from '../../../Custom Hook/showToaster';
 
+
+
 const RegisterPage = () => {
   const [formData, setFormData] = useState<{
-    username: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
+    username: string
+    email: string
+    password: string
+    confirmPassword: string
   }>({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
-  });
-  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
+  })
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
   const [lastSubmittedValues, setLastSubmittedValues] = useState({
     email: '',
     password: '',
     confirmPassword: '',
-  });
-  const [loading, setLoading] = useState<boolean>(false);
-  const [otpSent, setOtpSent] = useState<boolean>(false);
-  // const Toaster = useShowToast();
+  })
+  const [loading, setLoading] = useState<boolean>(false)
+  // const [otpSent, setOtpSent] = useState<boolean>(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const handleChange = (e: React.ChangeEvent<any>) => {
+    setFormData({...formData,[e.target.name]: e.target.value,})}
 
   const validateForm = () => {
-    const errors: string[] = [];
-    const validEmail = isValidateEmail(formData.email);
-    const validPassword = isValidatePassword(formData.password);
+    const errors: string[] = []
+    const validEmail = formData.email
+    const validPassword = formData.password
 
     if (!formData.email) {
-      errors.push('Email is required.');
+      errors.push('Email is required.')
     } else if (!validEmail) {
       errors.push('Invalid email format or domain not allowed.');
     }
 
     if (!formData.password) {
-      errors.push('Password is required.');
+      errors.push('Password is required.')
     } else if (!validPassword) {
       errors.push(
         'Password must be at least 6 characters long and contain one uppercase letter, one number, and one special character.'
-      );
+      )
     }
 
     if (formData.password !== formData.confirmPassword) {
-      errors.push('Passwords do not match.');
+      errors.push('Passwords do not match.')
     }
 
     return errors;
