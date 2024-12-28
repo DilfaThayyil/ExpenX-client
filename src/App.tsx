@@ -18,11 +18,11 @@ const App = ()=>{
   return (
     <Router>
       <Routes>
-        <Route path='/register' element={<RegisterPage/>}/>
-        <Route path='/otp' element={<OTPVerification/>}></Route>
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/otp" element={<OTPVerification />} />
       </Routes>
     </Router>
-  )
+  );
 }
 
 export default App

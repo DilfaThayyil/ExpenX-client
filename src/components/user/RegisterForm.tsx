@@ -11,10 +11,12 @@ import {
 } from '../../../../api/src/utils/validator'
   import useShowToast from '../../customHook/showToaster';
 import { useNavigate } from 'react-router-dom';
-const navigate = useNavigate()
 
 
 const RegisterPage = () => {
+  
+  const navigate = useNavigate()
+
   const [formData, setFormData] = useState<{
     username: string;
     email: string;
