@@ -1,6 +1,8 @@
+import { BrowserRouter as Router,Routes,Route } from 'react-router-dom'
 import './App.css'
 // import LoginPage from './components/user/LoginForm'
 import RegisterPage from './components/user/RegisterForm'
+import OTPVerification from './components/user/Otp'
 // import RegisterPage from './components/user/RegisterForm'
 // import LandingPage from './pages/user/LandingPage'
 // import FinancialAdvisorLoginPage from './components/advisor/LoginForm'
@@ -12,12 +14,14 @@ import RegisterPage from './components/user/RegisterForm'
 
 
 
-function App() {
-
+const App = ()=>{
   return (
-    <>
-    <RegisterPage/>
-    </>
+    <Router>
+      <Routes>
+        <Route path='/register' element={<RegisterPage/>}/>
+        <Route path='/otp' element={<OTPVerification/>}></Route>
+      </Routes>
+    </Router>
   )
 }
 

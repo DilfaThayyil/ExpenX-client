@@ -10,6 +10,9 @@ import {
   isValidatePassword,
 } from '../../../../api/src/utils/validator'
   import useShowToast from '../../customHook/showToaster';
+import { useNavigate } from 'react-router-dom';
+const navigate = useNavigate()
+
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState<{
@@ -69,18 +72,18 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      formData.email === lastSubmittedValues.email &&
-      formData.password === lastSubmittedValues.password &&
-      formData.confirmPassword === lastSubmittedValues.confirmPassword
-    ) {
-      if (formSubmitted) {
-        toastr.info('No changes detected. Please modify your input.');
-      } else {
-        toastr.info('Please make changes to submit the form.');
-      }
-      return;
-    }
+    // if (
+    //   formData.email === lastSubmittedValues.email &&
+    //   formData.password === lastSubmittedValues.password &&
+    //   formData.confirmPassword === lastSubmittedValues.confirmPassword
+    // ) {
+    //   if (formSubmitted) {
+    //     toastr.info('No changes detected. Please modify your input.');
+    //   } else {
+    //     toastr.info('Please make changes to submit the form.');
+    //   }
+    //   return;
+    // }
 
     setFormSubmitted(true);
     const errors = validateForm();
@@ -94,6 +97,7 @@ const RegisterPage = () => {
     try {
       setLoading(true);
       const response = await createUser({
+        username:formData.username,
         email: formData.email,
         password: formData.password,
       });
@@ -116,6 +120,7 @@ const RegisterPage = () => {
       if (res.message === 'OTP sent successfully') {
         toastr.success('OTP sent successfully');
         setOtpSent(true);
+        navigate('/otp')
       } else {
         toastr.error('Failed to send OTP');
       }
