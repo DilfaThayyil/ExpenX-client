@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { AlertCircle, Wallet, CheckCircle2 } from 'lucide-react';
-import axios from 'axios';
-// import toastr from 'toastr';
+import toastr from 'toastr';
 // import {
 //   createUser,
 //   otpGenerate,
@@ -13,53 +12,119 @@ import axios from 'axios';
 // import useShowToast from '../../../Custom Hook/showToaster';
 
 const RegisterPage = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    username: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }>({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
-  const [otpSent, setOtpSent] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
+  const [lastSubmittedValues, setLastSubmittedValues] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [otpSent, setOtpSent] = useState<boolean>(false);
+  const Toaster = useShowToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const validateForm = () => {
+    const errors: string[] = [];
+    const validEmail = isValidateEmail(formData.email);
+    const validPassword = isValidatePassword(formData.password);
+
+    if (!formData.email) {
+      errors.push('Email is required.');
+    } else if (!validEmail) {
+      errors.push('Invalid email format or domain not allowed.');
+    }
+
+    if (!formData.password) {
+      errors.push('Password is required.');
+    } else if (!validPassword) {
+      errors.push(
+        'Password must be at least 6 characters long and contain one uppercase letter, one number, and one special character.'
+      );
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      errors.push('Passwords do not match.');
+    }
+
+    return errors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      toastr.error('Passwords do not match.');
+    if (
+      formData.email === lastSubmittedValues.email &&
+      formData.password === lastSubmittedValues.password &&
+      formData.confirmPassword === lastSubmittedValues.confirmPassword
+    ) {
+      if (formSubmitted) {
+        toastr.info('No changes detected. Please modify your input.');
+      } else {
+        toastr.info('Please make changes to submit the form.');
+      }
+      return;
+    }
+
+    setFormSubmitted(true);
+    const errors = validateForm();
+
+    if (errors.length > 0) {
+      errors.forEach((error) => Toaster(error, 'error', true));
+      setFormSubmitted(false);
       return;
     }
 
     try {
-      const registerResponse = await axios.post('http://localhost:5000/api/auth/register', {
-        username: formData.username,
+      setLoading(true);
+      const response = await createUser({
         email: formData.email,
         password: formData.password,
       });
 
-      if (registerResponse.data.success) {
-        const otpResponse = await axios.post('/api/auth/otp-generate', {
-          email: formData.email,
-        });
+      if (response === 'Email is already in use') {
+        toastr.error(response);
+        setLoading(false);
+        return;
+      }
 
-        if (otpResponse.data.success) {
-          toastr.success('OTP sent successfully!');
-          setOtpSent(true);
-        } else {
-          toastr.error('Failed to send OTP.');
-        }
+      setLastSubmittedValues({
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+      });
+
+      const res = await otpGenerate(formData.email);
+      setLoading(false);
+
+      if (res.message === 'OTP sent successfully') {
+        toastr.success('OTP sent successfully');
+        setOtpSent(true);
       } else {
-        toastr.error(registerResponse.data.message || 'Registration failed.');
+        toastr.error('Failed to send OTP');
       }
     } catch (error) {
-      toastr.error('An error occurred during registration.');
-      console.error(error);
+      toastr.error('Registration failed');
+      console.error('Registration failed:', error);
+      setLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -191,6 +256,10 @@ const RegisterPage = () => {
           <a href="/privacy-policy" className="text-gray-600 hover:underline">
             Privacy Policy
           </a>.
+        </p>
+
+        <p className="mt-2 text-center text-xs text-gray-500">
+          Secure registration • Bank-level encryption • ISO 27001 certified
         </p>
       </div>
     </div>
