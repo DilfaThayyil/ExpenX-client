@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { AlertCircle, Wallet, CheckCircle2 } from 'lucide-react';
 import toastr from 'toastr';
-// import {
-//   createUser,
-//   otpGenerate,
-// } from '../../../api/user/AuthuserServices'; 
-// import {
-//   isValidateEmail,
-//   isValidatePassword,
-// } from '../../../utility/Validator';
-// import useShowToast from '../../../Custom Hook/showToaster';
+import {
+  createUser,
+  otpGenerate,
+} from '../../../../api/src/services/AuthUserServices'; 
+import {
+  isValidateEmail,
+  isValidatePassword,
+} from '../../../../api/src/utils/validator'
+  import useShowToast from '../../customHook/showToaster';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState<{
