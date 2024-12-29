@@ -91,7 +91,7 @@ const OTPVerification = () => {
           <div className="mt-4 text-center text-sm text-gray-600">
             <p>
               We sent verification code to your email{' '}
-              <span className="font-medium">d*****@gmail.com</span>
+              <span className="font-medium">*****@gmail.com</span>
             </p>
             <p className="mt-2">
               Time remaining: <span className="font-medium">{formatTime(timeLeft)}</span>

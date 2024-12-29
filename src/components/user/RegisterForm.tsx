@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 const RegisterPage = () => {
-  
+
   const navigate = useNavigate()
 
   const [formData, setFormData] = useState<{
@@ -244,7 +244,7 @@ const RegisterPage = () => {
         <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{' '}
           <a
-            href="/sign-in"
+            href="/login"
             className="text-emerald-600 hover:underline font-medium"
           >
             Sign in
