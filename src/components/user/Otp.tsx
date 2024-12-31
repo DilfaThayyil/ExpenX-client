@@ -1,10 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Wallet, Shield } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { verifyOtp, createUser } from '../../../../api/src/services/AuthUserServices';
+
+
 
 const OTPVerification = () => {
+  const location = useLocation()
+  const formData = location.state?.formData
+  const navigate = useNavigate()
   const [otp, setOtp] = useState(['', '', '', '']);
   const [timeLeft, setTimeLeft] = useState(60);
   const [isResending, setIsResending] = useState(false);
+  const [loading, setLoading] = useState(false);  
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -19,7 +27,7 @@ const OTPVerification = () => {
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
-      
+
       // Auto-focus next input
       if (value && index < 3) {
         inputs.current[index + 1]?.focus();
@@ -37,12 +45,31 @@ const OTPVerification = () => {
     setIsResending(true);
     // Add resend logic here
     setTimeLeft(60);
-    setTimeout(() => setIsResending(false), 1000);
+    setTimeout(() => setIsResending(false), 1000); 
   };
 
-  const handleVerify = async () => {
-    // Add verification logic here
-    console.log('Verifying OTP:', otp.join(''));
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (loading) return; 
+    setLoading(true);
+
+    try {
+      const enteredOtp = otp.join('');
+      const res = await verifyOtp(enteredOtp,formData.email,formData.username,formData.password);
+
+        if (res.message === 'User registered successfully') {
+          toastr.success('User registered successfully');
+          navigate('/login');
+        } else {
+          toastr.error(res.message || 'OTP verification failed');
+        }
+    } catch (error:any) {
+      toastr.error(error.response?.data?.message || 'Failed to verify OTP or create user');
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -90,7 +117,7 @@ const OTPVerification = () => {
           
           <div className="mt-4 text-center text-sm text-gray-600">
             <p>
-              We sent verification code to your email{' '}
+              We sent the verification code to your email{' '}
               <span className="font-medium">*****@gmail.com</span>
             </p>
             <p className="mt-2">
@@ -112,12 +139,12 @@ const OTPVerification = () => {
         {/* Verify Button */}
         <div className="mt-8">
           <button
-            onClick={handleVerify}
-            disabled={otp.some(digit => !digit)}
+            onClick={handleOtpSubmit}
+            disabled={otp.some(digit => !digit) || loading}
             className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             <Shield className="h-4 w-4" />
-            Verify
+            {loading ? 'Verifying...' : 'Verify'}
           </button>
         </div>
       </div>
