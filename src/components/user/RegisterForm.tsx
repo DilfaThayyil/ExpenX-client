@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { AlertCircle, Wallet, CheckCircle2 } from 'lucide-react';
 import toastr from 'toastr';
 import {
-  createUser,
-  otpGenerate,
+  otpGenerate
 } from '../../../../api/src/services/AuthUserServices'; 
 import {
   isValidateEmail,
@@ -98,23 +97,23 @@ const RegisterPage = () => {
 
     try {
       setLoading(true);
-      const response = await createUser({
-        username:formData.username,
-        email: formData.email,
-        password: formData.password,
-      });
+      // const response = await createUser({
+      //   username:formData.username,
+      //   email: formData.email,
+      //   password: formData.password,
+      // });
 
-      if (response === 'Email is already in use') {
-        toastr.error(response);
-        setLoading(false);
-        return;
-      }
+      // if (response === 'Email is already in use') {
+      //   toastr.error(response);
+      //   setLoading(false);
+      //   return;
+      // }
 
-      setLastSubmittedValues({
-        email: formData.email,
-        password: formData.password,
-        confirmPassword: formData.confirmPassword,
-      });
+      // setLastSubmittedValues({
+      //   email: formData.email,
+      //   password: formData.password,
+      //   confirmPassword: formData.confirmPassword,
+      // });
 
       const res = await otpGenerate(formData.email);
       setLoading(false);
@@ -122,7 +121,8 @@ const RegisterPage = () => {
       if (res.message === 'OTP sent successfully') {
         toastr.success('OTP sent successfully');
         setOtpSent(true);
-        navigate('/otp')
+        console.log(formData)
+        navigate('/otp',{state:{formData}})
       } else {
         toastr.error('Failed to send OTP');
       }
