@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { AlertCircle, Wallet, CheckCircle2 } from 'lucide-react';
 import toastr from 'toastr';
 import {
+  createUser,
   otpGenerate
-} from '../../../../api/src/services/AuthUserServices'; 
+} from '../../services/user/AuthServices'; 
 import {
   isValidateEmail,
   isValidatePassword,
@@ -29,6 +30,7 @@ const RegisterPage = () => {
   });
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [lastSubmittedValues, setLastSubmittedValues] = useState({
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -97,23 +99,24 @@ const RegisterPage = () => {
 
     try {
       setLoading(true);
-      // const response = await createUser({
-      //   username:formData.username,
-      //   email: formData.email,
-      //   password: formData.password,
-      // });
+      const response = await createUser({
+        username:formData.username,
+        email: formData.email,
+        password: formData.password,
+      });
 
-      // if (response === 'Email is already in use') {
-      //   toastr.error(response);
-      //   setLoading(false);
-      //   return;
-      // }
+      if (response === 'Email is already in use') {
+        toastr.error(response);
+        setLoading(false);
+        return;
+      }
 
-      // setLastSubmittedValues({
-      //   email: formData.email,
-      //   password: formData.password,
-      //   confirmPassword: formData.confirmPassword,
-      // });
+      setLastSubmittedValues({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+      });
 
       const res = await otpGenerate(formData.email);
       setLoading(false);
