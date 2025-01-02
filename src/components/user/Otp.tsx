@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Wallet, Shield } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { verifyOtp, createUser } from '../../../../api/src/services/AuthUserServices';
+import { verifyOtp, createUser } from '../../services/user/AuthServices';
 
 
 
@@ -10,7 +10,7 @@ const OTPVerification = () => {
   const formData = location.state?.formData
   const navigate = useNavigate()
   const [otp, setOtp] = useState(['', '', '', '']);
-  const [timeLeft, setTimeLeft] = useState(60);
+  const [timeLeft, setTimeLeft] = useState(300);
   const [isResending, setIsResending] = useState(false);
   const [loading, setLoading] = useState(false);  
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
@@ -56,10 +56,12 @@ const OTPVerification = () => {
 
     try {
       const enteredOtp = otp.join('');
-      const res = await verifyOtp(enteredOtp,formData.email,formData.username,formData.password);
+      console.log("typeof enteredOtp : ",typeof enteredOtp)
+      console.log("typeof formEmail : ",typeof formData.email)
+      const res = await verifyOtp(formData.email,enteredOtp);
 
         if (res.message === 'User registered successfully') {
-          toastr.success('User registered successfully');
+          // toastr.success('User registered successfully');
           navigate('/login');
         } else {
           toastr.error(res.message || 'OTP verification failed');
