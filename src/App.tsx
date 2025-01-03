@@ -4,6 +4,7 @@ import RegisterPage from './components/user/RegisterForm'
 import OTPVerification from './components/user/Otp'
 import LandingPage from './pages/user/LandingPage'
 import LoginPage from './components/user/LoginForm'
+import ForgetPassword from './components/user/ForgotPassword'
 // import LandingPage from './pages/user/LandingPage'
 // import FinancialAdvisorLoginPage from './components/advisor/LoginForm'
 // import AdvisorRegisterPage from './components/advisor/RegisterForm'
@@ -21,6 +22,9 @@ const App = ()=>{
         <Route path='/login' element={<LoginPage/>}/>
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/otp" element={<OTPVerification/>} />
+        <Route path='/forgot-password' element={<ForgetPassword toggleModal={function (): void {
+        throw new Error('Function not implemented.')
+      } }/>} />
       </Routes>
   );
 }
