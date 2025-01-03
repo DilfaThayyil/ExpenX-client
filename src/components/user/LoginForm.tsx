@@ -1,16 +1,93 @@
 import React, { useState } from 'react';
-import { AlertCircle, DollarSign, Wallet } from 'lucide-react';
+import { AlertCircle, DollarSign, Wallet, Eye, EyeOff } from 'lucide-react';
+import { ToastContainer,toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { userLogin } from '../../services/user/AuthServices';
+import { isValidateEmail, isValidatePassword } from '../../utility/validator';
+import { useNavigate } from 'react-router-dom';
+import ForgetPassword from './ForgotPassword';
+
 
 const LoginPage = () => {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState('');
+  const [passwordVisible,setPasswordVisible] = useState(false)
+  // const [rememberMe, setRememberMe] = useState(false)
+  const [lastSubmittedValues,setLastSubmittedValues] = useState<{
+    email : string;
+    password : string;
+  }>({email:"",password:""})
+  const [formSubmitted,setFormSubmitted] = useState<boolean>(false)
+  const [error,setError] = useState("")
+  const [isModalOpen,setIsModalOpen] = useState(false)
+
+
+  const validateForm = ()=>{
+    const errors : string[]=[]
+    const validEmail = isValidateEmail(email)
+    const validPassword = isValidatePassword(password)
+    if (!email) {
+      errors.push("Email is required.");
+    } else if (!validEmail) {
+      errors.push("Invalid email format or domain not allowed.");
+    }
+
+    if (!password) {
+      errors.push("Password is required.");
+    } else if (!validPassword) {
+      errors.push(
+        "Password must be at least 8 characters long and contain one uppercase letter, one number, and one special character."
+      );
+    }
+
+    return errors;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    // Handle login logic here
+      
+      setLastSubmittedValues({ email, password });
+  
+      // if (
+      //   email === lastSubmittedValues.email &&
+      //   password === lastSubmittedValues.password
+      // ) {
+      //   if (formSubmitted) {
+      //     Toast("No changes detected. Please modify your input.",'info',true);
+      //   } else {
+      //     Toast("Please make changes to submit the form.",'info',true);
+      //   }
+      //   return;
+      // }
+  
+      setFormSubmitted(true);
+      const errors = validateForm();
+      if (errors.length > 0) {
+        errors.forEach((error) => toast.error(error))
+        setFormSubmitted(false);
+        return;
+      }
+  
+      try {
+        const response = await userLogin(email, password);
+        if (response.message) {
+          // setUser(response.userObject);
+          console.log(response.userObject)
+          toast.success(response.message)
+          setTimeout(() => navigate("/"), 1000);
+        } else if (response.error) {
+          toast.error(response.error || "Login failed")
+        }
+      } catch (error) {
+        toast.error("login failed")
+        console.error("Login failed:", error);
+        // setLoading(false);
+      }
+    };
+  
+    const toggleModal = () => {
+      setIsModalOpen((prev) => !prev);
   };
 
   return (
@@ -66,18 +143,28 @@ const LoginPage = () => {
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={passwordVisible ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
+                <div
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                  onClick={() => setPasswordVisible(!passwordVisible)}
+                >
+                  {passwordVisible ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <input
                 id="remember-me"
                 name="remember-me"
@@ -89,15 +176,15 @@ const LoginPage = () => {
               <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                 Remember Me
               </label>
-            </div>
+            </div> */}
 
             <div className="text-sm">
-              <a href="/forgot-password" className="font-medium text-emerald-600 hover:text-emerald-500">
+              <a onClick={toggleModal} className="font-medium text-emerald-600 hover:text-emerald-500">
                 Forgot your password?
               </a>
             </div>
+            
           </div>
-
           <div>
             <button
               type="submit"
@@ -131,6 +218,7 @@ const LoginPage = () => {
             </button>
           </div>
         </form>
+        <ToastContainer/>
 
         <div className="text-center text-sm">
           <span className="text-gray-600">New to ExpenX? </span>
@@ -143,6 +231,7 @@ const LoginPage = () => {
           <p>Secure login • Bank-level encryption • ISO 27001 certified</p>
         </div>
       </div>
+      {isModalOpen && <ForgetPassword toggleModal={toggleModal} />}
     </div>
   );
 };
