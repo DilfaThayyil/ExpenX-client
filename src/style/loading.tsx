@@ -1,14 +1,12 @@
-// import { BeatLoader } from "react-spinners";
-// import './toastr-custom.css'
+import React from 'react';
+import './loading.css'
 
-  
-// const Loading = () => {
-  
-//     return (
-//       <div className="sweet-loading d-flex justify-content-center ">
-//       <BeatLoader color="#457ff8" /> 
-//       </div> 
-//     );
-// }
+const Loading = () => {
+  return (
+    <div className="sweet-loading d-flex justify-content-center">
+      <div className="spinner"></div>
+    </div>
+  );
+};
 
-// export default Loading;
+export default Loading;
