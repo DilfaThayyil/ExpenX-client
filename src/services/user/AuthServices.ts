@@ -73,38 +73,38 @@ export const verifyOtp = async (email: string, otp: string) => {
 //   }
 // };
 
-// export const userLogin = async (email: string, password: string) => {
-//   try {
-//     const response = await axiosInstance.post(`${BASEURL}/user/auth/userLogin`, {
-//       email,
-//       password,
-//     });
-//     const { accessToken, refreshToken } = response.data;
-//     if (accessToken && refreshToken) {
-//       localStorage.setItem("userAccessToken", accessToken);
-//       localStorage.setItem("userRefreshToken", refreshToken);
-//     }
-//     return response.data;
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
+export const userLogin = async (email: string, password: string) => {
+  try {
+    const response = await axiosInstance.post(`${BASEURL}/userLogin`, {
+      email,
+      password,
+    });
+    const { accessToken, refreshToken } = response.data;
+    if (accessToken && refreshToken) {
+      localStorage.setItem("userAccessToken", accessToken);
+      localStorage.setItem("userRefreshToken", refreshToken);
+    }
+    return response.data;
+  } catch (err) {
+    console.log(err);
+  }
+}
 
-// export const handleforgetpassword = async (email: string) => {
-//   try {
-//     const response = await axiosInstance.post(`${BASEURL}/user/auth/forgotPassword`, {
-//       email,
-//     });
-//     if (response) {
-//       return response.data;
-//     }
-//   } catch (err) {
-//     const axiosError = err as AxiosError;
-//     if (axiosError.response) {
-//       return axiosError.response.data;
-//     }
-//   }
-// };
+export const handleforgetpassword = async (email: string) => {
+  try {
+    const response = await axiosInstance.post(`${BASEURL}/forgotPassword`, {
+      email,
+    });
+    if (response) {
+      return response.data;
+    }
+  } catch (err) {
+    const axiosError = err as AxiosError;
+    if (axiosError.response) {
+      return axiosError.response.data;
+    }
+  }
+};
 
 // export const handleforgetpasswordOtp = async (email: string, otp: string) => {
 //   try {
