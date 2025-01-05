@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 import axiosInstance from "../axios/axios";
-const BASEURL = "http://localhost:3000/api/user/auth"
+const BASEURL = 'http://localhost:3000/user/auth'
+
 
 interface IcreateUser {
   username: string
@@ -53,10 +54,18 @@ export const verifyOtp = async (email: string, otp: string) => {
       email,
       otp,
     });
-    console.log("In Authservices-verifyOtp fn :",response.data)
+    console.log("In Authservices-verifyOtp fn :", response.data)
     return response.data;
   } catch (err) {
-    return err;
+    const axiosError = err as AxiosError;
+    if (axiosError.response) {
+      const errorData = axiosError.response.data as ErrorResponse;
+      console.error('Error verifying OTP:', errorData.error);
+      throw errorData.error;
+    } else {
+      console.error('Error verifying OTP:', axiosError.message);
+      throw axiosError.message;
+    }
   }
 };
 
