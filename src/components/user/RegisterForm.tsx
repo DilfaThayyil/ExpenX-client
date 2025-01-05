@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { AlertCircle, Wallet, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, Wallet, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import toastr from 'toastr';
+// import '../../style/toastr-custom.css'
+import 'toastr/build/toastr.min.css';
+
 import {
   createUser,
   otpGenerate
@@ -37,6 +40,7 @@ const RegisterPage = () => {
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [otpSent, setOtpSent] = useState<boolean>(false);
+  const [passwordVisible,setPassvisible] = useState<boolean>(false)
   const Toaster = useShowToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,18 +79,18 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // if (
-    //   formData.email === lastSubmittedValues.email &&
-    //   formData.password === lastSubmittedValues.password &&
-    //   formData.confirmPassword === lastSubmittedValues.confirmPassword
-    // ) {
-    //   if (formSubmitted) {
-    //     toastr.info('No changes detected. Please modify your input.');
-    //   } else {
-    //     toastr.info('Please make changes to submit the form.');
-    //   }
-    //   return;
-    // }
+    if (
+      formData.email === lastSubmittedValues.email &&
+      formData.password === lastSubmittedValues.password &&
+      formData.confirmPassword === lastSubmittedValues.confirmPassword
+    ) {
+      if (formSubmitted) {
+        toastr.info('No changes detected. Please modify your input.');
+      } else {
+        toastr.info('Please make changes to submit the form.');
+      }
+      return;
+    }
 
     setFormSubmitted(true);
     const errors = validateForm();
@@ -158,7 +162,7 @@ const RegisterPage = () => {
           {otpSent && <p className="text-green-500 text-center">OTP sent successfully!</p>}
           <div className="space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 text-left">
                 Username
               </label>
               <input
@@ -173,7 +177,7 @@ const RegisterPage = () => {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 text-left">
                 Email address
               </label>
               <input
@@ -188,28 +192,40 @@ const RegisterPage = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 text-left">
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              />
+              <div className="mt-1 relative rounded-md shadow-sm">
+                <input
+                  id="password"
+                  name="password"
+                  type={passwordVisible ? "text" : "password"}
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                />
+                <div
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                  onClick={() => setPassvisible(!passwordVisible)}
+                >
+                  {passwordVisible ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+            <div className="relative mt-4">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 text-left">
                 Confirm Password
               </label>
               <input
                 id="confirmPassword"
                 name="confirmPassword"
-                type="password"
+                type={passwordVisible ? "text" : "password"}
                 required
                 value={formData.confirmPassword}
                 onChange={handleChange}
@@ -217,6 +233,7 @@ const RegisterPage = () => {
               />
             </div>
           </div>
+
 
           <button
             type="submit"
@@ -254,7 +271,7 @@ const RegisterPage = () => {
           </a>
         </p>
 
-        <p className="mt-6 text-center text-xs text-gray-400">
+        {/* <p className="mt-6 text-center text-xs text-gray-400">
           By registering, you agree to our{' '}
           <a
             href="/terms-of-service"
@@ -266,11 +283,7 @@ const RegisterPage = () => {
           <a href="/privacy-policy" className="text-gray-600 hover:underline">
             Privacy Policy
           </a>.
-        </p>
-
-        <p className="mt-2 text-center text-xs text-gray-500">
-          Secure registration • Bank-level encryption • ISO 27001 certified
-        </p>
+        </p> */}
       </div>
     </div>
   );
