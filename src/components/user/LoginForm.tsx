@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AlertCircle, DollarSign, Wallet, Eye, EyeOff } from 'lucide-react';
 import { ToastContainer,toast } from 'react-toastify';
+import toastr from 'toastr';
 import "react-toastify/dist/ReactToastify.css";
 import { userLogin } from '../../services/user/AuthServices';
 import { isValidateEmail, isValidatePassword } from '../../utility/validator';
@@ -13,7 +14,6 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordVisible,setPasswordVisible] = useState(false)
-  // const [rememberMe, setRememberMe] = useState(false)
   const [lastSubmittedValues,setLastSubmittedValues] = useState<{
     email : string;
     password : string;
@@ -54,9 +54,9 @@ const LoginPage = () => {
       //   password === lastSubmittedValues.password
       // ) {
       //   if (formSubmitted) {
-      //     Toast("No changes detected. Please modify your input.",'info',true);
+      //     toastr.info("No changes detected. Please modify your input.");
       //   } else {
-      //     Toast("Please make changes to submit the form.",'info',true);
+      //     toastr.info("Please make changes to submit the form.");
       //   }
       //   return;
       // }
@@ -64,7 +64,7 @@ const LoginPage = () => {
       setFormSubmitted(true);
       const errors = validateForm();
       if (errors.length > 0) {
-        errors.forEach((error) => toast.error(error))
+        errors.forEach((error) => toastr.error(error))
         setFormSubmitted(false);
         return;
       }
@@ -74,13 +74,13 @@ const LoginPage = () => {
         if (response.message) {
           // setUser(response.userObject);
           console.log(response.userObject)
-          toast.success(response.message)
+          toastr.success(response.message)
           setTimeout(() => navigate("/"), 1000);
         } else if (response.error) {
-          toast.error(response.error || "Login failed")
+          toastr.error(response.error || "Login failed")
         }
       } catch (error) {
-        toast.error("login failed")
+        toastr.error("login failed")
         console.error("Login failed:", error);
         // setLoading(false);
       }
@@ -119,7 +119,7 @@ const LoginPage = () => {
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 text-left">
                 Your email address
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
@@ -136,7 +136,7 @@ const LoginPage = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 text-left">
                 Password
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
@@ -164,24 +164,11 @@ const LoginPage = () => {
           </div>
 
           <div className="flex items-center justify-between">
-            {/* <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                Remember Me
-              </label>
-            </div> */}
 
             <div className="text-sm">
-              <a onClick={toggleModal} className="font-medium text-emerald-600 hover:text-emerald-500">
+              <button onClick={toggleModal} className="font-medium text-emerald-600 hover:text-emerald-500">
                 Forgot your password?
-              </a>
+              </button>
             </div>
             
           </div>
@@ -225,10 +212,6 @@ const LoginPage = () => {
           <a href="/register" className="font-medium text-emerald-600 hover:text-emerald-500">
             Create an account
           </a>
-        </div>
-
-        <div className="text-center text-xs text-gray-500">
-          <p>Secure login • Bank-level encryption • ISO 27001 certified</p>
         </div>
       </div>
       {isModalOpen && <ForgetPassword toggleModal={toggleModal} />}
