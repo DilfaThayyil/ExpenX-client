@@ -14,7 +14,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 // import AdminLogin from './components/admin/Login'
 // import AdminRegister from './components/admin/Register'
 // import OTPVerification from './components/user/Otp'
-const GOOGLECLIENTID = "381764687047-sr9j6f9c7felftone2gfvsmq8sl5kdri.apps.googleusercontent.com"
+const GOOGLECLIENTID = import.meta.env.VITE_GOOGLECLIENTID
 
 
 const App = ()=>{

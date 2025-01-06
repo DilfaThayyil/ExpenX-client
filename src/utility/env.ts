@@ -1,3 +1,4 @@
+
 export const BACKENDENDPOINT = import.meta.env.VITE_BACKENDENDPOINT;
 export const STRIPEKEY = import.meta.env.VITE_STRIPEKEY;
 export const APPID = import.meta.env.VITE_APPID;

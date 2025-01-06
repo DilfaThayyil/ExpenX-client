@@ -7,6 +7,7 @@ import { userLogin } from '../../services/user/AuthServices';
 import { isValidateEmail, isValidatePassword } from '../../utility/validator';
 import { useNavigate } from 'react-router-dom';
 import ForgetPassword from './ForgotPassword';
+import GoogleAuth from './GoogleAuth';
 
 
 const LoginPage = () => {
@@ -192,17 +193,9 @@ const LoginPage = () => {
               </div>
             </div>
 
-            <button
-              type="button"
-              className="mt-6 w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
-            >
-              <img
-                className="h-5 w-5"
-                src="/api/placeholder/20/20"
-                alt="Google logo"
-              />
-              Login with Google
-            </button>
+            <div className="flex justify-center mt-4">
+              <GoogleAuth/>
+            </div>
           </div>
         </form>
         <ToastContainer/>

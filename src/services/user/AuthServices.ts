@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
 import axiosInstance from "../axios/axios";
+import { JwtPayload } from "jwt-decode";
 const BASEURL = 'http://localhost:3000/user/auth'
 
 
@@ -144,9 +145,14 @@ export const resetPassword = async (email: string, password: string) => {
   }
 };
 
-export const googleAuth = async (userCredential:string) => {
+export const googleAuth = async (userCredential:JwtPayload) => {
   try {
-    const response = await axiosInstance.post(`${BASEURL}/googleAuth/${userCredential}`);
+    console.log(userCredential,"123456")    
+    const response = await axiosInstance.post(`${BASEURL}/googleAuth`,{
+      userCredential:userCredential
+    },{
+      withCredentials:true
+    });
     return response.data
   } catch (err) {
     console.log(err);
