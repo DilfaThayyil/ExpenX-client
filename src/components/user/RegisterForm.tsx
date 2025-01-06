@@ -3,7 +3,7 @@ import { AlertCircle, Wallet, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import toastr from 'toastr';
 // import '../../style/toastr-custom.css'
 import 'toastr/build/toastr.min.css';
-
+import GoogleAuth from './GoogleAuth';
 import {
   createUser,
   otpGenerate
@@ -250,16 +250,9 @@ const RegisterPage = () => {
           <span className="flex-1 h-px bg-gray-300"></span>
         </div>
 
-        <button
-          className="mt-4 w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >
-          <img
-            src="/path-to-google-logo.svg"
-            alt="Google"
-            className="h-5 w-5"
-          />
-          Register with Google
-        </button>
+        <div className="flex justify-center mt-4">
+          <GoogleAuth/>
+        </div>
 
         <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{' '}
@@ -270,20 +263,6 @@ const RegisterPage = () => {
             Sign in
           </a>
         </p>
-
-        {/* <p className="mt-6 text-center text-xs text-gray-400">
-          By registering, you agree to our{' '}
-          <a
-            href="/terms-of-service"
-            className="text-gray-600 hover:underline"
-          >
-            Terms of Service
-          </a>{' '}
-          and{' '}
-          <a href="/privacy-policy" className="text-gray-600 hover:underline">
-            Privacy Policy
-          </a>.
-        </p> */}
       </div>
     </div>
   );
