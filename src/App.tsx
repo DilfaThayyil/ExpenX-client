@@ -5,6 +5,7 @@ import OTPVerification from './components/user/Otp'
 import LandingPage from './pages/user/LandingPage'
 import LoginPage from './components/user/LoginForm'
 import ForgetPassword from './components/user/ForgotPassword'
+import ResetPassword from './components/user/ResetPassword'
 // import LandingPage from './pages/user/LandingPage'
 // import FinancialAdvisorLoginPage from './components/advisor/LoginForm'
 // import AdvisorRegisterPage from './components/advisor/RegisterForm'
@@ -25,6 +26,7 @@ const App = ()=>{
         <Route path='/forgetPassword' element={<ForgetPassword toggleModal={function (): void {
         throw new Error('Function not implemented.')
       } }/>} />
+      <Route path='/resetPassword' element={<ResetPassword/>} />
       </Routes>
   );
 }

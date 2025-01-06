@@ -121,23 +121,24 @@ export const handleforgetpasswordOtp = async (email: string, otp: string) => {
       `${BASEURL}/forgetPassOtp`,
       { email, otp }
     );
-    return response.data;
+    return { success: true, message: response.data.message }
   } catch (err) {
     const axiosError = err as AxiosError;
     if (axiosError.response) {
       const errorData = axiosError.response.data as ErrorResponse;
-      return errorData.error;
+      return { success: false, message: errorData.error || 'Failed to verify OTP' };
     }
+    return { success: false, message: 'An unexpected error occurred' };
   }
 };
 
-export const changePassword = async (email: string, password: string) => {
+export const resetPassword = async (email: string, password: string) => {
   try {
-    const response = await axiosInstance.post(`${BASEURL}/changePassword`, {
+    const response = await axiosInstance.post(`${BASEURL}/resetPassword`, {
       email,
       password,
     });
-    return response.data.message;
+    return {success:true,message : response.data.message}
   } catch (err) {
     console.log(err);
   }

@@ -3,7 +3,8 @@ import { handleforgetpassword } from '../../services/user/AuthServices';
 import toastr from 'toastr';
 import { isValidateEmail } from '../../utility/validator';
 import Loading from '../../style/loading';
-import Otp from '../user/Otp';
+// import Otp from '../user/Otp';
+import { useNavigate } from 'react-router-dom';
 
 
 interface ForgetPasswordProps {
@@ -11,9 +12,11 @@ interface ForgetPasswordProps {
 }
 
 const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal }) => {
+
+  const navigate = useNavigate()
   const [email, setEmail] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [showOtp, setShowOtp] = useState<boolean>(false);
+  // const [showOtp, setShowOtp] = useState<boolean>(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,7 +33,7 @@ const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal }) => {
      setLoading(false);
      if(response.message){
       toastr.success(response.message)
-      setShowOtp(true)
+      navigate('/otp',{state:{email, purpose:'forgotPassword'}})
      }else{
       toastr.error(response.error)
      }
@@ -39,7 +42,7 @@ const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal }) => {
       toastr.error('An error occurred');
       console.log(err);
     }
-  };
+  }
 
   return (
     <div
@@ -114,11 +117,11 @@ const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal }) => {
             <Loading />
           </div>
         )}
-        {showOtp&& (
+        {/* {showOtp&& (
             <div className="fixed inset-0 flex items-center justify-center bg-white ">
             <Otp/>
           </div>
-        )}
+        )} */}
     </div>
   );
 };

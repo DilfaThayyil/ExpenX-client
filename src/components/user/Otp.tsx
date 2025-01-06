@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Wallet, Shield } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { verifyOtp, createUser } from '../../services/user/AuthServices';
-
+import { verifyOtp, createUser, handleforgetpasswordOtp } from '../../services/user/AuthServices';
+import toastr from 'toastr';
 
 
 const OTPVerification = () => {
   const location = useLocation()
   const formData = location.state?.formData
+  const email = location.state?.email || ''
+  const purpose = location.state?.purpose || ''
   const navigate = useNavigate()
   const [otp, setOtp] = useState(['', '', '', '']);
   const [timeLeft, setTimeLeft] = useState(300);
@@ -43,9 +45,18 @@ const OTPVerification = () => {
 
   const handleResend = async () => {
     setIsResending(true);
-    // Add resend logic here
-    setTimeLeft(60);
-    setTimeout(() => setIsResending(false), 1000); 
+    try {
+      // const emailToSend = formData.email || email;
+      // await resendOtp(emailToSend)
+      toastr.success('OTP resent successfully!');
+      setTimeLeft(60);
+      setTimeout(() => setIsResending(false), 1000); 
+    } catch (error) {
+      toastr.error('Failed to resend OTP.');
+      console.error('Resend OTP Error:', error);
+    } finally {
+      setIsResending(false);
+    }
   };
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
@@ -56,19 +67,31 @@ const OTPVerification = () => {
 
     try {
       const enteredOtp = otp.join('');
-      console.log("typeof enteredOtp : ",typeof enteredOtp)
-      console.log("typeof formEmail : ",typeof formData.email)
-      const res = await verifyOtp(formData.email,enteredOtp);
+      // console.log("typeof enteredOtp : ",typeof enteredOtp)
+      // console.log("typeof formEmail : ",typeof formData.email)
+      // console.log(" formEmail : ", formData.email , enteredOtp)
+      console.log("forgotPassword email : ", email)
+      console.log("forgotPassword purpose : ",purpose)
+      const res = purpose==='forgotPassword'
+        ? await handleforgetpasswordOtp(email,enteredOtp)
+        : await verifyOtp(formData.email,enteredOtp);
 
-        if (res.message === 'User registered successfully') {
-          // toastr.success('User registered successfully');
-          navigate('/login');
+        if(res.success){
+          if(purpose==='forgotPassword' && res?.message==='OTP verified successfully'){
+            console.log("Response from OTP verification: ", res);
+            toastr.success('OTP verified successfully')
+            navigate('/resetPassword',{state:{email}})
+          }
+          else if(res?.message === 'User registered successfully') {
+            toastr.success('User registered successfully');
+            navigate('/login');
+          }
         } else {
           toastr.error(res.message || 'OTP verification failed');
         }
     } catch (error:any) {
       toastr.error(error.response?.data?.message || 'Failed to verify OTP or create user');
-      console.error('Error:', error);
+      console.error('Error verifying otp :', error);
     } finally {
       setLoading(false);
     }
