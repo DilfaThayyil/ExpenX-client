@@ -94,7 +94,6 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full mx-auto space-y-8 bg-white p-8 rounded-xl shadow-lg border border-emerald-100">
-        {/* Logo and Title */}
         <div className="text-center">
           <div className="flex justify-center items-center gap-2">
             <Wallet className="h-12 w-12 text-emerald-600" />

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, Shield, Users, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import financialAdvisoryImage from '../../assets/download.jpeg'
 
 const FeatureCard = ({ icon: Icon, title, description }: {
   icon: React.ElementType;
@@ -32,7 +33,7 @@ const LandingPage = () => {
               </p>
               <div className="flex gap-4">
                 <Link 
-                  to="/register" 
+                  to="/advisor/register" 
                   className="inline-flex items-center px-6 py-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
                 >
                   Get Started
@@ -48,7 +49,7 @@ const LandingPage = () => {
             </div>
             <div className="flex justify-center">
               <img 
-                src="/api/placeholder/600/400"
+                src={financialAdvisoryImage}
                 alt="Financial Advisory"
                 className="rounded-lg shadow-lg"
               />
