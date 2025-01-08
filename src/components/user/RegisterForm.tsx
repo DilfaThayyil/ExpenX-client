@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { AlertCircle, Wallet, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import toastr from 'toastr';
-// import '../../style/toastr-custom.css'
 import 'toastr/build/toastr.min.css';
 import GoogleAuth from './GoogleAuth';
+import FormInput from '../InputField';
 import {
   createUser,
   otpGenerate
@@ -11,36 +11,33 @@ import {
 import {
   isValidateEmail,
   isValidatePassword,
-} from '../../../../api/src/utils/validator'
-  import useShowToast from '../../customHook/showToaster';
+} from '../../../../api/src/utils/validator';
+import useShowToast from '../../customHook/showToaster';
 import { useNavigate } from 'react-router-dom';
 
-
 const RegisterPage = () => {
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
-
-  const [formData, setFormData] = useState<{
-    username: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-  }>({
+  // Form state
+  const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
-  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
+
+  // UI state
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const [lastSubmittedValues, setLastSubmittedValues] = useState({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
-  const [loading, setLoading] = useState<boolean>(false);
-  const [otpSent, setOtpSent] = useState<boolean>(false);
-  const [passwordVisible,setPassvisible] = useState<boolean>(false)
+  const [loading, setLoading] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  
   const Toaster = useShowToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,6 +51,10 @@ const RegisterPage = () => {
     const errors: string[] = [];
     const validEmail = isValidateEmail(formData.email);
     const validPassword = isValidatePassword(formData.password);
+
+    if (!formData.username.trim()) {
+      errors.push('Username is required.');
+    }
 
     if (!formData.email) {
       errors.push('Email is required.');
@@ -79,6 +80,7 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Check if form has changed since last submission
     if (
       formData.email === lastSubmittedValues.email &&
       formData.password === lastSubmittedValues.password &&
@@ -104,7 +106,7 @@ const RegisterPage = () => {
     try {
       setLoading(true);
       const response = await createUser({
-        username:formData.username,
+        username: formData.username,
         email: formData.email,
         password: formData.password,
       });
@@ -116,10 +118,7 @@ const RegisterPage = () => {
       }
 
       setLastSubmittedValues({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        confirmPassword: formData.confirmPassword,
+        ...formData
       });
 
       const res = await otpGenerate(formData.email);
@@ -128,8 +127,7 @@ const RegisterPage = () => {
       if (res.message === 'OTP sent successfully') {
         toastr.success('OTP sent successfully');
         setOtpSent(true);
-        console.log(formData)
-        navigate('/otp',{state:{formData}})
+        navigate('/otp', { state: { formData } });
       } else {
         toastr.error('Failed to send OTP');
       }
@@ -143,6 +141,7 @@ const RegisterPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full mx-auto space-y-8 bg-white p-8 rounded-xl shadow-lg border border-emerald-100">
+        {/* Header */}
         <div className="text-center">
           <div className="flex justify-center items-center gap-2">
             <Wallet className="h-12 w-12 text-emerald-600" />
@@ -158,102 +157,91 @@ const RegisterPage = () => {
           </p>
         </div>
 
+        {/* Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {otpSent && <p className="text-green-500 text-center">OTP sent successfully!</p>}
+          {otpSent && (
+            <div className="flex items-center justify-center text-sm text-green-600 bg-green-50 p-2 rounded">
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              OTP sent successfully!
+            </div>
+          )}
+          
           <div className="space-y-4">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 text-left">
-                Username
-              </label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                required
-                value={formData.username}
-                onChange={handleChange}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              />
-            </div>
+            <FormInput
+              id="username"
+              name="username"
+              type="text"
+              label="Username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 text-left">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              />
-            </div>
+            <FormInput
+              id="email"
+              name="email"
+              type="email"
+              label="Email address"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 text-left">
-                Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <input
-                  id="password"
-                  name="password"
-                  type={passwordVisible ? "text" : "password"}
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                />
-                <div
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                  onClick={() => setPassvisible(!passwordVisible)}
-                >
-                  {passwordVisible ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </div>
-              </div>
-            </div>
+            <FormInput
+              id="password"
+              name="password"
+              type="password"
+              label="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              isPassword
+              passwordVisible={passwordVisible}
+              onPasswordVisibilityChange={() => setPasswordVisible(!passwordVisible)}
+            />
 
-            <div className="relative mt-4">
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 text-left">
-                Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type={passwordVisible ? "text" : "password"}
-                required
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              />
-            </div>
+            <FormInput
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              label="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              isPassword
+              passwordVisible={passwordVisible}
+              onPasswordVisibilityChange={() => setPasswordVisible(!passwordVisible)}
+            />
           </div>
 
-
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
+            disabled={loading}
+            className={`w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
+              ${loading 
+                ? 'bg-emerald-400 cursor-not-allowed' 
+                : 'bg-emerald-600 hover:bg-emerald-700'
+              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors`}
           >
             <CheckCircle2 className="h-4 w-4" />
-            Create Account
+            {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
 
+        {/* Divider */}
         <div className="flex items-center mt-4">
           <span className="flex-1 h-px bg-gray-300"></span>
           <span className="px-3 text-sm text-gray-600">or register with</span>
           <span className="flex-1 h-px bg-gray-300"></span>
         </div>
 
+        {/* Social Login */}
         <div className="flex justify-center mt-4">
-          <GoogleAuth/>
+          <GoogleAuth />
         </div>
 
+        {/* Login Link */}
         <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{' '}
           <a
