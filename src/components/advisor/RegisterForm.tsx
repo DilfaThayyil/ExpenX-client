@@ -1,27 +1,144 @@
 import React, { useState } from 'react';
-import { AlertCircle, Briefcase, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, Briefcase, CheckCircle2,Eye,EyeOff } from 'lucide-react';
+import toastr from 'toastr';
+// import '../../style/toastr-custom.css'
+import 'toastr/build/toastr.min.css';
+// import GoogleAuth from './GoogleAuth';
+import {
+  createUser,
+  otpGenerate
+} from '../../services/advisor/AuthServices'; 
+import {
+  isValidateEmail,
+  isValidatePassword,
+} from '../../../../api/src/utils/validator'
+  import useShowToast from '../../customHook/showToaster';
+import { useNavigate } from 'react-router-dom';
 
-const AdvisorRegisterPage = () => {
-  const [formData, setFormData] = useState({
-    name: '',
+
+
+const AdvisorRegister = () => {
+
+  const navigate = useNavigate()
+
+  const [formData, setFormData] = useState<{
+    username: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }>({
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
-    licenseNumber: ''
   });
-  const [error, setError] = useState('');
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
+  const [lastSubmittedValues, setLastSubmittedValues] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [otpSent, setOtpSent] = useState<boolean>(false);
+  const [passwordVisible,setPassvisible] = useState<boolean>(false)
+  const Toaster = useShowToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
+  };
+
+  const validateForm = () => {
+    const errors: string[] = [];
+    const validEmail = isValidateEmail(formData.email);
+    const validPassword = isValidatePassword(formData.password);
+
+    if (!formData.email) {
+      errors.push('Email is required.');
+    } else if (!validEmail) {
+      errors.push('Invalid email format or domain not allowed.');
+    }
+
+    if (!formData.password) {
+      errors.push('Password is required.');
+    } else if (!validPassword) {
+      errors.push(
+        'Password must be at least 6 characters long and contain one uppercase letter, one number, and one special character.'
+      );
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      errors.push('Passwords do not match.');
+    }
+
+    return errors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    // Handle registration logic here
+
+    if (
+      formData.email === lastSubmittedValues.email &&
+      formData.password === lastSubmittedValues.password &&
+      formData.confirmPassword === lastSubmittedValues.confirmPassword
+    ) {
+      if (formSubmitted) {
+        toastr.info('No changes detected. Please modify your input.');
+      } else {
+        toastr.info('Please make changes to submit the form.');
+      }
+      return;
+    }
+
+    setFormSubmitted(true);
+    const errors = validateForm();
+
+    if (errors.length > 0) {
+      errors.forEach((error) => Toaster(error, 'error', true));
+      setFormSubmitted(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await createUser({
+        username:formData.username,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (response === 'Email is already in use') {
+        toastr.error(response);
+        setLoading(false);
+        return;
+      }
+
+      setLastSubmittedValues({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+      });
+
+      const res = await otpGenerate(formData.email);
+      setLoading(false);
+
+      if (res.message === 'OTP sent successfully') {
+        toastr.success('OTP sent successfully');
+        setOtpSent(true);
+        console.log(formData)
+        navigate('/advisor/otp',{state:{formData}})
+      } else {
+        toastr.error('Failed to send OTP');
+      }
+    } catch (error) {
+      toastr.error('Registration failed');
+      console.error('Registration failed:', error);
+      setLoading(false);
+    }
   };
 
   return (
@@ -36,33 +153,25 @@ const AdvisorRegisterPage = () => {
             </h1>
           </div>
           <h2 className="mt-6 text-2xl font-semibold text-gray-900">
-            Register as a Financial Advisor
+            Register as Advisor
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Manage client expenses and provide professional insights
-          </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-50 p-4 rounded-md flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-red-500" />
-              <p className="text-sm text-red-500">{error}</p>
-            </div>
-          )}
+          {otpSent && <p className="text-indigo-500 text-center">OTP sent successfully!</p>}
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full Name
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 text-left">
+                Username
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <input
-                  id="name"
-                  name="name"
+                  id="username"
+                  name="username"
                   type="text"
                   required
-                  value={formData.name}
+                  value={formData.username}
                   onChange={handleChange}
                   className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 />
@@ -70,7 +179,7 @@ const AdvisorRegisterPage = () => {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 text-left">
                 Email address
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
@@ -86,49 +195,42 @@ const AdvisorRegisterPage = () => {
               </div>
             </div>
 
-            {/* <div>
-              <label htmlFor="licenseNumber" className="block text-sm font-medium text-gray-700">
-                License Number
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <input
-                  id="licenseNumber"
-                  name="licenseNumber"
-                  type="text"
-                  required
-                  value={formData.licenseNumber}
-                  onChange={handleChange}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-            </div> */}
-
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 text-left">
                 Password
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={passwordVisible?"text":"password"}
                   required
                   value={formData.password}
                   onChange={handleChange}
                   className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 />
+                <div
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                  onClick={() => setPassvisible(!passwordVisible)}
+                >
+                  {passwordVisible ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </div>
               </div>
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 text-left">
                 Confirm Password
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
-                  type="password"
+                  type={passwordVisible?"text":"password"}
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
@@ -144,7 +246,7 @@ const AdvisorRegisterPage = () => {
               className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
             >
               <CheckCircle2 className="h-4 w-4" />
-              Register as Advisor
+              Register
             </button>
           </div>
 
@@ -167,7 +269,7 @@ const AdvisorRegisterPage = () => {
                 src="/api/placeholder/20/20"
                 alt="Google logo"
               />
-              Register with Google
+              Signup with google
             </button>
           </div>
         </form>
@@ -178,14 +280,9 @@ const AdvisorRegisterPage = () => {
             Sign in
           </a>
         </div>
-
-        <div className="text-center text-xs text-gray-500">
-          <p>By registering, you agree to our Terms of Service and Privacy Policy</p>
-          <p className="mt-2">Secure registration • Bank-level encryption • ISO 27001 certified</p>
-        </div>
       </div>
     </div>
   );
 };
 
-export default AdvisorRegisterPage;
+export default AdvisorRegister;

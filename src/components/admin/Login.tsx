@@ -1,18 +1,49 @@
 import React, { useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  // const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
+    setIsLoading(true);
+
     if (!email || !password) {
       setErrorMessage('Please enter both email and password.');
+      setIsLoading(false);
       return;
     }
-    // Call your login API here
-    console.log('Login submitted');
+
+    // try {
+    //   const response = await fetch('/api/admin/login', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({ email, password }),
+    //   });
+
+    //   const data = await response.json();
+
+    //   if (!response.ok) {
+    //     throw new Error(data.message || 'Login failed');
+    //   }
+
+    //   // Store token in localStorage
+    //   localStorage.setItem('adminToken', data.token);
+      
+    //   // Redirect to admin dashboard
+    //   navigate('/admin/dashboard');
+    // } catch (error) {
+    //   setErrorMessage(error instanceof Error ? error.message : 'Login failed');
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   return (
@@ -26,7 +57,7 @@ const AdminLogin = () => {
         )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 text-left">
               Email Address
             </label>
             <input
@@ -36,11 +67,12 @@ const AdminLogin = () => {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full mt-2 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full mt-2 p-3 border border-gray-300 rounded-md shadow-sm"
+              disabled={isLoading}
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 text-left">
               Password
             </label>
             <input
@@ -50,28 +82,18 @@ const AdminLogin = () => {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full mt-2 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full mt-2 p-3 border border-gray-300 rounded-md shadow-sm"
+              disabled={isLoading}
             />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input type="checkbox" id="rememberMe" className="h-4 w-4 text-blue-600" />
-              <label htmlFor="rememberMe" className="ml-2 text-sm text-gray-700">Remember me</label>
-            </div>
-            <a href="#" className="text-sm text-blue-600 hover:underline">
-              Forgot password?
-            </a>
           </div>
           <button
             type="submit"
-            className="w-full py-3 mt-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full py-3 mt-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-400"
+            disabled={isLoading}
           >
-            Log in
+            {isLoading ? 'Logging in...' : 'Log in'}
           </button>
         </form>
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Don't have an account? <a href="#" className="text-blue-600 hover:underline">Sign up</a>
-        </p>
       </div>
     </div>
   );

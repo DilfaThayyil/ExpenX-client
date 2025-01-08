@@ -7,13 +7,14 @@ import LoginPage from './components/user/LoginForm'
 import ForgetPassword from './components/user/ForgotPassword'
 import ResetPassword from './components/user/ResetPassword'
 import { GoogleOAuthProvider } from '@react-oauth/google'
-// import LandingPage from './pages/user/LandingPage'
-// import FinancialAdvisorLoginPage from './components/advisor/LoginForm'
-// import AdvisorRegisterPage from './components/advisor/RegisterForm'
-// import LandingPage from './pages/advisor/LandingPage'
+import AdvisorLogin from './components/advisor/LoginForm'
+import AdvisorRegister from './components/advisor/RegisterForm'
+import AdvisorLanding from './pages/advisor/LandingPage'
 // import AdminLogin from './components/admin/Login'
 // import AdminRegister from './components/admin/Register'
-// import OTPVerification from './components/user/Otp'
+import OTPVerificationad from './components/advisor/Otp'
+import AdminLogin from './components/admin/Login'
+import AdminDashboard from './pages/admin/LandingPage'
 const GOOGLECLIENTID = import.meta.env.VITE_GOOGLECLIENTID
 
 
@@ -29,6 +30,15 @@ const App = ()=>{
         throw new Error('Function not implemented.')
       } }/>} />
       <Route path='/resetPassword' element={<ResetPassword/>} />
+      <Route path='/advisor/register' element={<AdvisorRegister/>} />
+      <Route path='/advisor/login' element={<AdvisorLogin/>} />
+      <Route path='/advisor' element={<AdvisorLanding/>} />
+      <Route path='/advisor/otp' element={<OTPVerificationad/>} />
+      <Route path='/advisor/resetPassword' element={<ResetPassword/>} />
+
+      <Route path='/admin/login' element={<AdminLogin/>} />      
+      <Route path='/admin' element={<AdminDashboard/>} />      
+      
       </Routes>
     </GoogleOAuthProvider>
   );
