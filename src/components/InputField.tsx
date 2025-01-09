@@ -39,7 +39,7 @@ const FormInput = ({
           required={required}
           value={value}
           onChange={onChange}
-          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
         />
         {isPassword && onPasswordVisibilityChange && (
           <div
