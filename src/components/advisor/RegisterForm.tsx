@@ -3,7 +3,7 @@ import { AlertCircle, Briefcase, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
-import FormInput from '../InputField2';
+import FormInput from '../InputField';
 import GoogleAuth from '../user/GoogleAuth';
 import {
   createUser,
@@ -181,54 +181,52 @@ const AdvisorRegister: React.FC = () => {
           <div className="space-y-4">
             <FormInput
               label="Username"
+              name='username'
               id="username"
               type="text"
               value={formData.username}
               onChange={handleChange}
               required
-              error={formErrors.username}
-              placeholder="Enter your username"
             />
 
             <FormInput
               label="Email address"
+              name='email'
               id="email"
               type="email"
               value={formData.email}
               onChange={handleChange}
               required
-              error={formErrors.email}
-              placeholder="example@email.com"
             />
 
             <FormInput
-              label="Password"
+              label="password"
+              name='password'
               id="password"
+              type='password'
               isPassword
               value={formData.password}
               onChange={handleChange}
               required
-              showPassword={passwordVisible}
-              onTogglePassword={() => setPasswordVisible(!passwordVisible)}
-              error={formErrors.password}
-              placeholder="Enter your password"
+              passwordVisible={passwordVisible}
+              onPasswordVisibilityChange={()=>setPasswordVisible}
             />
 
-            <FormInput
+            <FormInput     
               label="Confirm Password"
               id="confirmPassword"
+              name='confirmPassword'
+              type='password'
               isPassword
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              showPassword={passwordVisible}
-              onTogglePassword={() => setPasswordVisible(!passwordVisible)}
-              error={formErrors.confirmPassword}
-              placeholder="Confirm your password"
+              passwordVisible={passwordVisible}
+              onPasswordVisibilityChange={()=>setPasswordVisible}
             />
           </div>
 
-          <button
+          <button 
             type="submit"
             disabled={loading}
             className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
