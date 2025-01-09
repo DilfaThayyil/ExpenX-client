@@ -2,7 +2,7 @@ import React, { useState, FormEvent } from 'react';
 import { AlertCircle, Briefcase, PieChart } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import FormInput from '../InputField2';
+import FormInput from '../InputField';
 import GoogleAuth from '../user/GoogleAuth';
 import ForgetPassword from '../user/ForgotPassword';
 import { userLogin } from '../../services/advisor/AuthServices';
@@ -86,25 +86,25 @@ const FinancialAdvisorLoginPage: React.FC = () => {
             <FormInput
               label="Your email address"
               id="email"
+              name='email'
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              error={formErrors.email}
-              placeholder="example@email.com"
+
             />
 
             <FormInput
               label="Password"
               id="password"
+              name='password'
+              type='password'
               isPassword
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              showPassword={passwordVisible}
-              onTogglePassword={() => setPasswordVisible(!passwordVisible)}
-              error={formErrors.password}
-              placeholder="Enter your password"
+              passwordVisible={passwordVisible}
+              onPasswordVisibilityChange={()=>setPasswordVisible}
             />
           </div>
 
