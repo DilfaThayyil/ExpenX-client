@@ -5,7 +5,7 @@ import 'toastr/build/toastr.min.css';
 import GoogleAuth from './GoogleAuth';
 import FormInput from '../InputField';
 import {
-  createUser,
+  createUser, 
   otpGenerate
 } from '../../services/user/AuthServices'; 
 import {
