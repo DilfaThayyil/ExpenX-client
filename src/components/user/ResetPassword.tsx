@@ -3,6 +3,7 @@ import { Eye,EyeOff } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { resetPassword } from '../../services/user/AuthServices';
 import toastr from 'toastr';
+import { isValidateEmail, isValidatePassword } from '../../utility/validator';
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -13,11 +14,34 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [passwordVisible,setPasswordVisible] = useState(false)
 
+  const validateForm = () => {
+    const errors: string[] = [];
+    const validEmail = isValidateEmail(email);
+    const validPassword = isValidatePassword(password);
+
+    if (!validEmail) {
+      errors.push("Invalid email format or domain not allowed.");
+    }
+
+    if (!validPassword) {
+      errors.push(
+        "Password must be at least 8 characters long and contain one uppercase letter, one number, and one special character."
+      );
+    }
+
+    return errors;
+  } 
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (password !== confirmPassword) {
       toastr.error('Passwords do not match');
+      return;
+    }
+    const errors = validateForm();
+    if (errors.length > 0) {
+      errors.forEach((error) => toastr.error(error));
       return;
     }
 

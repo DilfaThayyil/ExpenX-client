@@ -135,7 +135,7 @@ const FinancialAdvisorLoginPage: React.FC = () => {
             </div>
 
             <div className="flex justify-center mt-4">
-              <GoogleAuth />
+              <GoogleAuth role={'advisor'}/>
             </div>
           </div>
         </form>

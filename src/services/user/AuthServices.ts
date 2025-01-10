@@ -15,14 +15,15 @@ interface ErrorResponse {
 }
 
 export const createUser = async (userData: IcreateUser) => {
-  console.log(userData);
+  console.log("userData in AuthService : ",userData);
 
   try {
-    const response = await axiosInstance.post(`${BASEURL}/register`, userData);
+    const response = await axiosInstance.post(`${BASEURL}/register`, userData)
+    console.log("response in createUser: ",response.data)
     return response.data;
   } catch (err) {
     const axiosError = err as AxiosError;
-
+  
     if (axiosError.response) {
       const errorData = axiosError.response.data as ErrorResponse;
 
@@ -42,7 +43,7 @@ export const otpGenerate = async (email: string) => {
     const response = await axiosInstance.post(`${BASEURL}/generateOtp`, {
       email,
     });
-    console.log("In Authservices :",response.data.message)
+    console.log("otpGenerate response :",response.data.message)
     return response.data;
   } catch (err) {
     console.log(err);
@@ -51,6 +52,7 @@ export const otpGenerate = async (email: string) => {
 
 export const verifyOtp = async (email: string, otp: string) => {
   try {
+    console.log('Heyy from verifyOtp')
     const response = await axiosInstance.post(`${BASEURL}/verifyOtp`, {
       email,
       otp,
@@ -72,11 +74,11 @@ export const verifyOtp = async (email: string, otp: string) => {
 
 export const resendOtp = async (email: string) => {
   try {
-    console.log(email);
-
+    console.log("email for resendOtp : ",email);
     const response = await axiosInstance.post(`${BASEURL}/resendOtp`, {
       email,
     });
+    console.log("resendotp response : ",response.data.message)
     return response.data;
   } catch (err) {
     return err;
@@ -94,6 +96,8 @@ export const userLogin = async (email: string, password: string) => {
       localStorage.setItem("userAccessToken", accessToken);
       localStorage.setItem("userRefreshToken", refreshToken);
     }
+    console.log(response.data)
+    console.log(response.data.message)
     return response.data;
   } catch (err) {
     console.log(err);
@@ -145,14 +149,14 @@ export const resetPassword = async (email: string, password: string) => {
   }
 };
 
-export const googleAuth = async (userCredential:JwtPayload) => {
+export const  googleAuth = async (userCredential:JwtPayload) => {
   try {
     console.log(userCredential,"123456")    
     const response = await axiosInstance.post(`${BASEURL}/googleAuth`,{
       userCredential:userCredential
     },{
       withCredentials:true
-    });
+    })
     return response.data
   } catch (err) {
     console.log(err);

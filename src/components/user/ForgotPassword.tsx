@@ -5,6 +5,7 @@ import { isValidateEmail } from '../../utility/validator';
 import Loading from '../../style/loading';
 // import Otp from '../user/Otp';
 import { useNavigate } from 'react-router-dom';
+import OTPVerification from './Otp';
 
 
 interface ForgetPasswordProps {
@@ -16,7 +17,7 @@ const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal }) => {
   const navigate = useNavigate()
   const [email, setEmail] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  // const [showOtp, setShowOtp] = useState<boolean>(false);
+  const [showOtp, setShowOtp] = useState<boolean>(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,7 +34,7 @@ const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal }) => {
      setLoading(false);
      if(response.message){
       toastr.success(response.message)
-      navigate('/otp',{state:{email, purpose:'forgotPassword'}})
+      setShowOtp(true)
      }else{
       toastr.error(response.error)
      }
@@ -43,6 +44,7 @@ const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal }) => {
       console.log(err);
     }
   }
+
 
   return (
     <div
@@ -117,11 +119,11 @@ const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal }) => {
             <Loading />
           </div>
         )}
-        {/* {showOtp&& (
+        {showOtp&& (
             <div className="fixed inset-0 flex items-center justify-center bg-white ">
-            <Otp/>
+            <OTPVerification email={email} purpose='forgotPassword'/>
           </div>
-        )} */}
+        )}
     </div>
   );
 };

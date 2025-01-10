@@ -1,18 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Wallet, Shield } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { verifyOtp, createUser, handleforgetpasswordOtp } from '../../services/user/AuthServices';
+import { verifyOtp, createUser, resendOtp,handleforgetpasswordOtp } from '../../services/user/AuthServices';
 import toastr from 'toastr';
 
+interface otpProps{
+  email:string
+  purpose:string
+}
 
-const OTPVerification = () => {
-  const location = useLocation()
-  const formData = location.state?.formData
-  const email = location.state?.email || ''
-  const purpose = location.state?.purpose || ''
+
+const OTPVerification:React.FC<otpProps> = ({email,purpose}) => {
+  // const location = useLocation()
+  // const formData = location.state?.formData
+  // const email = location.state?.email || ''
+  // const purpose = location.state?.purpose || ''
   const navigate = useNavigate()
   const [otp, setOtp] = useState(['', '', '', '']);
-  const [timeLeft, setTimeLeft] = useState(300);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [isResending, setIsResending] = useState(false);
   const [loading, setLoading] = useState(false);  
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
@@ -46,9 +51,10 @@ const OTPVerification = () => {
   const handleResend = async () => {
     setIsResending(true);
     try {
-      // const emailToSend = formData.email || email;
-      // await resendOtp(emailToSend)
-      toastr.success('OTP resent successfully!');
+      console.log("calling resendOtp...")
+      const res = await resendOtp(email)
+      console.log("response from resendOtp : ",res)
+      toastr.success(res.message);
       setTimeLeft(60);
       setTimeout(() => setIsResending(false), 1000); 
     } catch (error) {
@@ -67,18 +73,12 @@ const OTPVerification = () => {
 
     try {
       const enteredOtp = otp.join('');
-      // console.log("typeof enteredOtp : ",typeof enteredOtp)
-      // console.log("typeof formEmail : ",typeof formData.email)
-      // console.log(" formEmail : ", formData.email , enteredOtp)
-      console.log("forgotPassword email : ", email)
-      console.log("forgotPassword purpose : ",purpose)
+      console.log("email & otp : ",email , enteredOtp)
       const res = purpose==='forgotPassword'
         ? await handleforgetpasswordOtp(email,enteredOtp)
-        : await verifyOtp(formData.email,enteredOtp);
-
-        if(res.success){
+        : await verifyOtp(email,enteredOtp);
+        if(res){
           if(purpose==='forgotPassword' && res?.message==='OTP verified successfully'){
-            console.log("Response from OTP verification: ", res);
             toastr.success('OTP verified successfully')
             navigate('/resetPassword',{state:{email}})
           }
@@ -86,7 +86,8 @@ const OTPVerification = () => {
             toastr.success('User registered successfully');
             navigate('/login');
           }
-        } else {
+        } 
+        else {
           toastr.error(res.message || 'OTP verification failed');
         }
     } catch (error:any) {

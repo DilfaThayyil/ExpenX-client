@@ -74,7 +74,7 @@ const LoginPage = () => {
     try {
       const response = await userLogin(formData.email, formData.password);
       if (response.message) {
-        console.log(response.userObject);
+        console.log("response-msg in loginForm : ",response.message)
         toastr.success(response.message);
         setTimeout(() => navigate("/"), 1000);
       } else if (response.error) {
@@ -177,7 +177,7 @@ const LoginPage = () => {
 
             {/* Social Login */}
             <div className="flex justify-center mt-4">
-              <GoogleAuth />
+              <GoogleAuth role={'user'}/>
             </div>
           </div>
         </form>

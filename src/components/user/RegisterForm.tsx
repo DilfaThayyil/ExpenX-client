@@ -13,20 +13,24 @@ import {
   isValidatePassword,
 } from '../../../../api/src/utils/validator';
 import useShowToast from '../../customHook/showToaster';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
+import OTPVerification from './Otp';
 
 const RegisterPage = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    username:string
+    email:string
+    password:string
+    confirmPassword:string
+  }>({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
 
-  // UI state
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [lastSubmittedValues, setLastSubmittedValues] = useState({
     username: '',
@@ -80,7 +84,8 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Check if form has changed since last submission
+    console.log('form submitted with data: ',formData)
+
     if (
       formData.email === lastSubmittedValues.email &&
       formData.password === lastSubmittedValues.password &&
@@ -105,11 +110,13 @@ const RegisterPage = () => {
 
     try {
       setLoading(true);
+      console.log('calling createuser...')
       const response = await createUser({
         username: formData.username,
         email: formData.email,
         password: formData.password,
       });
+      console.log('createuser response : ',response)
 
       if (response === 'Email is already in use') {
         toastr.error(response);
@@ -121,13 +128,16 @@ const RegisterPage = () => {
         ...formData
       });
 
+      console.log('calling otpGenerate...')
+
       const res = await otpGenerate(formData.email);
+      console.log('otpgenerate response : ',res)
       setLoading(false);
 
       if (res.message === 'OTP sent successfully') {
         toastr.success('OTP sent successfully');
         setOtpSent(true);
-        navigate('/otp', { state: { formData } });
+        // navigate('/otp', { state: { formData } });
       } else {
         toastr.error('Failed to send OTP');
       }
@@ -137,6 +147,10 @@ const RegisterPage = () => {
       setLoading(false);
     }
   };
+
+  if(otpSent){
+    return <OTPVerification email={formData.email} purpose='register'/>
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -238,7 +252,7 @@ const RegisterPage = () => {
 
         {/* Social Login */}
         <div className="flex justify-center mt-4">
-          <GoogleAuth />
+          <GoogleAuth role={'user'}/>
         </div>
 
         {/* Login Link */}
