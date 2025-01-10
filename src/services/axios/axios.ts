@@ -1,5 +1,5 @@
 import axios from "axios";
-// import Swal from "sweetalert2";
+import Swal from "sweetalert2";
 import { BACKENDENDPOINT } from "../../utility/env";
 const axiosInstance = axios.create({
   baseURL: BACKENDENDPOINT,
@@ -26,16 +26,16 @@ axiosInstance.interceptors.response.use(
       } else if (error.response.status === 403) {
         localStorage.clear();
         console.log('you have been blocked!')
-        // Swal.fire({
-        //   icon: "error",
-        //   title: "Access Denied",
-        //   text: "You have been blocked. Please contact support.",
-        //   timer: 6000,
-        //   timerProgressBar: true,
-        //   willClose: () => {
-        //     window.location.href = "/";
-        //   },
-        // });
+        Swal.fire({
+          icon: "error",
+          title: "Access Denied",
+          text: "You have been blocked. Please contact support.",
+          timer: 6000,
+          timerProgressBar: true,
+          willClose: () => {
+            window.location.href = "/";
+          },
+        });
         return Promise.reject(error);
       }
     }
