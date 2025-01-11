@@ -11,7 +11,7 @@ import {
 import {
   isValidateEmail,
   isValidatePassword,
-} from '../../../../api/src/utils/validator';
+} from '../../utility/validator';
 import useShowToast from '../../customHook/showToaster';
 // import { useNavigate } from 'react-router-dom';
 import OTPVerification from './Otp';

@@ -12,7 +12,7 @@ import {
 import {
   isValidateEmail,
   isValidatePassword,
-} from '../../../../api/src/utils/validator';
+} from '../../utility/validator';
 import useShowToast from '../../customHook/showToaster';
 
 interface FormData {
@@ -57,48 +57,38 @@ const AdvisorRegister: React.FC = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    // Clear error when user starts typing
-    if (formErrors[e.target.name as keyof FormErrors]) {
-      setFormErrors({
-        ...formErrors,
-        [e.target.name]: undefined,
-      });
-    }
   };
 
-  const validateForm = (): boolean => {
-    const errors: FormErrors = {};
-    let isValid = true;
+  const validateForm = () => {
+    const errors: string[] = [];
+    const validEmail = isValidateEmail(formData.email);
+    const validPassword = isValidatePassword(formData.password);
 
     if (!formData.username.trim()) {
-      errors.username = 'Username is required';
-      isValid = false;
+      errors.push('Username is required.');
     }
 
     if (!formData.email) {
-      errors.email = 'Email is required';
-      isValid = false;
-    } else if (!isValidateEmail(formData.email)) {
-      errors.email = 'Invalid email format or domain not allowed';
-      isValid = false;
+      errors.push('Email is required.');
+    } else if (!validEmail) {
+      errors.push('Invalid email format or domain not allowed.');
     }
 
     if (!formData.password) {
-      errors.password = 'Password is required';
-      isValid = false;
-    } else if (!isValidatePassword(formData.password)) {
-      errors.password = 'Password must be at least 6 characters long with one uppercase, one number, and one special character';
-      isValid = false;
+      errors.push('Password is required.');
+    } else if (!validPassword) {
+      errors.push(
+        'Password must be at least 6 characters long and contain one uppercase letter, one number, and one special character.'
+      );
     }
 
     if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
-      isValid = false;
+      errors.push('Passwords do not match.');
     }
 
-    setFormErrors(errors);
-    return isValid;
+    return errors;
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,8 +107,11 @@ const AdvisorRegister: React.FC = () => {
     }
 
     setFormSubmitted(true);
+    const errors = validateForm()
     
-    if (!validateForm()) {
+    if (errors.length > 0) {
+      errors.forEach((error) => Toaster(error, 'error', true));
+      setFormSubmitted(false);
       return;
     }
 
