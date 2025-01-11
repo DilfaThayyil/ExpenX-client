@@ -25,7 +25,7 @@ const App = ()=>{
         <Route path='/' element={<LandingPage/>}/>
         <Route path='/login' element={<LoginPage/>}/>
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/otp" element={<OTPVerification/>} />
+        <Route path="/otp" element={<OTPVerification email={''} purpose={''}/>} />
         <Route path='/forgetPassword' element={<ForgetPassword toggleModal={function (): void {
         throw new Error('Function not implemented.')
       } }/>} />
