@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { AlertCircle, Briefcase, CheckCircle2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Briefcase, CheckCircle2 } from 'lucide-react';
+// import { useNavigate } from 'react-router-dom';
 import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
 import FormInput from '../InputField';
@@ -14,6 +14,7 @@ import {
   isValidatePassword,
 } from '../../utility/validator';
 import useShowToast from '../../customHook/showToaster';
+import OTPVerification from './Otp';
 
 interface FormData {
   username: string;
@@ -22,15 +23,10 @@ interface FormData {
   confirmPassword: string;
 }
 
-interface FormErrors {
-  username?: string;
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-}
+
 
 const AdvisorRegister: React.FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const Toaster = useShowToast();
 
   const [formData, setFormData] = useState<FormData>({
@@ -40,7 +36,6 @@ const AdvisorRegister: React.FC = () => {
     confirmPassword: '',
   });
 
-  const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [lastSubmittedValues, setLastSubmittedValues] = useState<FormData>({
     username: '',
@@ -137,7 +132,7 @@ const AdvisorRegister: React.FC = () => {
       if (res.message === 'OTP sent successfully') {
         toastr.success('OTP sent successfully');
         setOtpSent(true);
-        navigate('/advisor/otp', { state: { formData } });
+        // navigate('/advisor/otp', { state: { formData } });
       } else {
         toastr.error('Failed to send OTP');
       }
@@ -147,6 +142,10 @@ const AdvisorRegister: React.FC = () => {
       setLoading(false);
     }
   };
+
+  if(otpSent){
+    return <OTPVerification email={formData.email} purpose='register' role='advisor'/>
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">

@@ -51,22 +51,15 @@ export const otpGenerate = async (email: string) => {
 
 export const verifyOtp = async (email: string, otp: string) => {
   try {
+    console.log('email & otp in verifyOtp authService...',email,otp)
     const response = await axiosInstance.post(`${BASEURL}/verifyOtp`, {
       email,
       otp,
     });
     console.log("In advisorAuthservices-verifyOtp fn :", response.data)
-    return response.data;
-  } catch (err) {
-    const axiosError = err as AxiosError;
-    if (axiosError.response) {
-      const errorData = axiosError.response.data as ErrorResponse;
-      console.error('Error verifying OTP:', errorData.error);
-      throw errorData.error;
-    } else {
-      console.error('Error verifying OTP:', axiosError.message);
-      throw axiosError.message;
-    }
+    return {success:true, message:response.data.message}
+  } catch (err:any) {
+    throw err
   }
 };
 
@@ -122,18 +115,14 @@ export const handleforgetpasswordOtp = async (email: string, otp: string) => {
       `${BASEURL}/forgetPassOtp`,
       { email, otp }
     );
+    console.log("response in forgtPassOtp : ",response)
     return { success: true, message: response.data.message }
-  } catch (err) {
-    const axiosError = err as AxiosError;
-    if (axiosError.response) {
-      const errorData = axiosError.response.data as ErrorResponse;
-      return { success: false, message: errorData.error || 'Failed to verify OTP' };
-    }
-    return { success: false, message: 'An unexpected error occurred' };
+  } catch (err:any) {
+    throw err
   }
 };
 
-export const resetPassword = async (email: string, password: string) => {
+export const resetPasswordAdv = async (email: string, password: string) => {
   try {
     const response = await axiosInstance.post(`${BASEURL}/resetPassword`, {
       email,

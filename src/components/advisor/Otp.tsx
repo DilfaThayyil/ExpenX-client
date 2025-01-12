@@ -1,18 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Wallet, Shield } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { verifyOtp, createUser, handleforgetpasswordOtp } from '../../services/advisor/AuthServices';
+import { verifyOtp, createUser, handleforgetpasswordOtp, resendOtp } from '../../services/advisor/AuthServices';
 import toastr from 'toastr';
 
+interface otpProps{
+  email:string
+  purpose:string
+  role:'user'|'advisor'
+}
 
-const OTPVerification = () => {
-  const location = useLocation()
-  const formData = location.state?.formData
-  const email = location.state?.email || ''
-  const purpose = location.state?.purpose || ''
+const OTPVerification:React.FC<otpProps> = ({email,purpose,role}) => {
+  // const location = useLocation()
+  // const formData = location.state?.formData
+  // const email = location.state?.email || ''
+  // const purpose = location.state?.purpose || ''
   const navigate = useNavigate()
   const [otp, setOtp] = useState(['', '', '', '']);
-  const [timeLeft, setTimeLeft] = useState(300);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [isResending, setIsResending] = useState(false);
   const [loading, setLoading] = useState(false);  
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
@@ -46,9 +51,10 @@ const OTPVerification = () => {
   const handleResend = async () => {
     setIsResending(true);
     try {
-      // const emailToSend = formData.email || email;
-      // await resendOtp(emailToSend)
-      toastr.success('OTP resent successfully!');
+      console.log("calling resendOtp...")
+      const res = await resendOtp(email)
+      console.log("response from resendOtp : ",res)
+      toastr.success(res.message);
       setTimeLeft(60);
       setTimeout(() => setIsResending(false), 1000); 
     } catch (error) {
@@ -67,31 +73,36 @@ const OTPVerification = () => {
 
     try {
       const enteredOtp = otp.join('');
-      console.log("typeof enteredOtp : ",typeof enteredOtp)
-      console.log("typeof formEmail : ",typeof formData.email)
-      console.log(" formEmail : ", formData.email , enteredOtp)
       console.log("forgotPassword email : ", email)
       console.log("forgotPassword purpose : ",purpose)
+      console.log("email & otp : ",email,enteredOtp)
       const res = purpose==='forgotPassword'
         ? await handleforgetpasswordOtp(email,enteredOtp)
-        : await verifyOtp(formData.email,enteredOtp);
-console.log(res)
- if(res?.message === 'User registered successfully') {
-    toastr.success('User registered successfully');
-    console.log('dilu molllll')
-    navigate('/advisor/login');
-  }
-        if(res.success){
+        : await verifyOtp(email,enteredOtp)
+        console.log("response : ", res)
+        if(res){
           if(purpose==='forgotPassword' && res?.message==='OTP verified successfully'){
-            console.log("Response from OTP verification: ", res);
             toastr.success('OTP verified successfully')
-            navigate('/resetPassword',{state:{email}})
+            navigate('/resetPassword',{state:{email,role}})
           }
-          
+          else if(res?.message === 'User registered successfully') {
+              toastr.success('User registered successfully');
+              navigate('/advisor/login');
+          }
         }
-    } catch (error:any) {
-      toastr.error(error.response?.data?.message || 'Failed to verify OTP or create user');
-      console.error('Error verifying otp :', error);
+    } catch (error: any) {
+      // Check for specific error messages
+      if (error.response?.status === 404) {
+        toastr.error('No OTP record found for this email.');
+      } else if (error.response?.status === 400) {
+        toastr.error('The OTP you entered is incorrect.');
+      } else if (error.response?.status === 410) {
+        toastr.error('The OTP has expired. Please request a new one.');
+      } else {
+        // Generic fallback error
+        toastr.error(error.response?.data?.message || 'Failed to verify OTP');
+      }
+      console.error('Error verifying OTP:', error);
     } finally {
       setLoading(false);
     }
@@ -154,7 +165,7 @@ console.log(res)
             <button
               onClick={handleResend}
               disabled={timeLeft > 0 || isResending}
-              className="text-emerald-600 hover:text-emerald-500 font-medium disabled:text-gray-400 disabled:cursor-not-allowed"
+              className="text-indigo-600 hover:text-indigo-500 font-medium disabled:text-gray-400 disabled:cursor-not-allowed"
             >
               {isResending ? 'Sending...' : "I didn't receive the code? Send again"}
             </button>
@@ -166,7 +177,7 @@ console.log(res)
           <button
             onClick={handleOtpSubmit}
             disabled={otp.some(digit => !digit) || loading}
-            className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             <Shield className="h-4 w-4" />
             {loading ? 'Verifying...' : 'Verify'}

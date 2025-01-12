@@ -2,58 +2,69 @@ import React, { useState, FormEvent } from 'react';
 import { AlertCircle, Briefcase, PieChart } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import toastr from 'toastr'
+import "react-toastify/dist/ReactToastify.css";
 import FormInput from '../InputField';
 import GoogleAuth from '../user/GoogleAuth';
-import ForgetPassword from '../user/ForgotPassword';
+import ForgetPassword from '../advisor/ForgotPassword';
 import { userLogin } from '../../services/advisor/AuthServices';
 import { isValidateEmail, isValidatePassword } from '../../utility/validator';
 
-interface FormErrors {
-  email?: string;
-  password?: string;
-}
 
-const FinancialAdvisorLoginPage: React.FC = () => {
+const AdvisorLogin: React.FC = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
-  const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [formSubmitted,setFormSubmitted] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const validateForm = (): boolean => {
-    const errors: FormErrors = {};
-    let isValid = true;
+ const handleChange = (e:React.ChangeEvent<HTMLInputElement>)=>{
+  setFormData({
+    ...formData,
+    [e.target.name] : e.target.value
+  })
+ }
 
-    if (!email) {
-      errors.email = 'Email is required';
-      isValid = false;
-    } else if (!isValidateEmail(email)) {
-      errors.email = 'Invalid email format';
-      isValid = false;
-    }
 
-    if (!password) {
-      errors.password = 'Password is required';
-      isValid = false;
-    } else if (!isValidatePassword(password)) {
-      errors.password = 'Password must be at least 8 characters with one uppercase, one number, and one special character';
-      isValid = false;
-    }
+ const validateForm = () => {
+  const errors: string[] = [];
+  const validEmail = isValidateEmail(formData.email);
+  const validPassword = isValidatePassword(formData.password);
 
-    setFormErrors(errors);
-    return isValid;
-  };
+  if (!formData.email) {
+    errors.push("Email is required.");
+  } else if (!validEmail) {
+    errors.push("Invalid email format or domain not allowed.");
+  }
 
-  const handleSubmit = async (e: FormEvent) => {
+  if (!formData.password) {
+    errors.push("Password is required.");
+  } else if (!validPassword) {
+    errors.push(
+      "Password must be at least 8 characters long and contain one uppercase letter, one number, and one special character."
+    );
+  }
+
+  return errors;
+};
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    setFormSubmitted(true);
+    
+    const errors = validateForm();
+    if (errors.length > 0) {
+      errors.forEach((error) => toastr.error(error));
+      setFormSubmitted(false);
       return;
     }
 
     try {
-      const response = await userLogin(email, password);
+      const response = await userLogin(formData.email, formData.password);
       if (response.message) {
         toast.success(response.message);
         setTimeout(() => navigate("/advisor"), 1000);
@@ -65,6 +76,10 @@ const FinancialAdvisorLoginPage: React.FC = () => {
       console.error("Login failed:", error);
     }
   };
+
+  const toggleModal = ()=>{
+    setIsModalOpen((prev)=>!prev)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -88,8 +103,8 @@ const FinancialAdvisorLoginPage: React.FC = () => {
               id="email"
               name='email'
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={handleChange}
               required
 
             />
@@ -100,8 +115,8 @@ const FinancialAdvisorLoginPage: React.FC = () => {
               name='password'
               type='password'
               isPassword
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={handleChange}
               required
               passwordVisible={passwordVisible}
               onPasswordVisibilityChange={()=>setPasswordVisible}
@@ -110,9 +125,13 @@ const FinancialAdvisorLoginPage: React.FC = () => {
 
           <div className="flex items-center justify-between">
             <div className="text-sm">
-              <a href="/advisor/forgot-password" className="font-medium text-indigo-600 hover:text-indigo-500">
+            <button 
+                type="button"
+                onClick={toggleModal} 
+                className="font-medium text-emerald-600 hover:text-emerald-500"
+              >
                 Forgot your password?
-              </a>
+              </button>
             </div>
           </div>
 
@@ -148,9 +167,9 @@ const FinancialAdvisorLoginPage: React.FC = () => {
           </a>
         </div>
       </div>
-      {isModalOpen && <ForgetPassword toggleModal={() => setIsModalOpen(false)} />}
+      {isModalOpen && <ForgetPassword toggleModal={toggleModal} />}
     </div>
   );
 };
 
-export default FinancialAdvisorLoginPage;
+export default AdvisorLogin;
