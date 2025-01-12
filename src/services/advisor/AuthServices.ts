@@ -134,7 +134,7 @@ export const resetPasswordAdv = async (email: string, password: string) => {
   }
 };
 
-export const googleAuth = async (userCredential:JwtPayload) => {
+export const advisorGoogleAuth = async (userCredential:JwtPayload) => {
   try {
     console.log(userCredential,"123456")    
     const response = await axiosInstance.post(`${BASEURL}/googleAuth`,{
