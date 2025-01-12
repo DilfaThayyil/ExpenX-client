@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, Wallet, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { Wallet, CheckCircle2} from 'lucide-react';
 import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
 import GoogleAuth from './GoogleAuth';
@@ -16,9 +16,10 @@ import useShowToast from '../../customHook/showToaster';
 // import { useNavigate } from 'react-router-dom';
 import OTPVerification from './Otp';
 
+
+
 const RegisterPage = () => {
   // const navigate = useNavigate();
-
   const [formData, setFormData] = useState<{
     username:string
     email:string
@@ -149,7 +150,7 @@ const RegisterPage = () => {
   };
 
   if(otpSent){
-    return <OTPVerification email={formData.email} purpose='register'/>
+    return <OTPVerification email={formData.email} purpose='register' role='user'/>
   }
 
   return (

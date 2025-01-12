@@ -12,7 +12,7 @@ interface ForgetPasswordProps {
   toggleModal: () => void;
 }
 
-const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal }) => {
+const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal}) => {
 
   const navigate = useNavigate()
   const [email, setEmail] = useState<string>('');
@@ -21,13 +21,9 @@ const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if(email.trim()==''){
-      return toastr.error('Email is Required')
-    }
-    const emailvalidation=isValidateEmail(email)
-    if(!emailvalidation){
-      return toastr.error('Please Enter valid email')
-    }
+    if (!isValidateEmail(email.trim())) {
+      return toastr.error('Please enter a valid email address.');
+    }    
     setLoading(true);
     try {
      const response= await handleforgetpassword(email);
@@ -38,11 +34,13 @@ const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal }) => {
      }else{
       toastr.error(response.error)
      }
-    } catch (err) {
+    } catch (err: any) {
       setLoading(false);
-      toastr.error('An error occurred');
-      console.log(err);
+      const errorMessage = err.response?.data?.message || 'An error occurred';
+      toastr.error(errorMessage);
+      console.error('Error during password reset:', err);
     }
+    
   }
 
 
@@ -121,7 +119,7 @@ const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal }) => {
         )}
         {showOtp&& (
             <div className="fixed inset-0 flex items-center justify-center bg-white ">
-            <OTPVerification email={email} purpose='forgotPassword'/>
+            <OTPVerification email={email} purpose='forgotPassword' role='user'/>
           </div>
         )}
     </div>

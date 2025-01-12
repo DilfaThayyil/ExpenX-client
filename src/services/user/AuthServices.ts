@@ -52,23 +52,13 @@ export const otpGenerate = async (email: string) => {
 
 export const verifyOtp = async (email: string, otp: string) => {
   try {
-    console.log('Heyy from verifyOtp')
-    const response = await axiosInstance.post(`${BASEURL}/verifyOtp`, {
-      email,
-      otp,
-    });
-    console.log("In Authservices-verifyOtp fn :", response.data)
-    return response.data;
-  } catch (err) {
-    const axiosError = err as AxiosError;
-    if (axiosError.response) {
-      const errorData = axiosError.response.data as ErrorResponse;
-      console.error('Error verifying OTP:', errorData.error);
-      throw errorData.error;
-    } else {
-      console.error('Error verifying OTP:', axiosError.message);
-      throw axiosError.message;
-    }
+    console.log("email $ otp : ",email,otp)
+    const response = await axiosInstance.post(`${BASEURL}/verifyOtp`,
+      { email, otp }
+    )
+    return { success: true, message: response.data.message }
+  } catch (err:any) {
+    throw err
   }
 };
 
@@ -115,25 +105,22 @@ export const handleforgetpassword = async (email: string) => {
   } catch (err) {
     const axiosError = err as AxiosError;
     if (axiosError.response) {
-      return axiosError.response.data;
+      const errorData = axiosError.response.data as { message: string };
+      throw new Error(errorData.message);
     }
+    throw new Error('An unexpected error occurred');
   }
 };
 
 export const handleforgetpasswordOtp = async (email: string, otp: string) => {
   try {
-    const response = await axiosInstance.post(
-      `${BASEURL}/forgetPassOtp`,
+    console.log("email $ otp : ",email,otp)
+    const response = await axiosInstance.post(`${BASEURL}/forgetPassOtp`,
       { email, otp }
-    );
+    )
     return { success: true, message: response.data.message }
-  } catch (err) {
-    const axiosError = err as AxiosError;
-    if (axiosError.response) {
-      const errorData = axiosError.response.data as ErrorResponse;
-      return { success: false, message: errorData.error || 'Failed to verify OTP' };
-    }
-    return { success: false, message: 'An unexpected error occurred' };
+  } catch (err:any) {
+    throw err
   }
 };
 

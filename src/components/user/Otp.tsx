@@ -7,10 +7,11 @@ import toastr from 'toastr';
 interface otpProps{
   email:string
   purpose:string
+  role:'user'|'advisor'
 }
 
 
-const OTPVerification:React.FC<otpProps> = ({email,purpose}) => {
+const OTPVerification:React.FC<otpProps> = ({email,purpose,role}) => {
   // const location = useLocation()
   // const formData = location.state?.formData
   // const email = location.state?.email || ''
@@ -67,36 +68,49 @@ const OTPVerification:React.FC<otpProps> = ({email,purpose}) => {
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (loading) return; 
+  
+    if (loading) return;
     setLoading(true);
-
+  
     try {
       const enteredOtp = otp.join('');
-      console.log("email & otp : ",email , enteredOtp)
-      const res = purpose==='forgotPassword'
-        ? await handleforgetpasswordOtp(email,enteredOtp)
-        : await verifyOtp(email,enteredOtp);
-        if(res){
-          if(purpose==='forgotPassword' && res?.message==='OTP verified successfully'){
-            toastr.success('OTP verified successfully')
-            navigate('/resetPassword',{state:{email}})
-          }
-          else if(res?.message === 'User registered successfully') {
-            toastr.success('User registered successfully');
-            navigate('/login');
-          }
-        } 
-        else {
-          toastr.error(res.message || 'OTP verification failed');
+      console.log('forgotPassword email : ', email);
+      console.log('forgotPassword purpose : ', purpose);
+      console.log('email & otp : ', email, enteredOtp);
+  
+      const res = purpose === 'forgotPassword'
+        ? await handleforgetpasswordOtp(email, enteredOtp)
+        : await verifyOtp(email, enteredOtp);
+  
+      console.log('response : ', res);
+  
+      if (res) {
+        if (purpose === 'forgotPassword' && res?.message === 'OTP verified successfully') {
+          toastr.success('OTP verified successfully');
+          navigate('/resetPassword', { state: { email, role } });
+        } else if (res?.message === 'User registered successfully') {
+          toastr.success('User registered successfully');
+          navigate('/login');
         }
-    } catch (error:any) {
-      toastr.error(error.response?.data?.message || 'Failed to verify OTP or create user');
-      console.error('Error verifying otp :', error);
+      }
+    } catch (error: any) {
+      // Check for specific error messages
+      if (error.response?.status === 404) {
+        toastr.error('No OTP record found for this email.');
+      } else if (error.response?.status === 400) {
+        toastr.error('The OTP you entered is incorrect.');
+      } else if (error.response?.status === 410) {
+        toastr.error('The OTP has expired. Please request a new one.');
+      } else {
+        // Generic fallback error
+        toastr.error(error.response?.data?.message || 'Failed to verify OTP');
+      }
+      console.error('Error verifying OTP:', error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const formatTime = (seconds: number) => {
     return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;

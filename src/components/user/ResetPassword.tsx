@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Eye,EyeOff } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { resetPassword } from '../../services/user/AuthServices';
+import {resetPasswordAdv} from '../../services/advisor/AuthServices'
 import toastr from 'toastr';
 import { isValidateEmail, isValidatePassword } from '../../utility/validator';
 
@@ -9,6 +10,7 @@ const ResetPassword = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const email = location?.state?.email || '';
+  const role = location?.state?.role || ''
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,12 +51,22 @@ const ResetPassword = () => {
       setLoading(true);
       console.log("email : ", email);
       console.log("password : ",password)
-      const response = await resetPassword(email, password);
-      if (response?.success) {
-        toastr.success('Password reset successfully');
-        navigate('/login');
-      } else {
-        toastr.error(response?.message || 'Failed to reset password');
+      if(role==='user'){
+        const response = await resetPassword(email, password);
+        if (response?.success) {
+          toastr.success('Password reset successfully');
+          navigate('/login');
+        } else {
+          toastr.error(response?.message || 'Failed to reset password');
+        }
+      }else{
+        const response = await resetPasswordAdv(email, password);
+        if (response?.success) {
+          toastr.success('Password reset successfully');
+          navigate('/advisor/login');
+        } else {
+          toastr.error(response?.message || 'Failed to reset password');
+        }
       }
     } catch (error: any) {
       toastr.error(error.response?.data?.message || 'An error occurred');
