@@ -28,7 +28,7 @@ const LandingPage = () => {
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
               Effortlessly manage shared expenses, track group spending, and maintain crystal-clear financial relationships with friends and roommates.
             </p>
-            <a href="/advisor" className="inline-flex items-center gap-2 bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 transition-colors text-lg font-medium">
+            <a href="/advisor/login" className="inline-flex items-center gap-2 bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 transition-colors text-lg font-medium">
               Start as a Financial advisor
               <ChevronRight className="h-5 w-5" />
             </a>

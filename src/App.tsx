@@ -14,7 +14,7 @@ import AdvisorLanding from './pages/advisor/LandingPage'
 // import AdminRegister from './components/admin/Register'
 import OTPVerificationad from './components/advisor/Otp'
 import AdminLogin from './components/admin/Login'
-import AdminDashboard from './pages/admin/LandingPage'
+import AdminDashboard from './pages/admin/AdminDashboard'
 const GOOGLECLIENTID = import.meta.env.VITE_GOOGLECLIENTID
 
 
