@@ -106,6 +106,8 @@ const OTPVerification:React.FC<otpProps> = ({email,purpose,role}) => {
         toastr.error(error.response?.data?.message || 'Failed to verify OTP');
       }
       console.error('Error verifying OTP:', error);
+      setOtp(['','','',''])
+      inputs.current[0]?.focus()
     } finally {
       setLoading(false);
     }

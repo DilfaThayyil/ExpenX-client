@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Wallet, Shield } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { verifyOtp, createUser, handleforgetpasswordOtp, resendOtp } from '../../services/advisor/AuthServices';
+import { useNavigate } from 'react-router-dom';
+import { verifyOtp, handleforgetpasswordOtp, resendOtp } from '../../services/advisor/AuthServices';
 import toastr from 'toastr';
+
+
 
 interface otpProps{
   email:string
@@ -11,10 +13,6 @@ interface otpProps{
 }
 
 const OTPVerification:React.FC<otpProps> = ({email,purpose,role}) => {
-  // const location = useLocation()
-  // const formData = location.state?.formData
-  // const email = location.state?.email || ''
-  // const purpose = location.state?.purpose || ''
   const navigate = useNavigate()
   const [otp, setOtp] = useState(['', '', '', '']);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -91,18 +89,19 @@ const OTPVerification:React.FC<otpProps> = ({email,purpose,role}) => {
           }
         }
     } catch (error: any) {
-      // Check for specific error messages
       if (error.response?.status === 404) {
         toastr.error('No OTP record found for this email.');
+
       } else if (error.response?.status === 400) {
         toastr.error('The OTP you entered is incorrect.');
       } else if (error.response?.status === 410) {
         toastr.error('The OTP has expired. Please request a new one.');
       } else {
-        // Generic fallback error
         toastr.error(error.response?.data?.message || 'Failed to verify OTP');
       }
       console.error('Error verifying OTP:', error);
+      setOtp(['', '', '', '']);
+      inputs.current[0]?.focus();
     } finally {
       setLoading(false);
     }
