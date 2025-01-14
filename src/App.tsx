@@ -28,17 +28,12 @@ const App = ()=>{
         <Route path='/' element={<LandingPage/>}/>
         <Route path='/login' element={<LoginPage/>}/>
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/otp" element={<OTPVerification email={''} purpose={''} role={'user'}/>} />
-        <Route path='/forgetPassword' element={<ForgetPassword toggleModal={function (): void {
-        throw new Error('Function not implemented.')
-      } }/>} />
       <Route path='/resetPassword' element={<ResetPassword/>} />
 
       {/* <Route path='/advisor/home' element={<HomePageAd/>}/> */}
       <Route path='/advisor/register' element={<AdvisorRegister/>} />
       <Route path='/advisor/login' element={<AdvisorLogin/>} />
       <Route path='/advisor' element={<AdvisorLanding/>} />
-      <Route path='/advisor/otp' element={<OTPVerificationad email={''} purpose={''} role={'advisor'}/>} />
       <Route path='/advisor/resetPassword' element={<ResetPassword/>} />
 
       <Route path='/admin/login' element={<AdminLogin/>} />      
