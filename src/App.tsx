@@ -14,6 +14,8 @@ import OTPVerificationad from './components/advisor/Otp'
 import AdminLogin from './components/admin/Login'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import Navbar from './layout/layout'
+// import HomePage from './pages/user/HomePage'
+// import HomePageAd from './pages/advisor/HomePage'
 const GOOGLECLIENTID = import.meta.env.VITE_GOOGLECLIENTID
 
 
@@ -22,6 +24,7 @@ const App = ()=>{
     <GoogleOAuthProvider clientId={GOOGLECLIENTID}>
       <Navbar/>
       <Routes>
+        {/* <Route path='/home' element={<HomePage/>}/> */}
         <Route path='/' element={<LandingPage/>}/>
         <Route path='/login' element={<LoginPage/>}/>
         <Route path="/register" element={<RegisterPage />} />
@@ -30,6 +33,8 @@ const App = ()=>{
         throw new Error('Function not implemented.')
       } }/>} />
       <Route path='/resetPassword' element={<ResetPassword/>} />
+
+      {/* <Route path='/advisor/home' element={<HomePageAd/>}/> */}
       <Route path='/advisor/register' element={<AdvisorRegister/>} />
       <Route path='/advisor/login' element={<AdvisorLogin/>} />
       <Route path='/advisor' element={<AdvisorLanding/>} />
