@@ -12,7 +12,7 @@ const LandingPage = () => {
               <span className="text-2xl font-bold text-gray-900">ExpenX</span>
             </div>
             <div className="flex gap-4">
-              <a href="/login" className="text-gray-600 hover:text-gray-900 px-3 py-2">Login</a>
+              {/* <a href="/login" className="text-gray-600 hover:text-gray-900 px-3 py-2">Login</a> */}
               <a href="/register" className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
                 Signup
               </a>

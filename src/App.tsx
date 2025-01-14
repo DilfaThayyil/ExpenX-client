@@ -13,12 +13,14 @@ import AdvisorLanding from './pages/advisor/LandingPage'
 import OTPVerificationad from './components/advisor/Otp'
 import AdminLogin from './components/admin/Login'
 import AdminDashboard from './pages/admin/AdminDashboard'
+import Navbar from './layout/layout'
 const GOOGLECLIENTID = import.meta.env.VITE_GOOGLECLIENTID
 
 
 const App = ()=>{
   return (
     <GoogleOAuthProvider clientId={GOOGLECLIENTID}>
+      <Navbar/>
       <Routes>
         <Route path='/' element={<LandingPage/>}/>
         <Route path='/login' element={<LoginPage/>}/>
