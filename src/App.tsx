@@ -14,6 +14,9 @@ import DashboardPage from './pages/user/home';
 import DashboardAd from './pages/advisor/home'
 import WithoutNavbar from './layout/withoutNav';
 import WithNavbar from './layout/withNav';
+import Profile from './pages/user/Profile';
+import ProfileAd from './pages/advisor/Profile';
+
 
 
 const GOOGLECLIENTID = import.meta.env.VITE_GOOGLECLIENTID;
@@ -26,6 +29,8 @@ const App = () => {
         <Route element={<WithoutNavbar />}>
           <Route path="/home" element={<DashboardPage />} />
           <Route path='/advisor/home' element={<DashboardAd/>}/>
+          <Route path='/profile' element={<Profile/>}/>
+          <Route path='advisor/profile' element={<ProfileAd/>}/>
         </Route>
 
         {/* Routes with Navbar */}

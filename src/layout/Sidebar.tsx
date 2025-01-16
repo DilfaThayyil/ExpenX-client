@@ -3,7 +3,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
 
 const userMenuItems = [
-  { title: "Dashboard", url: "/dashboard", icon: Home },
+  { title: "Dashboard", url: "/home", icon: Home },
   { title: "Expense Tracker", url: "/expenses", icon: Inbox },
   { title: "Groups", url: "/groups", icon: Calendar },
   { title: "Profile", url: "/profile", icon: Search },
@@ -11,17 +11,17 @@ const userMenuItems = [
 ];
 
 const advisorMenuItems = [
-  { title: "Advisor Dashboard", url: "/advisor/dashboard", icon: Home },
+  { title: "Advisor Dashboard", url: "/advisor/home", icon: Home },
   { title: "Client Management", url: "/advisor/clients", icon: Inbox },
   { title: "Appointments", url: "/advisor/appointments", icon: Calendar },
   { title: "Advisor Profile", url: "/advisor/profile", icon: Search },
   { title: "Advisor Settings", url: "/advisor/settings", icon: Settings },
 ];
-
+    
 export default function Layout({
   children,
   role,
-}: {
+}: {  
   children: React.ReactNode;
   role: "user" | "advisor";
 }) {
