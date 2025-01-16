@@ -1,14 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiHome, FiBook, FiDollarSign, FiLogIn } from 'react-icons/fi';
-// import { IoMdAddCircleOutline } from "react-icons/io";
+import { FiHome, FiBook, FiDollarSign, FiLogIn, FiBell, FiUser } from 'react-icons/fi';
 import { FaRegMessage } from "react-icons/fa6";
 import image from '../assets/Letter E.png';
 
 const Navbar: React.FC = () => {
   return (
     <nav className="bg-white shadow-sm sticky top-0 w-full z-10">
-      <div className="container mx-auto px-4 py-2 flex items-center justify-between">
+      <div className="px-4 py-2 flex items-center justify-between w-full">
         {/* Logo Section */}
         <div className="flex items-center">
           <Link to="" className="text-xl font-bold">
@@ -48,17 +47,17 @@ const Navbar: React.FC = () => {
           </Link>
         </div>
 
-        {/* Profile and Login Section */}
+        {/* Profile Section */}
         <div className="flex items-center">
-          {/* <button className="px-3 py-2 mr-3 rounded-md text-gray-700 flex items-center hover:bg-gray-200">
+          <button className="px-3 py-2 mr-3 rounded-md text-gray-700 flex items-center hover:bg-gray-200">
             <FiBell size={19} className='mr-3' />
-          </button> */}
+          </button>
           <Link
-            to='/login'
+            to='/profile'
             className="px-3 py-2 border border-gray-300 rounded-md text-gray-700 flex items-center hover:bg-gray-200"
           >
-            <FiLogIn className="mr-2" />
-            Login
+            <FiUser className="mr-2" />
+            Profile
           </Link>
         </div>
       </div>
