@@ -1,71 +1,25 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
+import { User2 } from "lucide-react";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <SidebarProvider>
-      <div className="flex">
-        <AppSidebar />
-        <div className="flex-1">
-          <main className="p-4">
-            <SidebarTrigger />
-            {children}
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
-  );
+interface MenuItem {
+  title: string;
+  url: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
-import { Calendar, Home, Inbox, Search, Settings, User2 } from "lucide-react";
+interface AppSidebarProps {
+  menuItems: MenuItem[];
+  username: string;
+}
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
-
-// Menu items.
-const items = [
-  {
-    title: "Dashboard",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "Expense Tracker",
-    url: "/",
-    icon: Inbox,
-  },
-  {
-    title: "Groups",
-    url: "/",
-    icon: Calendar,
-  },
-  {
-    title: "Profile",
-    url: "/",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "/",
-    icon: Settings,
-  },
-];
-
-export function AppSidebar() {
+export function AppSidebar({ menuItems, username }: AppSidebarProps) {
   return (
     <Sidebar>
       <SidebarContent className="mt-20">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {menuItems.map((item) => (
                 <SidebarMenuItem
                   key={item.title}
                   className="rounded-lg hover:bg-gray-200 transition-colors duration-200"
@@ -88,7 +42,7 @@ export function AppSidebar() {
       <SidebarFooter className="mt-auto px-8 py-6">
         <SidebarMenuButton className="flex items-center space-x-4 text-lg font-semibold text-gray-700">
           <User2 className="w-8 h-8 text-emerald-600" /> {/* Larger icon for footer */}
-          <span>Username</span> {/* Larger text */}
+          <span>{username}</span> {/* Larger text */}
         </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>
