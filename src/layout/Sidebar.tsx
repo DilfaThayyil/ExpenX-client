@@ -4,26 +4,27 @@ import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
 
 const userMenuItems = [
   { title: "Dashboard", url: "/home", icon: Home },
-  { title: "Expense Tracker", url: "/expenses", icon: Inbox },
+  { title: "Expenses", url: "/expenses", icon: Inbox },
   { title: "Groups", url: "/groups", icon: Calendar },
-  { title: "Profile", url: "/profile", icon: Search },
-  { title: "Settings", url: "/settings", icon: Settings },
+  { title: "Advisors", url: "/advisors", icon: Search },
+  { title: "Profile", url: "/profile", icon: Settings },
 ];
 
 const advisorMenuItems = [
-  { title: "Advisor Dashboard", url: "/advisor/home", icon: Home },
-  { title: "Client Management", url: "/advisor/clients", icon: Inbox },
+  { title: "Dashboard", url: "/advisor/home", icon: Home },
+  { title: "Clients", url: "/advisor/clients", icon: Inbox },
   { title: "Appointments", url: "/advisor/appointments", icon: Calendar },
-  { title: "Advisor Profile", url: "/advisor/profile", icon: Search },
-  { title: "Advisor Settings", url: "/advisor/settings", icon: Settings },
+  // { title: "Profile", url: "/advisor/profile", icon: Search },
+  { title: "Profile", url: "/advisor/profile", icon: Settings },
 ];
-    
+
+     
 export default function Layout({
   children,
   role,
 }: {  
   children: React.ReactNode;
-  role: "user" | "advisor";
+  role: "user" | "advisor"
 }) {
   const menuItems = role === "advisor" ? advisorMenuItems : userMenuItems;
   const username = role === "advisor" ? "Advisor Name" : "User Name";
