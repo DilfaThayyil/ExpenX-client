@@ -27,30 +27,24 @@ const App = () => {
   return (
     <GoogleOAuthProvider clientId={GOOGLECLIENTID}>
       <Routes>
-        {/* Routes with sidebar */}
-        {/* Routes without Navbar */}
-        <Route element={<WithoutNavbar />}>
-          <Route path="/home" element={<DashboardPage />} />
-          <Route path='/expenses' element={<Expenses/>}/>
-          <Route path='groups' element={<Groups/>}/>
-          <Route path='profile' element={<Profile/>}/>
-          <Route path='/advisor/home' element={<DashboardAd/>}/>
-          <Route path='advisor/profile' element={<ProfileAd/>}/>
-        </Route>
-
-        {/* Routes with Navbar */}
-        <Route element={<WithNavbar />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/home" element={<DashboardPage />} />
+          <Route path='/expenses' element={<Expenses/>}/>
+          <Route path='/groups' element={<Groups/>}/>
+          <Route path='/profile' element={<Profile/>}/>
           <Route path="/resetPassword" element={<ResetPassword />} />
+          
+          <Route path="/advisor" element={<AdvisorLanding />} />
           <Route path="/advisor/register" element={<AdvisorRegister />} />
           <Route path="/advisor/login" element={<AdvisorLogin />} />
-          <Route path="/advisor" element={<AdvisorLanding />} />
+          <Route path='/advisor/home' element={<DashboardAd/>}/>
+          <Route path='advisor/profile' element={<ProfileAd/>}/>
           <Route path="/advisor/resetPassword" element={<ResetPassword />} />
+
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
-        </Route>
       </Routes>
     </GoogleOAuthProvider>
   );

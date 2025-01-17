@@ -161,15 +161,9 @@ const RegisterPage = () => {
           <div className="flex justify-center items-center gap-2">
             <Wallet className="h-12 w-12 text-emerald-600" />
             <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-              ExpenX
+              Sign up
             </h1>
           </div>
-          <h2 className="mt-6 text-2xl font-semibold text-gray-900">
-            Create your account
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Start tracking expenses and splitting bills with friends
-          </p>
         </div>
 
         {/* Form */}
@@ -244,14 +238,7 @@ const RegisterPage = () => {
           </button>
         </form>
 
-        {/* Divider */}
-        <div className="flex items-center mt-4">
-          <span className="flex-1 h-px bg-gray-300"></span>
-          <span className="px-3 text-sm text-gray-600">or register with</span>
-          <span className="flex-1 h-px bg-gray-300"></span>
-        </div>
-
-        {/* Social Login */}
+        {/* Google Login */}
         <div className="flex justify-center mt-4">
           <GoogleAuth role={'user'}/>
         </div>
@@ -259,11 +246,8 @@ const RegisterPage = () => {
         {/* Login Link */}
         <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <a
-            href="/login"
-            className="text-emerald-600 hover:underline font-medium"
-          >
-            Sign in
+          <a href="/login" className="text-emerald-600 hover:underline font-medium">
+              Sign in
           </a>
         </p>
       </div>

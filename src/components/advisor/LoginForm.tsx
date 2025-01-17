@@ -88,12 +88,9 @@ const AdvisorLogin: React.FC = () => {
           <div className="flex justify-center items-center gap-2">
             <Briefcase className="h-12 w-12 text-indigo-600" />
             <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-              ExpenX
+              Login
             </h1>
           </div>
-          <h2 className="mt-6 text-2xl font-semibold text-gray-900">
-            Financial Advisor Login
-          </h2>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -143,29 +140,18 @@ const AdvisorLogin: React.FC = () => {
             Sign in
           </button>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">or continue with</span>
-              </div>
-            </div>
-
             <div className="flex justify-center mt-4">
               <GoogleAuth role={'advisor'}/>
             </div>
-          </div>
+            <div className="text-center text-sm">
+              <span className="text-gray-600">New to ExpenX Advisors? </span>
+              <a href="/advisor/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+                Create an account
+              </a>
+            </div>
         </form>
         <ToastContainer />
 
-        <div className="text-center text-sm">
-          <span className="text-gray-600">New to ExpenX Advisors? </span>
-          <a href="/advisor/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-            Create an account
-          </a>
-        </div>
       </div>
       {isModalOpen && <ForgetPassword toggleModal={toggleModal} />}
     </div>

@@ -154,12 +154,9 @@ const AdvisorRegister: React.FC = () => {
           <div className="flex justify-center items-center gap-2">
             <Briefcase className="h-12 w-12 text-indigo-600" />
             <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-              ExpenX
+              Sign up
             </h1>
           </div>
-          <h2 className="mt-6 text-2xl font-semibold text-gray-900">
-            Register as Advisor
-          </h2>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -226,22 +223,13 @@ const AdvisorRegister: React.FC = () => {
             <CheckCircle2 className="h-4 w-4" />
             {loading ? 'Registering...' : 'Register'}
           </button>
+        </form>
 
           <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">or register with</span>
-              </div>
-            </div>
-
             <div className="flex justify-center mt-4">
               <GoogleAuth role={'advisor'}/>
             </div>
           </div>
-        </form>
 
         <div className="text-center text-sm">
           <span className="text-gray-600">Already an advisor? </span>
