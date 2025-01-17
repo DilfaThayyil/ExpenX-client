@@ -18,7 +18,6 @@ import Sidebar from './layout/Sidebar'
 import Expenses from './pages/user/Expenses';
 import Groups from './pages/user/Groups';
 import Profile from './pages/user/profile';
-import ProfileAd from './pages/advisor/Profile';
 
 
 
@@ -30,17 +29,13 @@ const App = () => {
       <Routes>
         {/* Routes with sidebar */}
         {/* Routes without Navbar */}
-        <Route element={<><WithoutNavbar /><Sidebar children='' role={'user'} /></>}>
-          <Route path="/home" element={<DashboardPage />}/>
-          <Route path='/expenses' element={<Expenses/>}/>
-          <Route path='/groups' element={<Groups/>}/>
-          <Route path='/profile' element={<Profile/>}/>
+        <Route element={<WithNavbar />}>
+          <Route path="/home" element={<DashboardPage />} />
+          <Route path='/expenses' element={<Expenses/>}></Route>
+          <Route path='/groups' element={<Groups/>}></Route>
+          <Route path='/profile' element={<Profile/>}></Route>
         </Route>
-
-        <Route element={<><WithoutNavbar/><Sidebar children='' role={'advisor'}/></>}>
-          <Route path='/advisor/home' element={<DashboardAd/>}/>
-          <Route path='/advisor/profile' element={<ProfileAd/>}/>
-        </Route>
+        
 
 
         {/* Routes with Navbar */}
