@@ -14,8 +14,10 @@ import DashboardPage from './pages/user/home';
 import DashboardAd from './pages/advisor/home'
 import WithoutNavbar from './layout/withoutNav';
 import WithNavbar from './layout/withNav';
-import Profile from './pages/user/Profile';
-import ProfileAd from './pages/advisor/Profile';
+import Sidebar from './layout/Sidebar'
+import Expenses from './pages/user/Expenses';
+import Groups from './pages/user/Groups';
+import Profile from './pages/user/profile';
 
 
 
@@ -25,13 +27,16 @@ const App = () => {
   return (
     <GoogleOAuthProvider clientId={GOOGLECLIENTID}>
       <Routes>
+        {/* Routes with sidebar */}
         {/* Routes without Navbar */}
-        <Route element={<WithoutNavbar />}>
+        <Route element={<><WithoutNavbar /><Sidebar children='' role={'user'} /></>}>
           <Route path="/home" element={<DashboardPage />} />
           <Route path='/advisor/home' element={<DashboardAd/>}/>
-          <Route path='/profile' element={<Profile/>}/>
-          <Route path='advisor/profile' element={<ProfileAd/>}/>
+          <Route path='/expenses' element={<Expenses/>}></Route>
+          <Route path='/groups' element={<Groups/>}></Route>
+          <Route path='/profile' element={<Profile/>}></Route>
         </Route>
+
 
         {/* Routes with Navbar */}
         <Route element={<WithNavbar />}>
