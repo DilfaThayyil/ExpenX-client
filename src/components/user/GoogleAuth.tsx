@@ -30,7 +30,7 @@ const GoogleAuth:React.FC<GoogleAuthProps> = ({role}) => {
           if (userData?.message) {
             Toast(userData.message, 'success', true);
             setTimeout(() => {
-              navigate(role === 'advisor' ? "/advisor" : "/");
+              navigate(role === 'advisor' ? "/advisor/home" : "/home");
             }, 1000);
           }
         }

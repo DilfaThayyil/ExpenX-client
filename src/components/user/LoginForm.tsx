@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, DollarSign, Wallet } from 'lucide-react';
+import { DollarSign, Wallet } from 'lucide-react';
 import { ToastContainer } from 'react-toastify';
 import toastr from 'toastr';
 import "react-toastify/dist/ReactToastify.css";

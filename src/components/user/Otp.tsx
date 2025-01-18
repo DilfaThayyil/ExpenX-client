@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Wallet, Shield } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { verifyOtp, createUser, resendOtp,handleforgetpasswordOtp } from '../../services/user/AuthServices';
+import { useNavigate } from 'react-router-dom';
+import { verifyOtp, resendOtp,handleforgetpasswordOtp } from '../../services/user/AuthServices';
 import toastr from 'toastr';
 
 interface otpProps{

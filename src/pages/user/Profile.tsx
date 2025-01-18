@@ -1,6 +1,6 @@
 import { DescriptionSection } from "@/components/Descriptionsection";
 import { ProfileCard } from "@/components/profileCard";
-import { SkillsSection } from "@/components/skillsSection";
+// import { SkillsSection } from "@/components/skillsSection";
 import Layout from "@/layout/Sidebar";
 
 export const Profile = () => {
