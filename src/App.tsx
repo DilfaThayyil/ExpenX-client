@@ -15,10 +15,9 @@ import DashboardAd from './pages/advisor/home'
 import WithoutNavbar from './layout/withoutNav';
 import WithNavbar from './layout/withNav';
 import Expenses from './pages/user/Expenses';
-import Profile from './pages/user/profile';
-import ProfileAd from './pages/advisor/Profile'
 import Groups from './pages/user/Groups';
-
+import { Profile } from './pages/user/Profile';
+import {ProfileAd} from './pages/advisor/Profile'
 
 
 const GOOGLECLIENTID = import.meta.env.VITE_GOOGLECLIENTID;
