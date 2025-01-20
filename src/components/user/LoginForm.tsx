@@ -9,10 +9,12 @@ import { useNavigate } from 'react-router-dom';
 import ForgetPassword from './ForgotPassword';
 import GoogleAuth from './GoogleAuth';
 import FormInput from '../InputField';
+import Store from '@/store/store';
 
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const {setUser} = Store()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -66,6 +68,8 @@ const LoginPage = () => {
       const response = await userLogin(formData.email, formData.password);
       if (response.message) {
         console.log("response-msg in loginForm : ",response.message)
+        console.log("response-user2 : ",response.user)
+        setUser(response.user)
         toastr.success(response.message);
         setTimeout(() => navigate("/"), 1000);
       } else if (response.error) {

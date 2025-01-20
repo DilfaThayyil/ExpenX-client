@@ -17,7 +17,7 @@ export type UserType = {
     language: string;
     profilePic: string;
     users: onlineUsers[] | any;
-    // lastSeen?: string;
+    lastSeen?: string;
 };
 
 type State = {
