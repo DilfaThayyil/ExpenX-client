@@ -27,12 +27,11 @@ export default function Layout({
   role: "user" | "advisor"
 }) {
   const menuItems = role === "advisor" ? advisorMenuItems : userMenuItems;
-  const username = role === "advisor" ? "Advisor Name" : "User Name";
 
   return (
     <SidebarProvider>
       <div className="flex">
-        <AppSidebar menuItems={menuItems} username={username} />
+        <AppSidebar menuItems={menuItems}/>
         <div className="flex-1">
           <main className="p-4">
             <SidebarTrigger />
