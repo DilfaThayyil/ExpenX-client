@@ -4,12 +4,15 @@ import { advisorGoogleAuth } from "../../services/advisor/AuthServices";
 import useShowToast from '../../customHook/showToaster'
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import Store from "@/store/store";
 
 interface GoogleAuthProps{
   role: 'user'| 'advisor'
 }
 
 const GoogleAuth:React.FC<GoogleAuthProps> = ({role}) => {
+
+    const {setUser} = Store()
     const navigate=useNavigate()
     const Toast=useShowToast()
     const handleGoogle = async (userCredential:CredentialResponse) => {
@@ -26,8 +29,10 @@ const GoogleAuth:React.FC<GoogleAuthProps> = ({role}) => {
           }
   
           console.log("User data:", userData);
+          console.log("User: ",userData.user)
   
           if (userData?.message) {
+            setUser(userData.user)
             Toast(userData.message, 'success', true);
             setTimeout(() => {
               navigate(role === 'advisor' ? "/advisor/home" : "/home");
