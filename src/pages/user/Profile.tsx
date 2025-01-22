@@ -1,253 +1,335 @@
 import React, { useState } from 'react';
+import { User, Mail, Phone, Globe, Languages, Target, Edit2, X, UploadCloud } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  User, Settings, PieChart, Users, LogOut,
-  CheckCircle, Edit,
-  UploadCloud
-} from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
 import Layout from '@/layout/Sidebar';
 import Store from '@/store/store';
-import { FaLanguage, FaLocationDot } from 'react-icons/fa6';
-import { MdOutlineMailOutline } from "react-icons/md";
-import { FaPhoneAlt } from "react-icons/fa";
 import FormInput from '@/components/InputField';
-import ImageUploader from '@/components/imageUploader';
+import Progresss from '@/components/progressBar'
+import useShowToast from '@/customHook/showToaster';
+import { updateUser, uploadImageToS3 } from '@/services/user/userService';
 
 
-
-// Types
-interface RecentActivity {
-  id: number;
-  type: string;
-  description: string;
-  amount: number;
-  timestamp: string;
+interface ExpenseGoal {
+  title: string;
+  current: number;
+  target: number;
+  deadline: string;
 }
 
-export const Profile = () => {
-  const user = Store(state => state.user);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [isEditModalOpen,setEditModalOpen] = useState(false)
-  const [formData,setFormData] = useState({
-    username: user.username,
-    email: user.email,
-    phone: user.phone,
-    language: user.language || 'English',
-    country: user.country || 'india',
-    profilePic: user.profilePic || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80'
-  })
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleImageUpload = (uploadedImage: string) => {
-    setFormData({ ...formData, profilePic: uploadedImage });
-  };
+const ProfilePage = () => {
   
+  const Toaster = useShowToast()
+  const user = Store(state=>state.user)
+  const [profilePic,setProfilePic] = useState<File | null>(null)
+  const [previewPic,setPreviewPic] = useState(user.profilePic)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [formSubmitted,setFormSubmitted] = useState(false)
+  const [loading,setLoading] = useState(false)
+  const [formData,setFormData] = useState<{
+    username:string
+    email:string
+    phone:string
+    country:string
+    language:string
+  }>({
+    username: '',
+    email: '',
+    phone: '',
+    country: '',
+    language: ''
+  })
+  const handleChange = (e:React.ChangeEvent<HTMLInputElement>)=>{
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value
+      })
+  }
 
-  const recentActivity: RecentActivity[] = [
-    { id: 1, type: "expense", description: "Groceries at Walmart", amount: 85.50, timestamp: "2 hours ago" },
-    { id: 2, type: "group", description: "Split dinner bill with roommates", amount: 45.00, timestamp: "Yesterday" },
-    { id: 3, type: "payment", description: "Utility bill payment", amount: 120.00, timestamp: "2 days ago" },
-  ];
+  const validateForm = () => {
+    const errors: string[] = [];
+
+    if (!formData.phone.trim()) {
+      errors.push('phone is required.');
+    }
+    if (!formData.country.trim()) {
+      errors.push('country is required.');
+    }
+    if (!formData.language.trim()) {
+      errors.push('language is required.');
+    }
+    return errors;
+  };
+
+  const handleImageChange = (e:React.ChangeEvent<HTMLInputElement>)=>{
+    if(e.target.files && e.target.files[0]){
+      setProfilePic(e.target.files[0])
+      setPreviewPic(URL.createObjectURL(e.target.files[0]))
+    }
+  }
+
+  const handleSubmit = async(e:React.FormEvent)=>{
+    e.preventDefault()
+    console.log("form data : ",formData)
+    setFormSubmitted(true)
+    const errors = validateForm()
+    if(errors.length>0){
+      errors.forEach((error)=>Toaster(error,'error',true))
+      setFormSubmitted(false)
+      return
+    }
+    try {
+      setLoading(true);
+
+      let imageUrl = previewPic;
+
+      if (profilePic) {
+          const formData = new FormData();
+          formData.append('profilePic', profilePic);
+
+          const response = await uploadImageToS3(formData); 
+          imageUrl = response.url;
+      }
+
+      const updatedUser = await updateUser({
+          profilePic: imageUrl,
+          username: formData.username,
+          email: formData.email,
+          phone: formData.phone,
+          country: formData.country,
+          language: formData.language,
+      });
+
+      Toaster('Profile updated successfully!', 'success', true);
+      Store.setState({ user: updatedUser });
+      setIsDrawerOpen(false);
+    } catch (error) {
+        Toaster(error as string, 'error', true);
+        console.error('Update failed:', error);
+        setLoading(false);
+    }
+  }
+
+  const [goals] = useState<ExpenseGoal[]>([
+    {
+      title: "Emergency Fund",
+      current: 5000,
+      target: 10000,
+      deadline: "2024-12-31"
+    },
+    {
+      title: "Vacation Savings",
+      current: 2000,
+      target: 5000,
+      deadline: "2024-08-31"
+    }
+  ]);
+
+  const calculateProfileCompletion = () => {
+    const fields = Object.values(user);
+    const completedFields = fields.filter(field => field && field.length > 0);
+    return Math.floor((completedFields.length / fields.length) * 100);
+  };
 
   return (
-    <Layout role="user">
-      <div className="min-h-screen bg-gray-50 p-6">
-        {/* Header Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col md:flex-row gap-6">
-          <div className="flex flex-col items-center md:items-start">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={user.profilePic} alt={user.username} />
-              <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
-            </Avatar>
-            <div className="mt-4 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-2">
-                <h1 className="text-2xl font-bold">{user.username}</h1>
-                <CheckCircle className="text-emerald-600 w-5 h-5" />
-              </div>
-              <p className="text-gray-600">{user.email}</p>
-              <button className="mt-2 inline-flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700"
-                onClick={()=>setEditModalOpen(true)}>
-                <Edit className="w-4 h-4" /> Edit Profile
+    <Layout role='user'>
+    <div className="container mx-auto p-4 max-w-6xl">
+      {/* Profile Completion Alert */}
+      <Alert className="mb-6">
+        <AlertDescription className="flex items-center justify-between">
+          <span>Profile Completion: {calculateProfileCompletion()}%</span>
+          <Progress value={calculateProfileCompletion()} className="w-64"/>
+        </AlertDescription>
+      </Alert>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* User Information Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Profile Information</CardTitle>
+            <Button variant="outline" size="icon" onClick={() => setIsDrawerOpen(true)}>
+              <Edit2 className="h-4 w-4 text-emerald-600" />
+            </Button>
+          </CardHeader>
+          <CardContent>
+          <div className="flex flex-col items-center space-y-4">
+            {/* Profile Image with Edit Icon */}
+            <div className="relative">
+              <img
+                src={previewPic}
+                alt="Profile"
+                className="h-24 w-24 rounded-full object-cover"
+              />
+              {/* Edit Icon */}
+              <button
+                onClick={() => document.getElementById('fileInput')?.click()}
+                className="absolute bottom-0 right-0 p-2 bg-emerald-800 text-white rounded-full shadow-md"
+              >
+                <UploadCloud className="h-5 w-5" />
               </button>
-              <hr className="my-6 border-t border-gray-300" />
-              <div className="flex items-center text-gray-700">
-                <FaLanguage className="mr-3" />
-                <p>{user.language ? user.language : "English"}</p>
+              {/* Hidden File Input */}
+              <input
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </div>
+  
+            {/* Other user info sections */}
+            <div className="w-full space-y-4">
+              <div className="flex items-center space-x-2">
+                <User className="h-4 w-4 text-gray-500" />
+                <span>{user.username}</span>
               </div>
-              <div className="flex items-center text-gray-700 mt-3">
-                <FaLocationDot className="mr-3" />
-                <p>{user.country ? user.country : ""}</p>
+              <div className="flex items-center space-x-2">
+                <Mail className="h-4 w-4 text-gray-500" />
+                <span>{user.email}</span>
               </div>
-              <div className="flex items-center text-gray-700 mt-3">
-                <MdOutlineMailOutline className="mr-3" />
-                <p>{user.email}</p>
+              <div className="flex items-center space-x-2">
+                <Phone className="h-4 w-4 text-gray-500" />
+                <span>{user.phone || "....."}</span>
               </div>
-              <div className="flex items-center text-gray-700 mt-3">
-                <FaPhoneAlt className="mr-3" />
-                <p>{user.phone}</p>
+              <div className="flex items-center space-x-2">
+                <Globe className="h-4 w-4 text-gray-500" />
+                <span>{user.country || "....."}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Languages className="h-4 w-4 text-gray-500" />
+                <span>{user.language || "English"}</span>
               </div>
             </div>
           </div>
+          </CardContent>
+        </Card>
 
-          {/* Tabs Section */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-            <TabsList className="bg-white p-1 rounded-lg shadow-sm">
-              <TabsTrigger value="overview" className="flex items-center gap-2">
-                <User className="w-4 h-4" /> Overview
-              </TabsTrigger>
-              <TabsTrigger value="expenses" className="flex items-center gap-2">
-                <PieChart className="w-4 h-4" /> Expenses
-              </TabsTrigger>
-              <TabsTrigger value="groups" className="flex items-center gap-2">
-                <Users className="w-4 h-4" /> Groups
-              </TabsTrigger>
-              <TabsTrigger value="settings" className="flex items-center gap-2">
-                <Settings className="w-4 h-4" /> Settings
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="overview" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Total Expenses</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold text-emerald-600">
-                      {/* ${user.totalExpenses.toLocaleString()} */}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Active Groups</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold text-blue-600">
-                      {/* {user.activeGroups} */}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Pending Settlements</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold text-amber-600">
-                      {/* ${user.pendingSettlements} */}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card className="w-full">
-                <CardHeader>
-                  <CardTitle>Recent Activity</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {recentActivity.map((activity) => (
-                      <div key={activity.id} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                        <div className="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                          <User className="h-5 w-5 text-emerald-600" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-medium">{activity.description}</p>
-                          <p className="text-sm text-gray-600">{activity.timestamp}</p>
-                        </div>
-                        <p className="font-semibold text-gray-900">
-                          ${activity.amount.toFixed(2)}
-                        </p>
-                      </div>
-                    ))}
+        {/* Expense Goals Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Financial Goals</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {goals.map((goal, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Target className="h-4 w-4 text-emerald-500"/>
+                      <span className="font-medium">{goal.title}</span>
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      Due: {new Date(goal.deadline).toLocaleDateString()}
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-        {isEditModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-lg w-96 p-6">
-              <h2 className="text-lg font-semibold text-gray-800">Edit Profile</h2>
-              <div className="mt-4 space-y-4">
-              <div className="flex flex-col items-center">
-                  <div className="relative">
-                  <ImageUploader
-                    initialImage={formData.profilePic} 
-                    onImageUpload={handleImageUpload} 
-                  />
+                  <div className="space-y-1">
+                    <Progresss
+                      value={(goal.current / goal.target) * 100}
+                      className="h-2"
+                    />
+                    <div className="flex justify-between text-sm">
+                      <span>${goal.current.toLocaleString()}</span>
+                      <span>${goal.target.toLocaleString()}</span>
+                    </div>
                   </div>
                 </div>
-                <FormInput
-                  id="username"
-                  name="username"
-                  type="text"
-                  label="Username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  required
-                />
-                <FormInput
-                  id="email"
-                  name="email"
-                  type="email"
-                  label="Email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-                <FormInput
-                  id="phone"
-                  name="phone"
-                  type="text"
-                  label="Phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                />
-                <FormInput
-                  id="language"
-                  name="language"
-                  type="text"
-                  label="Language"
-                  value={formData.language}
-                  onChange={handleChange}
-                />
-                <FormInput
-                  id="country"
-                  name="country"
-                  type="text"
-                  label="Country"
-                  value={formData.country}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="mt-6 flex justify-end space-x-3">
-                <button
-                  className="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
-                  onClick={() => setEditModalOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="px-4 py-2 text-sm text-white bg-emerald-600 rounded-md hover:bg-emerald-700"
-                  
-                >
-                  Save
-                </button>
-              </div>
+              ))}
             </div>
-          </div>
-        )}
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Edit Profile Drawer */}
+      {isDrawerOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
+          <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-lg p-6 overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-emerald-600">Edit Profile</h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsDrawerOpen(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div>
+                <FormInput
+                id="username"
+                name="username"
+                type="text"
+                label="Username"
+                value={formData.username}
+                onChange={handleChange}
+                required
+                />
+              </div>
+              {/* <div>
+              <FormInput
+                id="email"
+                name="email"
+                type="text"
+                label="email"
+                value={user.email}
+                onChange={handleChange}
+                required
+                />
+              </div> */}
+              <div>
+              <FormInput
+                id="phone"
+                name="phone"
+                type="text"
+                label="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                />
+              </div>
+              <div>
+              <FormInput
+                id="country"
+                name="country"
+                type="text"
+                label="country"
+                value={formData.country}
+                onChange={handleChange}
+                required
+                />
+              </div>
+              <div>
+              <FormInput
+                id="language"
+                name="language"
+                type="text"
+                label="language"
+                value={formData.language}
+                onChange={handleChange}
+                required
+                />
+              </div>
+              <Button 
+                type='submit'
+                disabled={loading}
+                className="w-full bg-emerald-800
+                ${loading 
+                ? 'bg-emerald-400 cursor-not-allowed' 
+                : 'bg-emerald-600 hover:bg-emerald-700'
+              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors`}"
+              >
+                {loading ? 'saving..' : 'Save changes'}
+              </Button>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
     </Layout>
   );
 };
+
+export default ProfilePage;
