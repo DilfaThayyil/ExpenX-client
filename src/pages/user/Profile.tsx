@@ -9,7 +9,7 @@ import Store from '@/store/store';
 import FormInput from '@/components/InputField';
 import Progresss from '@/components/progressBar'
 import useShowToast from '@/customHook/showToaster';
-import { updateUser, uploadImageToS3 } from '@/services/user/userService';
+import { updateUser, uploadImageToCloudinary } from '@/services/user/userService';
 
 
 interface ExpenseGoal {
@@ -89,7 +89,7 @@ const ProfilePage = () => {
           const formData = new FormData();
           formData.append('profilePic', profilePic);
 
-          const response = await uploadImageToS3(formData); 
+          const response = await uploadImageToCloudinary(formData); 
           imageUrl = response.url;
       }
 

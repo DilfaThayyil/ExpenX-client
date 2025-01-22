@@ -16,7 +16,7 @@ import WithoutNavbar from './layout/withoutNav';
 import WithNavbar from './layout/withNav';
 import Expenses from './pages/user/Expenses';
 import Groups from './pages/user/Groups';
-import { Profile } from './pages/user/Profile';
+import Profile from './pages/user/Profile';
 import {ProfileAd} from './pages/advisor/Profile'
 
 
