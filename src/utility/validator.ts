@@ -19,3 +19,24 @@ export const isValidateEmail = (Email: string): boolean => {
       /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
     return passwordRegex.test(password);
   };
+
+  export const isValidCountry = (country:string):boolean =>{
+    const countries = [
+      "United States",
+      "Canada",
+      "United Kingdom",
+      "Australia",
+      "Germany",
+      "France",
+      "Japan",
+      "China",
+      "India",
+      "Brazil",
+      "Russia",
+      "South Africa",
+      "Italy",
+      "Spain",
+      "Mexico",
+    ];
+    return countries.includes(country)
+  }
