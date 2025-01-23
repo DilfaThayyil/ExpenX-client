@@ -30,13 +30,11 @@ const ProfilePage = () => {
   const [loading,setLoading] = useState(false)
   const [formData,setFormData] = useState<{
     username:string
-    email:string
     phone:string
     country:string
     language:string
   }>({
     username: '',
-    email: '',
     phone: '',
     country: '',
     language: ''
@@ -88,22 +86,33 @@ const ProfilePage = () => {
       if (profilePic) {
           const formData = new FormData();
           formData.append('profilePic', profilePic);
-
+          console.log("profilePic : ",profilePic)
           const response = await uploadImageToCloudinary(formData); 
+          console.log("response : ",response)
           imageUrl = response.url;
+          setLoading(false)
       }
 
       const updatedUser = await updateUser({
           profilePic: imageUrl,
           username: formData.username,
-          email: formData.email,
+          email: user.email,
           phone: formData.phone,
           country: formData.country,
           language: formData.language,
       });
-
+      console.log("updatedUser : ",updatedUser)
       Toaster('Profile updated successfully!', 'success', true);
-      Store.setState({ user: updatedUser });
+      // Store.setState({ user: updatedUser });
+      Store.getState().setUser(updatedUser);
+      console.log("Updated User in Store:", Store.getState().user);
+      setFormData({
+        username : '',
+        phone: '',
+        country: '',
+        language: ''
+      })
+      setLoading(false)
       setIsDrawerOpen(false);
     } catch (error) {
         Toaster(error as string, 'error', true);
@@ -191,11 +200,11 @@ const ProfilePage = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-gray-500" />
-                <span>{user.phone || "....."}</span>
+                <span>{user.phone}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Globe className="h-4 w-4 text-gray-500" />
-                <span>{user.country || "....."}</span>
+                <span>{user.country}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Languages className="h-4 w-4 text-gray-500" />
@@ -274,14 +283,14 @@ const ProfilePage = () => {
                 name="email"
                 type="text"
                 label="email"
-                value={user.email}
+                value={formData.email}
                 onChange={handleChange}
                 required
                 />
               </div> */}
               <div>
               <FormInput
-                id="phone"
+                id="phone" 
                 name="phone"
                 type="text"
                 label="phone"
@@ -312,17 +321,17 @@ const ProfilePage = () => {
                 required
                 />
               </div>
-              <Button 
-                type='submit'
-                disabled={loading}
-                className="w-full bg-emerald-800
-                ${loading 
+              <button
+            type="submit"
+            disabled={loading}
+            className={`w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
+              ${loading 
                 ? 'bg-emerald-400 cursor-not-allowed' 
                 : 'bg-emerald-600 hover:bg-emerald-700'
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors`}"
-              >
-                {loading ? 'saving..' : 'Save changes'}
-              </Button>
+              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors`}
+          >
+            {loading ? 'Saving Changes..' : 'Save Changes'}
+          </button>
             </form>
           </div>
         </div>

@@ -13,7 +13,7 @@ export const uploadImageToCloudinary = async (formData: FormData) => {
   }
 };
 
-export const updateUser = async (formData: { profilePic: string; username: string; email: string; phone: string; country: string; language: string }) => {
+export const updateUser = async (formData: { profilePic: string; username: string; email:string; phone: string; country: string; language: string }) => {
   try {
     const response = await axiosInstance.patch(`${BASEURL}/editProfile`, formData, {
       headers: { 'Content-Type': 'application/json' },
