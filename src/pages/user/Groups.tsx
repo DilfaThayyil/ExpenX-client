@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,16 +45,15 @@ import {
     //   UserPlus
 } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
-import { createGroup } from '../../services/user/userService'
+import { createGroup,getUserGroups} from '../../services/user/userService'
 import useShowToast from '@/customHook/showToaster';
 // import Loading from '@/style/loading';
-// import Store from '../../store/store'
-
+import Store from '../../store/store'
 
 
 // Types
 interface Group {
-    id: number;
+    id: string;
     name: string;
     totalExpenses: number;
     memberCount: number;
@@ -62,10 +61,11 @@ interface Group {
     lastActivity: string;
     members: GroupMember[];
     expenses: GroupExpense[];
+    splitMethod?: string;
 }
 
 interface GroupMember {
-    id: number;
+    id: string;
     name: string;
     avatar: string;
     paid: number;
@@ -104,23 +104,36 @@ const GroupsPage = () => {
         splitMethod: ''
     })
     const [groups, setGroups] = useState<Group[]>([])
+    
     const [isDialogOpen,setIsDialogOpen] = useState<boolean>(false)
+    const email = Store((state)=>state.user.email)
 
-    // useEffect(()=>{
-    //     fetchGroups()
-    // },[])
 
-    // const fetchGroups = ()=>{
-    //     try{
-    //         setLoading(true)
-    //         const response = await getGroups()
-    //         setGroups(response.data.groups)
-    //     }catch(error){
-    //         Toastr.error('Failed to get groups')
-    //     }finally{
-    //         setLoading(false)
-    //     }
-    // }
+    useEffect(()=>{
+        const fetchGroups = async()=>{
+            try{
+                if(!email){
+                    console.error('email is required')
+                    return
+                }
+                console.log("email : ",email)
+                const response = await getUserGroups(email)
+                console.log('response: ',response)
+                console.log('response.groups : ',response.groups)
+                console.log('response.groups[0]: ',response[0].name)
+                setGroups(response)
+                console.log('Fetched groups:', groups);
+            }catch(error){
+                console.error('Error creating group',error)
+                Toaster('errrr fetching groups','error')
+            }
+        }
+        fetchGroups()
+    },[email])
+   
+
+    
+
 
     //   const categoryData = [
     //     { name: "Food", value: 400, color: "#10B981" },
@@ -150,12 +163,12 @@ const GroupsPage = () => {
             const response = await createGroup(newGroup)
             setGroups((prev)=>[...prev,response])
             console.log("-------------response : ", response)
-            toastr.success('Group created successfully')
+            Toaster('Group creation successfull','success')
             setNewGroup({name:'',members:[],splitMethod:''})
             setIsDialogOpen(false)
         } catch (error) {
             console.error('Error creating group',error)
-            toastr.error('Failed to create group', error)
+            Toaster('Failed to create group','error')
         }finally{
             setLoading(false)
         }
@@ -205,7 +218,7 @@ const GroupsPage = () => {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">My Groups</h1>
-                    <Dialog>
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
                             <Button className="bg-emerald-600 hover:bg-emerald-700">
                                 <Plus className="mr-2 h-4 w-4" /> Create New Group

@@ -83,3 +83,40 @@ export const createGroup = async (formData: { name: string; members: string[]; s
     throw error;
   }
 };
+
+
+export const getUserGroups = async (email: string) => {
+  try {
+    console.log("email --- ",email)
+    const response = await axiosInstance.get(`${BASEURL}/getUserGroups/${email}`);
+
+    const transformedGroups = response.data.groups.map((group: any) => ({
+      id: group._id || group.id,
+      name: group.name,
+      totalExpenses: 0, 
+      memberCount: group.members ? group.members.length : 0,
+      balance: 0,
+      lastActivity: group.expenses && group.expenses.length > 0 
+        ? group.expenses[group.expenses.length - 1].description 
+        : 'No recent activity',
+      members: group.members 
+        ? group.members.map((memberEmail: string) => ({
+            id: memberEmail.replace('@', '_'),
+            name: memberEmail.split('@')[0],
+            avatar: `https://ui-avatars.com/api/?name=${memberEmail.split('@')[0]}`,
+            paid: 0, 
+            owed: 0  
+          }))
+        : [], 
+      expenses: group.expenses || [],
+      splitMethod: group.splitMethod || 'equal'
+    }));
+    
+    return transformedGroups;
+    
+    return transformedGroups
+  } catch (error) {
+    console.error('Error fetching groups:', error);
+    throw error;
+  }
+};
