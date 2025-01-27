@@ -1,6 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+import { Calendar, Home, Inbox, Search, Settings, Users, UsersRound } from "lucide-react";
 
 const userMenuItems = [
   { title: "Dashboard", url: "/home", icon: Home },
@@ -18,20 +18,32 @@ const advisorMenuItems = [
   // { title: "Profile", url: "/advisor/profile", icon: Search },
 ];
 
+const adminMenuItems = [
+  { title: "Dashboard", url: "/admin/", icon: Home },
+  { title: "Users", url: "/admin/users", icon: Users },
+  { title: "Advisors", url: "/admin/advisors", icon: UsersRound },
+  { title: "Profile", url: "/admin/profile", icon: Settings },
+];
      
+
 export default function Layout({
   children,
   role,
 }: {  
   children: React.ReactNode;
-  role: "user" | "advisor"
+  role: "user" | "advisor" | "admin"
 }) {
-  const menuItems = role === "advisor" ? advisorMenuItems : userMenuItems;
+  const menuItems =
+   role === "advisor" ?
+   advisorMenuItems
+   : role === "admin"
+   ? adminMenuItems
+   : userMenuItems;
 
   return (
     <SidebarProvider>
       <div className="flex">
-        <AppSidebar menuItems={menuItems}/>
+        <AppSidebar menuItems={menuItems} role={role}/>
         <div className="flex-1">
           <main className="p-4">
             <SidebarTrigger />

@@ -12,6 +12,7 @@ import { User2, Sun, Moon } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Store from "@/store/store";
+import useAdminStore from '@/store/adminStore'
 import { useState } from "react";
 
 interface MenuItem {
@@ -22,13 +23,14 @@ interface MenuItem {
 
 interface AppSidebarProps {
   menuItems: MenuItem[];
+  role: "user" | "advisor" | "admin"
 }
 
-export function AppSidebar({ menuItems }: AppSidebarProps) {
+export function AppSidebar({ menuItems, role }: AppSidebarProps) {
   const router = useLocation();
   const currentPath = router.pathname;
   const user = Store((state) => state.user);
-  console.log("user in store : ",user)
+  const adminEmail = useAdminStore((state)=>state.adminEmail)
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {
@@ -92,7 +94,7 @@ export function AppSidebar({ menuItems }: AppSidebarProps) {
           {/* User Info */}
           <SidebarMenuButton className="flex items-center space-x-4 text-lg font-semibold text-gray-700 dark:text-gray-300">
             <User2 className="w-8 h-8 text-emerald-600" />
-            <span>{user.username}</span>
+            <span>{role ==='admin' ? adminEmail : user.username}</span>
           </SidebarMenuButton>
 
           {/* Dark/Light Mode Toggle */}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Users, CreditCard, TrendingUp, DollarSign } from 'lucide-react';
+import Layout from '@/layout/Sidebar';
 
 const AdminDashboard = () => {
   // Sample data - Replace with your actual API calls
@@ -29,6 +30,8 @@ const AdminDashboard = () => {
   ];
 
   return (
+    <Layout role='admin'>
+
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
       
@@ -131,6 +134,8 @@ const AdminDashboard = () => {
         </div>
       </div>
     </div>
+
+    </Layout>
   );
 };
 
