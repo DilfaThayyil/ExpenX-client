@@ -82,11 +82,7 @@ export const userLogin = async (email: string, password: string) => {
       email,
       password,
     });
-    const { accessToken, refreshToken } = response.data;
-    if (accessToken && refreshToken) {
-      localStorage.setItem("userAccessToken", accessToken);
-      localStorage.setItem("userRefreshToken", refreshToken);
-    }
+    console.log(response.data)
     return response.data;
   } catch (err) {
     console.log(err);

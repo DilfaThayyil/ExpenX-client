@@ -19,7 +19,7 @@ interface ExpenseGoal {
   deadline: string;
 }
 
-const ProfilePage = () => {
+const Profile = () => {
   
   const Toaster = useShowToast()
   const user = Store(state=>state.user)
@@ -341,4 +341,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default Profile;

@@ -28,6 +28,7 @@ export function AppSidebar({ menuItems }: AppSidebarProps) {
   const router = useLocation();
   const currentPath = router.pathname;
   const user = Store((state) => state.user);
+  console.log("user in store : ",user)
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {

@@ -68,10 +68,10 @@ const LoginPage = () => {
       const response = await userLogin(formData.email, formData.password);
       if (response.message) {
         console.log("response-msg in loginForm : ",response.message)
-        console.log("response-user2 : ",response.user)
-        setUser(response.user)
+        console.log("response-user2 : ",response.user2)
+        setUser(response.user2)
         toastr.success(response.message);
-        setTimeout(() => navigate("/"), 1000);
+        setTimeout(() => navigate("/home"), 1000);
       } else if (response.error) {
         toastr.error(response.error || "Login failed");
       }

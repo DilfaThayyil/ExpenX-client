@@ -9,10 +9,13 @@ import GoogleAuth from '../user/GoogleAuth';
 import ForgetPassword from '../advisor/ForgotPassword';
 import { userLogin } from '../../services/advisor/AuthServices';
 import { isValidateEmail, isValidatePassword } from '../../utility/validator';
+import Store from '@/store/store';
+
 
 
 const AdvisorLogin: React.FC = () => {
   const navigate = useNavigate();
+  const {setUser} = Store()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -66,8 +69,10 @@ const AdvisorLogin: React.FC = () => {
     try {
       const response = await userLogin(formData.email, formData.password);
       if (response.message) {
+        setUser(response.user2)
         toast.success(response.message);
-        setTimeout(() => navigate("/advisor"), 1000);
+        console.log("response-user :",response.user2)
+        setTimeout(() => navigate("/advisor/home"), 1000);
       } else if (response.error) {
         toast.error(response.error || "Login failed");
       }

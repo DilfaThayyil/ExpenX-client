@@ -108,6 +108,7 @@ const GroupsPage = () => {
     const [isDialogOpen,setIsDialogOpen] = useState<boolean>(false)
     const email = Store((state)=>state.user.email)
 
+    const [refreshGroups, setRefreshGroups] = useState(false)
 
     useEffect(()=>{
         const fetchGroups = async()=>{
@@ -118,18 +119,19 @@ const GroupsPage = () => {
                 }
                 console.log("email : ",email)
                 const response = await getUserGroups(email)
-                console.log('response: ',response)
-                console.log('response.groups : ',response.groups)
-                console.log('response.groups[0]: ',response[0].name)
-                setGroups(response)
-                console.log('Fetched groups:', groups);
+                if (Array.isArray(response)) {
+                    setGroups(response)
+                } else {
+                    console.error('Invalid response format:', response)
+                    Toaster('Error fetching groups: Invalid format', 'error')
+                }
             }catch(error){
                 console.error('Error creating group',error)
                 Toaster('errrr fetching groups','error')
             }
         }
         fetchGroups()
-    },[email])
+    },[email,refreshGroups])
    
 
     
@@ -161,11 +163,12 @@ const GroupsPage = () => {
         setLoading(true)
         try {
             const response = await createGroup(newGroup)
-            setGroups((prev)=>[...prev,response])
+            // setGroups((prev)=>[...prev,response])
             console.log("-------------response : ", response)
             Toaster('Group creation successfull','success')
             setNewGroup({name:'',members:[],splitMethod:''})
             setIsDialogOpen(false)
+            setRefreshGroups(prev => !prev)
         } catch (error) {
             console.error('Error creating group',error)
             Toaster('Failed to create group','error')
