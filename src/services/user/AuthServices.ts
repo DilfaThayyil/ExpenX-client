@@ -51,16 +51,14 @@ export const otpGenerate = async (email: string) => {
 };
 
 export const verifyOtp = async (email: string, otp: string) => {
-  try {
     console.log("email $ otp : ",email,otp)
     const response = await axiosInstance.post(`${BASEURL}/verifyOtp`,
       { email, otp }
     )
     return { success: true, message: response.data.message }
-  } catch (err:any) {
-    throw err
-  }
 };
+
+////////some updation should be here in verifyOtp///////////////
 
 export const resendOtp = async (email: string) => {
   try {
@@ -108,16 +106,14 @@ export const handleforgetpassword = async (email: string) => {
 };
 
 export const handleforgetpasswordOtp = async (email: string, otp: string) => {
-  try {
     console.log("email $ otp : ",email,otp)
     const response = await axiosInstance.post(`${BASEURL}/forgetPassOtp`,
       { email, otp }
     )
     return { success: true, message: response.data.message }
-  } catch (err:any) {
-    throw err
-  }
 };
+
+/////////////some updation need here in handleForgetPasswordOtp////////////
 
 export const resetPassword = async (email: string, password: string) => {
   try {
