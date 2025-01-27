@@ -4,16 +4,18 @@ import FormInput from '../InputField';
 import { isValidateEmail, isValidatePassword } from '../../utility/validator';
 import useShowToast from '../../customHook/showToaster';
 import { adminLogin } from '../../services/admin/adminServices';
-// import useAdminStore from '../../store/adminStore';
+import useAdminStore from '@/store/adminStore'
+
+
 
 const AdminLogin: React.FC = () => {
-  // const adminEmail = useAdminStore((state) => state.setAdminEmail);
+  const setAdminEmail = useAdminStore((state) => state.setAdminEmail)
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const Toaster=useShowToast()
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const togglePasswordVisibility = () => {
     setShowPassword(prev => !prev);
@@ -56,6 +58,7 @@ const AdminLogin: React.FC = () => {
             Toaster(response.error,'error',true)
         }else{
           Toaster("admin logged in successfully",'success',true)
+          setAdminEmail(email)
           navigate('/admin')
         }
 
