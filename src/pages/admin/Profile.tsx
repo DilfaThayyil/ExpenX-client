@@ -1,10 +1,11 @@
 import Layout from "@/layout/Sidebar";
+import Profile from '@/components/admin/ProfileComponent'
 
 const AdminProfile=()=>{
   return (
     <Layout role="admin">
       <div>
-        <h1 className="text-xl font-bold">Profile</h1>
+        <Profile/>
       </div>
     </Layout>
   );
