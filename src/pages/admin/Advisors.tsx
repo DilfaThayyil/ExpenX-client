@@ -1,11 +1,12 @@
 import Layout from "@/layout/Sidebar";
+import UserTable from '@/components/admin/Listings'
 
  const Advisors=()=>{
   return (
     <Layout role="admin">
-      <div>
-        <h1 className="text-xl font-bold">Advisors</h1>
-      </div>
+      <>
+      <UserTable type="advisor"/>
+      </>
     </Layout>
   );
 }

@@ -1,17 +1,16 @@
-import axiosInstance from "../axios/axios";
 import { AxiosError } from "axios";
-
+import axios from 'axios'
 const BASEURL = "http://localhost:3000/admin";
 
-export const adminLogin = async (email: string, password: string) => {
-  try {
-    const response = await axiosInstance.post(`${BASEURL}/login`, { email, password });
-    const { accessToken, refreshToken } = response.data;
 
-    if (accessToken && refreshToken) {
-      localStorage.setItem("AdminAccessToken", accessToken);
-      localStorage.setItem("AdminRefreshToken", refreshToken);
-    }
+
+export const adminLogin = async (username:string, email: string, password: string) => {
+  try {
+    const response = await axios.post(`${BASEURL}/login`, {
+       username,
+       email,
+       password 
+      })
     console.log("response in service : ",response.data)
     return response.data;
   } catch (err) {
@@ -22,3 +21,46 @@ export const adminLogin = async (email: string, password: string) => {
     return { error: "An unexpected error occurred" };
   }
 };
+
+export const fetchUsers = async (page: number, limit: number) => {
+  const response = await axios.get(`${BASEURL}/users`, {
+    params: { page, limit },
+  });
+  return response.data;
+}
+
+export const fetchAdvisors = async (page: number, limit: number) => {
+  const response = await axios.get(`${BASEURL}/advisors`, {
+    params: { page, limit },
+  });
+  return response.data;
+}
+
+export const updateAdmin = async (name:string,email:string,password:string)=>{
+  try{
+    console.log("name : ",name)
+    console.log("email : ",email)
+    console.log("password : ",password)
+    const response = await axios.post(`${BASEURL}/updateAdmin`,{
+      name,
+      email,
+      password
+    })
+    return response.data
+  }catch(error){
+    console.error(error)
+  }
+}
+
+
+// export const manageUser = async (action: string, email: string) => {
+//   try {
+//     const response = await axiosInstance.put(`${BASEURL}/updateUserBlockStatus/`, {
+//       action,
+//       email,
+//     });
+//     return response.data;
+//   } catch (err) {
+//     console.log(err);
+//   }
+// }
