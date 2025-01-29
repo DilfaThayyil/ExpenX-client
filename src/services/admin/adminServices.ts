@@ -53,14 +53,12 @@ export const updateAdmin = async (name:string,email:string,password:string)=>{
 }
 
 
-// export const manageUser = async (action: string, email: string) => {
-//   try {
-//     const response = await axiosInstance.put(`${BASEURL}/updateUserBlockStatus/`, {
-//       action,
-//       email,
-//     });
-//     return response.data;
-//   } catch (err) {
-//     console.log(err);
-//   }
-// }
+export const manageUser = async (action: string,type:'user'|'advisor', email: string) => {
+  try {
+    const endPoint = type === 'user' ? `${BASEURL}/updateUserBlockStatus` : `${BASEURL}/updateAdvisorBlockStatus/`
+    const response = await axios.patch(endPoint, {action,email})
+    return response.data;
+  } catch (err) {
+    console.log(err);
+  }
+}

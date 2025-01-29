@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Table from "@/components/admin/Table";
-import { fetchUsers, fetchAdvisors } from "@/services/admin/adminServices";
+import { fetchUsers, fetchAdvisors, manageUser } from "@/services/admin/adminServices";
 import useShowToast from "@/customHook/showToaster";
 import Loading from "@/style/loading";
 import Pagination from "@/components/admin/Pagination";
@@ -51,22 +51,17 @@ const UserTable: React.FC<UserTableProps> = ({ type }) => {
   // Dynamic columns based on type
   const columns = [
     {
-      header: "Name",
-      accessor: (item: User) => item.username,
+      header: "Name", accessor: (item: User) => item.username,
     },
     { header: "Email", accessor: (item: User) => item.email },
     {
-      header: "Join Date",
-      accessor: (item: User) => new Date(item.createdAt).toLocaleDateString(),
+      header: "Join Date", accessor: (item: User) => new Date(item.createdAt).toLocaleDateString(),
     },
     {
-      header: "Status",
-      accessor: (item: User) => (item.isBlock ? "Blocked" : "Active"),
+      header: "Status", accessor: (item: User) => (item.isBlock ? "Blocked" : "Active"),
     },
     {
-      header: "Action",
-      accessor: (item: User) =>
-        item.isBlock ? (
+      header: "Action", accessor: (item: User) => item.isBlock ? (
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             onClick={() => handleUser("unblock", item.email)}
@@ -84,10 +79,10 @@ const UserTable: React.FC<UserTableProps> = ({ type }) => {
     },
   ];
 
-  // Handle block/unblock actions
+//block & unblock
   const handleUser = async (action: string, email: string) => {
     try {
-      // const response = await manageUser(action, email);
+      const response = await manageUser(action, type, email);
       if (response.message) {
         Toast(`${type} ${action}ed successfully`, "success", true);
         setData(
@@ -100,6 +95,7 @@ const UserTable: React.FC<UserTableProps> = ({ type }) => {
       }
     } catch (err) {
       console.log(err);
+      Toast(`Failed to ${action} the ${type}`,"error",true)
     }
   };
 
