@@ -246,6 +246,7 @@ const Profile = () => {
                 </div>
               ))}
             </div>
+            <Button variant='outline'>Add goal</Button>
           </CardContent>
         </Card>
       </div>

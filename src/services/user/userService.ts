@@ -114,9 +114,26 @@ export const getUserGroups = async (email: string) => {
     
     return transformedGroups;
     
-    return transformedGroups
   } catch (error) {
     console.error('Error fetching groups:', error);
     throw error;
   }
 };
+
+
+export const addMember = async (groupId: string, memberEmail: string) => {
+  try {
+    const response = await axiosInstance.post(`${BASEURL}/addMember/${groupId}`,{
+      memberEmail
+    })
+    console.log("response in frontService : ",response.data)
+    return response.data
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const addExpense = async()=>{
+  
+}

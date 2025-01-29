@@ -68,8 +68,8 @@ const Expenses = () => {
     const [loading,setLoading] = useState<boolean>(false)
     const [searchQuery, setSearchQuery] = useState('');
     const [isDialogOpen,setIsDialogOpen] = useState<boolean>(false)
-    const userId = Store((state)=>state.user._id)
-
+    const userId = Store((state)=>state.user.id)
+console.log("frontent user Id  : ",userId)
 
     useEffect(() => {
         const fetchExpenses = async () => {
