@@ -35,6 +35,9 @@ import {
   LogOut
 } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
+import Store from '@/store/store'
+
+
 
 // Types
 interface ExpenseData {
@@ -59,6 +62,9 @@ const getGreeting = () => {
 };
 
 const DashboardPage = () => {
+
+  const user = Store(state=>state.user)
+  console.log("user in store : ", user)
   const [budgetProgress, setBudgetProgress] = useState(65);
 
   // Mock data
@@ -90,11 +96,12 @@ const DashboardPage = () => {
           <div className="flex items-center gap-4">
             <Avatar className="h-12 w-12">
               <AvatarImage src="/api/placeholder/40/40" alt="User" />
-              <AvatarFallback>JD</AvatarFallback>
+              
+              <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                {getGreeting()}, John!
+                {getGreeting()},{user.username}
               </h1>
               <p className="text-gray-600">Welcome back to your dashboard</p>
             </div>

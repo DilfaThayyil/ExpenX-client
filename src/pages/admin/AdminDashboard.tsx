@@ -1,4 +1,3 @@
-import React from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Users, CreditCard, TrendingUp, DollarSign } from 'lucide-react';
 import Layout from '@/layout/Sidebar';

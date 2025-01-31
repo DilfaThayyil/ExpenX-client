@@ -14,7 +14,7 @@ export const uploadImageToCloudinary = async (formData: FormData) => {
   }
 };
 
-export const updateUser = async (formData: { profilePic: string; username: string; email:string; phone: string; country: string; language: string }) => {
+export const updateUser = async (formData: { profilePic: string; username: string; email: string; phone: string; country: string; language: string }) => {
   try {
     const response = await axiosInstance.patch(`${BASEURL}/editProfile`, formData, {
       headers: { 'Content-Type': 'application/json' },
@@ -39,9 +39,9 @@ export const createExpense = async (formData: FormData, userId: string) => {
 };
 
 
-export const getExpenses = async (userId:string) => {
+export const getExpenses = async (userId: string) => {
   try {
-    console.log("userid : ",userId)
+    console.log("userid : ", userId)
     const response = await axiosInstance.get(`${BASEURL}/getExpenses/${userId}`);
     return response.data;
   } catch (error) {
@@ -75,11 +75,11 @@ export const getExpenses = async (userId:string) => {
 
 export const createGroup = async (formData: { name: string; members: string[]; splitMethod: string }) => {
   try {
-    const response = await axiosInstance.post(`${BASEURL}/createGroup`, formData);
-    console.log('Response in service:', response);
-    return response.data;
+    const response = await axiosInstance.post(`${BASEURL}/createGroup`, formData)
+    console.log('Response in service:', response)
+    return response.data
   } catch (error) {
-    console.error('Error creating group:', error);
+    console.error('Error creating group:', error)
     throw error;
   }
 };
@@ -87,33 +87,33 @@ export const createGroup = async (formData: { name: string; members: string[]; s
 
 export const getUserGroups = async (email: string) => {
   try {
-    console.log("email --- ",email)
+    console.log("email --- ", email)
     const response = await axiosInstance.get(`${BASEURL}/getUserGroups/${email}`);
 
     const transformedGroups = response.data.groups.map((group: any) => ({
       id: group._id || group.id,
       name: group.name,
-      totalExpenses: 0, 
+      totalExpenses: 0,
       memberCount: group.members ? group.members.length : 0,
       balance: 0,
-      lastActivity: group.expenses && group.expenses.length > 0 
-        ? group.expenses[group.expenses.length - 1].description 
+      lastActivity: group.expenses && group.expenses.length > 0
+        ? group.expenses[group.expenses.length - 1].description
         : 'No recent activity',
-      members: group.members 
+      members: group.members
         ? group.members.map((memberEmail: string) => ({
-            id: memberEmail.replace('@', '_'),
-            name: memberEmail.split('@')[0],
-            avatar: `https://ui-avatars.com/api/?name=${memberEmail.split('@')[0]}`,
-            paid: 0, 
-            owed: 0  
-          }))
-        : [], 
+          id: memberEmail.replace('@', '_'),
+          name: memberEmail.split('@')[0],
+          avatar: `https://ui-avatars.com/api/?name=${memberEmail.split('@')[0]}`,
+          paid: 0,
+          owed: 0
+        }))
+        : [],
       expenses: group.expenses || [],
       splitMethod: group.splitMethod || 'equal'
     }));
-    
+
     return transformedGroups;
-    
+
   } catch (error) {
     console.error('Error fetching groups:', error);
     throw error;
@@ -123,10 +123,10 @@ export const getUserGroups = async (email: string) => {
 
 export const addMember = async (groupId: string, memberEmail: string) => {
   try {
-    const response = await axiosInstance.post(`${BASEURL}/addMember/${groupId}`,{
+    const response = await axiosInstance.post(`${BASEURL}/addMember/${groupId}`, {
       memberEmail
     })
-    console.log("response in frontService : ",response.data)
+    console.log("response in frontService : ", response.data)
     return response.data
   } catch (error) {
     console.error(error)
@@ -134,6 +134,17 @@ export const addMember = async (groupId: string, memberEmail: string) => {
   }
 }
 
-export const addExpense = async()=>{
-  
-}
+
+export const addExpenseInGroup = async (groupId: string,
+  expenseData: { description: string; amount: number; paidBy: string; date: string; splitMethod: string }
+) => {
+  try {
+    console.log("groupId : ",groupId)
+    console.log("expenseData: ",expenseData)
+    const response = await axiosInstance.post(`${BASEURL}/addExpenseInGroup/${groupId}`, expenseData)
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

@@ -1,5 +1,4 @@
-
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,13 +38,14 @@ import {
     Plus,
     //   Settings,
     //   LogOut,
+    Calendar as CalendarIcon,
     Receipt,
     //   ArrowRight,
     //   ChevronRight,
     //   UserPlus
 } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
-import { createGroup,getUserGroups} from '../../services/user/userService'
+import { createGroup, getUserGroups, addMember} from '../../services/user/userService'
 import useShowToast from '@/customHook/showToaster';
 // import Loading from '@/style/loading';
 import Store from '../../store/store'
@@ -75,9 +75,9 @@ interface GroupMember {
 interface GroupExpense {
     date: string;
     description: string;
-    amount: string;
+    amount: number;
     paidBy: string;
-    splitMethod: string;
+    splitMethod?: string;
 }
 
 interface Group1 {
@@ -89,12 +89,13 @@ interface Group1 {
 const GroupsPage = () => {
 
     const Toaster = useShowToast()
+    const [member, setMember] = useState('')
     const [loading, setLoading] = useState<boolean>(false)
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [newExpense, setNewExpense] = useState<GroupExpense>({
-        date: '',
+        date: new Date().toISOString(),
         description: '',
-        amount: '',
+        amount: 0,
         paidBy: '',
         splitMethod: 'equal'
     })
@@ -104,20 +105,20 @@ const GroupsPage = () => {
         splitMethod: ''
     })
     const [groups, setGroups] = useState<Group[]>([])
-    
-    const [isDialogOpen,setIsDialogOpen] = useState<boolean>(false)
-    const email = Store((state)=>state.user.email)
+
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+    const email = Store((state) => state.user.email)
 
     const [refreshGroups, setRefreshGroups] = useState(false)
 
-    useEffect(()=>{
-        const fetchGroups = async()=>{
-            try{
-                if(!email){
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+                if (!email) {
                     console.error('email is required')
                     return
                 }
-                console.log("email : ",email)
+                console.log("email : ", email)
                 const response = await getUserGroups(email)
                 if (Array.isArray(response)) {
                     setGroups(response)
@@ -125,18 +126,39 @@ const GroupsPage = () => {
                     console.error('Invalid response format:', response)
                     Toaster('Error fetching groups: Invalid format', 'error')
                 }
-            }catch(error){
-                console.error('Error creating group',error)
-                Toaster('errrr fetching groups','error')
+            } catch (error) {
+                console.error('Error creating group', error)
+                Toaster('errrr fetching groups', 'error')
             }
         }
         fetchGroups()
-    },[email,refreshGroups])
-   
-
-    
+    }, [email, refreshGroups])
 
 
+    const handleAddMember = async () => {
+        if (!selectedGroup?.id || !member) {
+            Toaster('Member email is required', 'error');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await addMember(selectedGroup.id, member);
+
+            if (response.success) {
+                Toaster('Member added successfully', 'success');
+                setMember('');
+                setRefreshGroups(prev => !prev);
+            } else {
+                Toaster(response.message || 'Failed to add member', 'error');
+            }
+        } catch (error) {
+            console.error('Error adding member:', error);
+            Toaster('Failed to add member', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
     //   const categoryData = [
     //     { name: "Food", value: 400, color: "#10B981" },
     //     { name: "Transport", value: 300, color: "#3B82F6" },
@@ -165,55 +187,22 @@ const GroupsPage = () => {
             const response = await createGroup(newGroup)
             // setGroups((prev)=>[...prev,response])
             console.log("-------------response : ", response)
-            Toaster('Group creation successfull','success')
-            setNewGroup({name:'',members:[],splitMethod:''})
+            Toaster('Group creation successfull', 'success')
+            setNewGroup({ name: '', members: [], splitMethod: '' })
             setIsDialogOpen(false)
             setRefreshGroups(prev => !prev)
         } catch (error) {
-            console.error('Error creating group',error)
-            Toaster('Failed to create group','error')
-        }finally{
+            console.error('Error creating group', error)
+            Toaster('Failed to create group', 'error')
+        } finally {
             setLoading(false)
         }
     }
 
-    // const handleAddExpense = async () => {
-    //     if (!newExpense.description || !newExpense.amount || !newExpense.paidBy) {
-    //         Toaster('All fields are required for the expense.', 'error');
-    //         return;
-    //     }
-    //     try {
-    //         setLoading(true);
-    //         const response = await addExpense(selectedGroup?.id, newExpense);
-    //         const updatedGroup = response.data.group;
-    //         setGroups((prev) =>
-    //             prev.map((group) => (group.id === updatedGroup.id ? updatedGroup : group))
-    //         );
-    //         setSelectedGroup(updatedGroup);
-    //         Toaster('Expense added successfully.', 'success');
-    //     } catch (error) {
-    //         Toaster('Failed to add expense.', 'error');
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
+    
 
+    
 
-    // const handleAddExpense = () => {
-    //     if (selectedGroup && newExpense.description && newExpense.amount && newExpense.paidBy) {
-    //         const newExpenseData: GroupExpense = {
-    //             id: selectedGroup.expenses.length + 1,
-    //             date: new Date().toISOString().split('T')[0],
-    //             description: newExpense.description,
-    //             amount: parseFloat(newExpense.amount),
-    //             paidBy: newExpense.paidBy,
-    //             splitMethod: "Equal"
-    //         };
-    //         selectedGroup.expenses.push(newExpenseData);
-    //         selectedGroup.totalExpenses += newExpenseData.amount;
-    //         setNewExpense({ description: '', amount: '', paidBy: '' });
-    //     }
-    // };
 
     return (
         <Layout role='user'>
@@ -415,87 +404,21 @@ const GroupsPage = () => {
                                                     </Badge>
                                                 </div>
                                             ))}
-                                            <Button variant="outline" className="h-full">
+                                            <input
+                                                type="text"
+                                                placeholder='Enter email address'
+                                                value={member}
+                                                onChange={(e) => setMember(e.target.value)}
+                                            />
+                                            <Button variant="outline" className="h-full"
+                                                onClick={handleAddMember}>
                                                 <Users className="mr-2 h-4 w-4" /> Add Member
                                             </Button>
                                         </div>
                                     </div>
 
                                     {/* Expenses Table */}
-                                    <div className="mb-6">
-                                        <div className="flex justify-between items-center mb-4">
-                                            <h3 className="text-lg font-semibold">Recent Expenses</h3>
-                                            <Dialog>
-                                                <DialogTrigger asChild>
-                                                    <Button>
-                                                        <Receipt className="mr-2 h-4 w-4" /> Add Expense
-                                                    </Button>
-                                                </DialogTrigger>
-                                                <DialogContent>
-                                                    <DialogHeader>
-                                                        <DialogTitle>Add New Expense</DialogTitle>
-                                                    </DialogHeader>
-                                                    <div className="grid gap-4 py-4">
-                                                        <div className="grid gap-2">
-                                                            <label>Description</label>
-                                                            <Input
-                                                                placeholder="What was this expense for?"
-                                                                value={newExpense.description}
-                                                                onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
-                                                            />
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <label>Amount</label>
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="Enter amount"
-                                                                value={newExpense.amount}
-                                                                onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
-                                                            />
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <label>Paid By</label>
-                                                            <Select onValueChange={(value) => setNewExpense({ ...newExpense, paidBy: value })}>
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Who paid?" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    {selectedGroup.members.map(member => (
-                                                                        <SelectItem key={member.id} value={member.name}>
-                                                                            {member.name}
-                                                                        </SelectItem>
-                                                                    ))}
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-                                                    </div>
-                                                    <Button className="w-full" >Add Expense</Button>
-                                                </DialogContent>
-                                            </Dialog>
-                                        </div>
-                                        <Table>
-                                            <TableHeader>
-                                                <TableRow>
-                                                    <TableHead>Date</TableHead>
-                                                    <TableHead>Description</TableHead>
-                                                    <TableHead>Paid By</TableHead>
-                                                    <TableHead className="text-right">Amount</TableHead>
-                                                </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {selectedGroup.expenses.map((expense) => (
-                                                    <TableRow key={expense.id}>
-                                                        <TableCell>{expense.date}</TableCell>
-                                                        <TableCell>{expense.description}</TableCell>
-                                                        <TableCell>{expense.paidBy}</TableCell>
-                                                        <TableCell className="text-right">
-                                                            ${expense.amount}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
-                                    </div>
+                                    
 
                                     {/* Spending Categories
                     <div>
