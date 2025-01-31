@@ -75,11 +75,11 @@ export const getExpenses = async (userId: string) => {
 
 export const createGroup = async (formData: { name: string; members: string[]; splitMethod: string }) => {
   try {
-    const response = await axiosInstance.post(`${BASEURL}/createGroup`, formData)
-    console.log('Response in service:', response)
-    return response.data
+    const response = await axiosInstance.post(`${BASEURL}/createGroup`, formData);
+    console.log('Response in service:', response);
+    return response.data;
   } catch (error) {
-    console.error('Error creating group:', error)
+    console.error('Error creating group:', error);
     throw error;
   }
 };
