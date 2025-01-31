@@ -45,7 +45,7 @@ import {
     //   UserPlus
 } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
-import { createGroup, getUserGroups, addMember} from '../../services/user/userService'
+import { createGroup, getUserGroups, addMember, addExpenseInGroup } from '../../services/user/userService'
 import useShowToast from '@/customHook/showToaster';
 // import Loading from '@/style/loading';
 import Store from '../../store/store'
@@ -199,9 +199,55 @@ const GroupsPage = () => {
         }
     }
 
-    
+    const handleAddExpense = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedGroup?.id || !newExpense.description || !newExpense.amount || !newExpense.paidBy) {
+            Toaster('All fields are required for the expense.', 'error');
+            return;
+        }
 
-    
+        try {
+            setLoading(true)
+            console.log("handleAddExpense......")
+            const response = await addExpenseInGroup(selectedGroup.id, {
+                ...newExpense,
+                date: new Date().toISOString(),
+                splitMethod: newExpense.splitMethod || selectedGroup.splitMethod || 'equal'
+            })
+            if (response.success) {
+                setGroups(prev =>
+                    prev.map(group =>
+                        group.id === selectedGroup.id ? response.data.group : group
+                    )
+                )
+                setSelectedGroup(response.data.group)
+                setNewExpense({
+                    date: new Date().toISOString(),
+                    description: '',
+                    amount: 0,
+                    paidBy: '',
+                    splitMethod: 'equal'
+                });
+                setIsDialogOpen(false)
+                Toaster('Expense added successfully', 'success')
+            } else {
+                Toaster(response.message || 'Failed to add expense', 'error')
+            }
+        } catch (error) {
+            console.error('Error adding expense:', error)
+            Toaster('Failed to add expense', 'error')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleChange = (e:React.ChangeEvent<HTMLInputElement | HTMLSelectElement>)=>{
+        const {name,value} = e.target
+        setNewExpense({
+            ...newExpense,
+            [name]: name === 'amount' ? parseFloat(value) : value
+        })
+    }
 
 
     return (
@@ -418,7 +464,83 @@ const GroupsPage = () => {
                                     </div>
 
                                     {/* Expenses Table */}
-                                    
+                                    <div className="mb-6">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h3 className="text-lg font-semibold">Recent Expenses</h3>
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button>
+                                                        <Receipt className="mr-2 h-4 w-4" /> Add Expense
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent>
+                                                    <DialogHeader>
+                                                        <DialogTitle>Add New Expense</DialogTitle>
+                                                    </DialogHeader>
+                                                    <form onSubmit={handleAddExpense} className='grid gap-4 py-4'>
+
+                                                        <div className="grid gap-2">
+                                                            <label>Description</label>
+                                                            <Input
+                                                                name='description'
+                                                                placeholder="What was this expense for?"
+                                                                value={newExpense.description}
+                                                                onChange={handleChange}
+                                                            />
+                                                        </div>
+                                                        <div className="grid gap-2">
+                                                            <label>Amount</label>
+                                                            <Input
+                                                                type="number"
+                                                                name='amount'
+                                                                placeholder="Enter amount"
+                                                                value={newExpense.amount}
+                                                                onChange={handleChange}
+                                                            />
+                                                        </div>                                                        
+                                                        <div className="grid gap-2">
+                                                            <label>Paid By</label>
+                                                            <Select onValueChange={(value) => handleChange({target: {name:'paidBy',value}} as any)}>
+                                                                <SelectTrigger>
+                                                                    <SelectValue placeholder="Who paid?" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {selectedGroup.members.map(member => (
+                                                                        <SelectItem key={member.id} value={member.name}>
+                                                                            {member.name}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                        <Button className="w-full">Add Expense</Button>
+                                                    </form>
+                                                </DialogContent>
+                                            </Dialog>
+                                        </div>
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>Date</TableHead>
+                                                    <TableHead>Description</TableHead>
+                                                    <TableHead>Paid By</TableHead>
+                                                    <TableHead className="text-right">Amount</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {selectedGroup.expenses.map((expense) => (  
+                                                    <TableRow key={expense.id}>
+                                                        <TableCell>{expense.date}</TableCell>
+                                                        <TableCell>{expense.description}</TableCell>
+                                                        <TableCell>{expense.paidBy}</TableCell>
+                                                        <TableCell className="text-right">
+                                                            ${expense.amount}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
 
                                     {/* Spending Categories
                     <div>
