@@ -43,7 +43,7 @@ export function AppSidebar({ menuItems, role }: AppSidebarProps) {
       {/* ExpenX Logo */}
       <div className="flex items-center justify-center p-6 border-b border-gray-200">
         <img
-          src="/src/assets/Letter E.png"
+          src="/src/assets/image/Letter E.png"
           alt="ExpenX Logo"
           className="w-16 h-16"
         />
