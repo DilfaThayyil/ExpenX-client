@@ -12,8 +12,8 @@ const userMenuItems = [
 
 const advisorMenuItems = [
   { title: "Dashboard", url: "/advisor/home", icon: Home },
+  { title: "Appointments", url: "/advisor/slotManage", icon: Calendar },
   { title: "Clients", url: "/advisor/clients", icon: Inbox },
-  { title: "Appointments", url: "/advisor/appointments", icon: Calendar },
   { title: "Profile", url: "/advisor/profile", icon: Settings },
   // { title: "Profile", url: "/advisor/profile", icon: Search },
 ];

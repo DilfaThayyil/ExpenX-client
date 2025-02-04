@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight, Shield, Users, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import financialAdvisoryImage from '../../assets/download.jpeg'
+import financialAdvisoryImage from '../../assets/image/download.jpeg'
 
 const FeatureCard = ({ icon: Icon, title, description }: {
   icon: React.ElementType;

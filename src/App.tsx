@@ -14,11 +14,13 @@ import AdvisorRegister from './components/advisor/RegisterForm';
 import AdvisorLanding from './pages/advisor/LandingPage';
 import DashboardAd from './pages/advisor/home'
 import ProfileAd from './pages/advisor/Profile';
+import SlotManage from './pages/advisor/SlotManage';
 import AdminLogin from './components/admin/Login';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import Users from '@/pages/admin/Users'
 import Advisors from '@/pages/admin/Advisors'
 import AdminProfile from '@/pages/admin/Profile'
+import Clients from './pages/advisor/Clients';
 
 
 
@@ -43,6 +45,8 @@ const App = () => {
           <Route path='/advisor/home' element={<DashboardAd/>}/>
           <Route path='advisor/profile' element={<ProfileAd/>}/>
           <Route path="/advisor/resetPassword" element={<ResetPassword />} />
+          <Route path='/advisor/slotManage' element={<SlotManage/>}/>
+          <Route path='/advisor/clients' element={<Clients/>}/>
 
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
