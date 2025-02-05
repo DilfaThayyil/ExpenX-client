@@ -43,6 +43,7 @@ export const updateUser = async (formData: { profilePic: string; username: strin
 export const createSlot = async (slotData:Slot) => {
   try {
     const response = await axiosInstance.post(`${BASEURL}/createSlot`, slotData);
+    console.log("response-data : ",response.data)
     return response.data;
   } catch (error) {
     console.error(error)
@@ -50,7 +51,7 @@ export const createSlot = async (slotData:Slot) => {
   }
 };
 
-export const fetchSlots = async()=>{
+export const fetchSlots = async()=>{  
   try{
     const response = await axiosInstance.get(`${BASEURL}/fetchSlots`)
     console.log("response-data : ",response.data)
@@ -64,6 +65,17 @@ export const fetchSlots = async()=>{
 export const updateSlot = async(updatedSlot:Slot,slotId:string)=>{
   try{
     const response = await axiosInstance.patch(`${BASEURL}/updateSlot/${slotId}`,updatedSlot)
+    console.log("response-data : ",response.data)
+    return response.data
+  }catch(err){
+    console.error(err)
+    throw err
+  }
+}
+
+export const deleteSlot = async(slotId:string)=>{
+  try{
+    const response = await axiosInstance.delete(`${BASEURL}/deleteSlot/${slotId}`)
     console.log("response-data : ",response.data)
     return response.data
   }catch(err){

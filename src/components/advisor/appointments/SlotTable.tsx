@@ -20,7 +20,7 @@ const SlotTable: React.FC<{
     onDelete: (slotId: string) => void;
 }> = ({ slots, onEdit, onDelete }) => {
     const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
-    
+    const [slotToDelete, setSlotToDelete] = useState<string | null>(null);
 
     return (
         <div className="overflow-x-auto">
@@ -45,14 +45,14 @@ const SlotTable: React.FC<{
                                     {slot.status}
                                 </span>
                             </td>
-                            <td className="p-4">
-                                <button onClick={() => setSelectedSlot(slot)} className="mr-2 text-gray-600 hover:text-gray-800">
+                            <td className="p-4 flex space-x-2">
+                                <button onClick={() => setSelectedSlot(slot)} className="text-gray-600 hover:text-gray-800">
                                     <Eye size={20} />
                                 </button>
-                                <button onClick={() => onEdit(slot)} className="mr-2 text-blue-600 hover:text-blue-800">
+                                <button onClick={() => onEdit(slot)} className="text-blue-600 hover:text-blue-800">
                                     <Edit size={20} />
                                 </button>
-                                <button onClick={() => onDelete(slot._id)} className="text-red-600 hover:text-red-800">
+                                <button onClick={() => setSlotToDelete(slot._id)} className="text-red-600 hover:text-red-800">
                                     <Trash2 size={20} />
                                 </button>
                             </td>
@@ -60,9 +60,10 @@ const SlotTable: React.FC<{
                     ))}
                 </tbody>
             </table>
+
             {selectedSlot && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded-lg w-96">
+                    <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
                         <h2 className="text-xl font-bold mb-4">Slot Details</h2>
                         <p><strong>Date:</strong> {selectedSlot.date}</p>
                         <p><strong>Start Time:</strong> {selectedSlot.startTime}</p>
@@ -73,6 +74,32 @@ const SlotTable: React.FC<{
                         <p><strong>Location:</strong> {selectedSlot.location} {selectedSlot.locationDetails ? `- ${selectedSlot.locationDetails}` : ''}</p>
                         <p><strong>Description:</strong> {selectedSlot.description || 'N/A'}</p>
                         <button onClick={() => setSelectedSlot(null)} className="mt-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Close</button>
+                    </div>
+                </div>
+            )}
+
+            {slotToDelete && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+                        <h2 className="text-lg font-bold mb-4">Confirm Deletion</h2>
+                        <p className="mb-4">Are you sure you want to delete this slot? This action cannot be undone.</p>
+                        <div className="flex justify-center space-x-4">
+                            <button
+                                onClick={() => {
+                                    onDelete(slotToDelete);
+                                    setSlotToDelete(null);
+                                }}
+                                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                            >
+                                Delete
+                            </button>
+                            <button
+                                onClick={() => setSlotToDelete(null)}
+                                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

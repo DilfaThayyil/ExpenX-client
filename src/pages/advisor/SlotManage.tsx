@@ -4,7 +4,7 @@ import { Calendar, Clock, MapPin, Users, Edit, Trash2, Plus } from 'lucide-react
 import SlotCreationModal from '@/components/advisor/appointments/addSlotModal';
 import SlotTable from '@/components/advisor/appointments/SlotTable';
 import Layout from '@/layout/Sidebar';
-import { createSlot, fetchSlots, updateSlot } from '@/services/advisor/advisorService';
+import { createSlot, fetchSlots, updateSlot, deleteSlot } from '@/services/advisor/advisorService';
 import { toast } from 'react-toastify';
 
 // Types for Slot and Booking
@@ -53,9 +53,9 @@ const SlotManage: React.FC = () => {
     try {
       console.log("newSlot-frontent: ", newSlot)
       const response = await createSlot(newSlot)
-      console.log("newSlot : ", response.slot)
-      toast.success("Slot created succesfully")
-      setSlots([...slots, response.slot]);
+      console.log("newSlot : ", response.Slot)
+      toast.success("Slot created successfully")
+      setSlots([...slots, response.Slot]);
       setIsCreateModalOpen(false);
     } catch (err) {
       console.error(err)
@@ -78,8 +78,17 @@ const SlotManage: React.FC = () => {
   };
 
 
-  const deleteSlot = (slotId: string) => {
-    setSlots(slots.filter(slot => slot._id !== slotId));
+  const handleDeleteSlot = async(slotId: string) => {
+    try{
+      console.log("deletingId: ",slotId)
+      const response = await deleteSlot(slotId)
+      setSlots(slots.filter(slot => slot._id !== slotId));
+      console.log("response : ",response)
+      toast.success("Slot deleted successfully")
+    }catch(err){
+      console.error(err)
+      toast.error('Failed to delete slot')
+    }
   };
 
   return (
@@ -137,7 +146,7 @@ const SlotManage: React.FC = () => {
                 setSelectedSlot(slot);
                 setIsCreateModalOpen(true);
               }}              
-              onDelete={deleteSlot}
+              onDelete={handleDeleteSlot}
             />
           </div>
         </div>
