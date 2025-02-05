@@ -6,6 +6,8 @@ import SlotTable from '@/components/advisor/appointments/SlotTable';
 import Layout from '@/layout/Sidebar';
 import { createSlot, fetchSlots, updateSlot, deleteSlot } from '@/services/advisor/advisorService';
 import { toast } from 'react-toastify';
+import Store from '@/store/store';
+
 
 // Types for Slot and Booking
 interface Slot {
@@ -15,7 +17,7 @@ interface Slot {
   endTime: string;
   duration: number;
   maxBookings: number;
-  status: 'Active' | 'Inactive';
+  status: 'Available' | 'Booked' | 'Cancelled';
   location: 'Virtual' | 'Physical';
   locationDetails?: string;
   description?: string;
@@ -31,7 +33,7 @@ interface Slot {
 
 const SlotManage: React.FC = () => {
   const [slots, setSlots] = useState<Slot[]>([]);
-  // const [bookedAppointments, setBookedAppointments] = useState<Booking[]>([]);
+  const advisor = Store(state=>state.user)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
 
@@ -49,10 +51,12 @@ const SlotManage: React.FC = () => {
     fetchSlot()
   }, [])
 
-  const createNewSlot = async (newSlot: Slot) => {
+  const createNewSlot = async (id:string,newSlot: Slot) => {
     try {
+      const id = advisor._id
+      console.log("advisorId : ",id)
       console.log("newSlot-frontent: ", newSlot)
-      const response = await createSlot(newSlot)
+      const response = await createSlot(id,newSlot)
       console.log("newSlot : ", response.Slot)
       toast.success("Slot created successfully")
       setSlots([...slots, response.Slot]);

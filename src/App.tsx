@@ -21,6 +21,7 @@ import Users from '@/pages/admin/Users'
 import Advisors from '@/pages/admin/Advisors'
 import AdminProfile from '@/pages/admin/Profile'
 import Clients from './pages/advisor/Clients';
+import SlotBooking from './pages/user/slotBooking';
 
 
 
@@ -38,6 +39,7 @@ const App = () => {
           <Route path='/groups' element={<Groups/>}/>
           <Route path='/profile' element={<Profile/>}/>
           <Route path="/resetPassword" element={<ResetPassword />} />
+          <Route path="/slotBooking" element={<SlotBooking/>}/>
           
           <Route path="/advisor" element={<AdvisorLanding />} />
           <Route path="/advisor/register" element={<AdvisorRegister />} />

@@ -8,7 +8,8 @@ interface Slot {
     endTime: string;
     duration: number;
     maxBookings: number;
-    status: 'Active' | 'Inactive';
+    status: 'Available' | 'Booked' | 'Cancelled';
+    bookedBy?: string;
     location: 'Virtual' | 'Physical';
     locationDetails?: string;
     description?: string;
@@ -41,7 +42,7 @@ const SlotTable: React.FC<{
                             <td className="p-4">{slot.startTime}</td>
                             <td className="p-4">{slot.endTime}</td>
                             <td className="p-4">
-                                <span className={`px-2 py-1 rounded ${slot.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                <span className={`px-2 py-1 rounded ${slot.status === 'Available' ? 'bg-blue-100 text-blue-800' : slot.status === 'Booked' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                     {slot.status}
                                 </span>
                             </td>
@@ -71,6 +72,9 @@ const SlotTable: React.FC<{
                         <p><strong>Duration:</strong> {selectedSlot.duration} min</p>
                         <p><strong>Max Bookings:</strong> {selectedSlot.maxBookings}</p>
                         <p><strong>Status:</strong> {selectedSlot.status}</p>
+                        {selectedSlot.status === 'Booked' && selectedSlot.bookedBy && (
+                        <p><strong>Booked By:</strong> {selectedSlot.bookedBy}</p>
+                        )}
                         <p><strong>Location:</strong> {selectedSlot.location} {selectedSlot.locationDetails ? `- ${selectedSlot.locationDetails}` : ''}</p>
                         <p><strong>Description:</strong> {selectedSlot.description || 'N/A'}</p>
                         <button onClick={() => setSelectedSlot(null)} className="mt-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Close</button>

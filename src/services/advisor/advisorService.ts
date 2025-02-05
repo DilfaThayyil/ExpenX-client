@@ -9,7 +9,7 @@ interface Slot {
   endTime: string;
   duration: number;
   maxBookings: number;
-  status: "Active" | "Inactive";
+  status: 'Available' | 'Booked' | 'Cancelled';
   location: "Virtual" | "Physical";
   locationDetails?: string;
   description?: string;
@@ -40,16 +40,17 @@ export const updateUser = async (formData: { profilePic: string; username: strin
   }
 }
 
-export const createSlot = async (slotData:Slot) => {
+export const createSlot = async (id:string,slotData:Slot) => {
   try {
-    const response = await axiosInstance.post(`${BASEURL}/createSlot`, slotData);
+    console.log("advissor Id : ",id)
+    const response = await axiosInstance.post(`${BASEURL}/createSlot`, {id,slotData});
     console.log("response-data : ",response.data)
     return response.data;
   } catch (error) {
     console.error(error)
     throw error || "Failed to create slot";
   }
-};
+}
 
 export const fetchSlots = async()=>{  
   try{

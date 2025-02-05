@@ -148,3 +148,14 @@ export const addExpenseInGroup = async (groupId: string,
     throw error;
   }
 };
+
+export const bookSlot = async(slotId:string, userId:string)=>{
+  try{
+    const response = await axiosInstance.patch(`${BASEURL}/bookslot`,{slotId,userId})
+    console.log("response-data :",response.data)
+    return response.data
+  }catch(err){
+    console.error(err)
+    throw err
+  }
+}

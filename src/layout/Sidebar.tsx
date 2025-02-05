@@ -6,7 +6,7 @@ const userMenuItems = [
   { title: "Dashboard", url: "/home", icon: Home },
   { title: "Expenses", url: "/expenses", icon: Inbox },
   { title: "Groups", url: "/groups", icon: Calendar },
-  { title: "Advisors", url: "/advisors", icon: Search },
+  { title: "Advisors", url: "/slotBooking", icon: Search },
   { title: "Profile", url: "/profile", icon: Settings },
 ];
 

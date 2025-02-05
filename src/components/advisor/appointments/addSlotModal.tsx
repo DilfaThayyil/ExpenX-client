@@ -9,7 +9,7 @@ interface Slot {
   endTime: string;
   duration: number;
   maxBookings: number;
-  status: "Active" | "Inactive";
+  status: "Available" | "Booked" | "Cancelled";
   location: "Virtual" | "Physical";
   locationDetails?: string;
   description?: string;
@@ -17,7 +17,7 @@ interface Slot {
 
 const SlotCreationModal: React.FC<{
   onClose: () => void;
-  onCreate: (slot: Slot) => void;
+  onCreate: (id:string,slot: Slot) => void;
   onUpdate: (slot: Slot) => void;
   existingSlot: Slot | null
 }> = ({ onClose, onCreate, onUpdate, existingSlot }) => {
@@ -28,7 +28,7 @@ const SlotCreationModal: React.FC<{
     endTime: existingSlot?.endTime || "",
     duration: existingSlot?.duration || 30,
     maxBookings: existingSlot?.maxBookings || 1,
-    status: existingSlot?.status || "Active",
+    status: existingSlot?.status || "Available",
     location: existingSlot?.location || "Virtual",
     locationDetails: existingSlot?.locationDetails || "",
     description: existingSlot?.description || "",
@@ -72,7 +72,7 @@ const SlotCreationModal: React.FC<{
     if(existingSlot){
       onUpdate(slotData)
     }else{
-      onCreate(slotData);
+      onCreate('',slotData);
     }
     
     onClose();
@@ -138,8 +138,8 @@ const SlotCreationModal: React.FC<{
               onChange={handleChange}
               className="w-full border p-2"
             >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
+              <option value="Available">Available</option>
+              <option value="Cancelled">Cancelled</option>
             </select>
             <select
               name="location"
