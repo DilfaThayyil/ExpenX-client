@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
-import {fetchSlots} from '@/services/advisor/advisorService';
-import {bookSlot} from '@/services/user/userService'
+import { fetchSlots } from '@/services/advisor/advisorService';
+import { bookSlot } from '@/services/user/userService';
 import Store from '@/store/store';
 import { toast } from 'react-toastify';
-
+import ConfirmationModal from '@/components/modals/confirmationModal'
 
 interface Slot {
   _id: string;
@@ -22,38 +22,52 @@ interface Slot {
 }
 
 const SlotBooking: React.FC = () => {
-  const [slots, setSlots] = useState<Slot[]>([])
-  const user = Store(state=>state.user)
-  const userId = user._id
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const user = Store((state) => state.user);
+  const userId = user._id;
 
   const fetchSlot = async () => {
     try {
-      const data = await fetchSlots()
-      console.log("slots : ", data.slots)
-      setSlots(data.slots)
+      const data = await fetchSlots();
+      console.log('slots : ', data.slots);
+      setSlots(data.slots);
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchSlot()
-  }, [])
+    fetchSlot();
+  }, []);
 
-  const handleBookSlot = async (slotId: string) => {
+  const handleBookSlot = (slotId: string) => {
+    if (!slotId || !userId) {
+      toast.error('Slot and user are required for booking');
+      return;
+    }
+    setSelectedSlot(slotId);
+    setIsModalOpen(true); 
+  };
+
+  const handleConfirmBooking = async () => {
     try {
-      if(!slotId || !userId){
-        toast.error('slot and user are required for booking')
+      if (selectedSlot) {
+        const response = await bookSlot(selectedSlot, userId);
+        console.log('response : ', response);
+        setSlots((prevSlots) =>
+          prevSlots.map((slot) =>
+            slot._id === selectedSlot
+              ? { ...slot, status: 'Booked', bookedBy: userId }
+              : slot
+          )
+        );
+        toast.success('Slot booked successfully');
       }
-      const response = await bookSlot(slotId, userId)
-      console.log("response : ",response)
-      setSlots((prevSlots) =>
-        prevSlots.map((slot) =>
-          slot._id === slotId ? { ...slot, status: "Booked", bookedBy: userId } : slot
-        )
-      );
     } catch (error) {
-      console.error("Error booking slot", error);
+      console.error('Error booking slot', error);
+      toast.error('Error booking slot');
     }
   };
 
@@ -89,9 +103,9 @@ const SlotBooking: React.FC = () => {
                     <td className="border p-3">{slot.location}</td>
                     <td
                       className={`border p-3 ${
-                        slot.status === "Available"
-                          ? "text-green-600"
-                          : "text-red-600"
+                        slot.status === 'Available'
+                          ? 'text-green-600'
+                          : 'text-red-600'
                       }`}
                     >
                       {slot.status}
@@ -99,14 +113,14 @@ const SlotBooking: React.FC = () => {
                     <td className="border p-3">
                       <button
                         className={`px-4 py-2 rounded ${
-                          slot.status === "Available"
-                            ? "bg-blue-600 text-white hover:bg-blue-700"
-                            : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                          slot.status === 'Available'
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-gray-400 text-gray-700 cursor-not-allowed'
                         }`}
                         onClick={() => handleBookSlot(slot._id)}
-                        disabled={slot.status !== "Available"}
+                        disabled={slot.status !== 'Available'}
                       >
-                        {slot.status === "Available" ? "Book Now" : "Booked"}
+                        {slot.status === 'Available' ? 'Book Now' : 'Booked'}
                       </button>
                     </td>
                   </tr>
@@ -118,10 +132,16 @@ const SlotBooking: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirmBooking}
+        slot={selectedSlot || ''}
+      />
     </Layout>
   );
-
 };
-
 
 export default SlotBooking;
