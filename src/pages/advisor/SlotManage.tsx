@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Clock, MapPin, Users, Edit, Trash2, Plus } from 'lucide-react';
+import { Calendar, Plus } from 'lucide-react';
 // import BookedAppointmentsTable from '@/components/advisor/appointments/bookedSlots';
 import SlotCreationModal from '@/components/advisor/appointments/addSlotModal';
 import SlotTable from '@/components/advisor/appointments/SlotTable';
