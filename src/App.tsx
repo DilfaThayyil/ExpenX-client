@@ -22,6 +22,7 @@ import Advisors from '@/pages/admin/Advisors'
 import AdminProfile from '@/pages/admin/Profile'
 import Clients from './pages/advisor/Clients';
 import SlotBooking from './pages/user/slotBooking';
+import VideoCall from './components/advisor/appointments/videoCall';
 
 
 
@@ -49,6 +50,7 @@ const App = () => {
           <Route path="/advisor/resetPassword" element={<ResetPassword />} />
           <Route path='/advisor/slotManage' element={<SlotManage/>}/>
           <Route path='/advisor/clients' element={<Clients/>}/>
+          <Route path='/videoCall' element={<VideoCall/>}/>
 
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
