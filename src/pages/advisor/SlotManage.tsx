@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { Calendar, Plus } from 'lucide-react';
-// import BookedAppointmentsTable from '@/components/advisor/appointments/bookedSlots';
 import SlotCreationModal from '@/components/advisor/appointments/addSlotModal';
 import SlotTable from '@/components/advisor/appointments/SlotTable';
-import Layout from '@/layout/Sidebar';
 import { createSlot, fetchSlots, updateSlot, deleteSlot } from '@/services/advisor/advisorService';
+import React, { useEffect, useState } from 'react';
+import { Calendar, Plus } from 'lucide-react';
+import Layout from '@/layout/Sidebar';
 import { toast } from 'react-toastify';
 import Store from '@/store/store';
 
 
-// Types for Slot and Booking
 interface Slot {
   _id: string;
   date: string;
@@ -22,14 +20,6 @@ interface Slot {
   locationDetails?: string;
   description?: string;
 }
-
-// interface Booking {
-//   id: string;
-//   userName: string;
-//   userEmail: string;
-//   slotId: string;
-//   paymentStatus: 'Paid' | 'Pending';
-// }
 
 const SlotManage: React.FC = () => {
   const [slots, setSlots] = useState<Slot[]>([]);

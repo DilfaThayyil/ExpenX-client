@@ -159,3 +159,4 @@ export const bookSlot = async(slotId:string, userId:string)=>{
     throw err
   }
 }
+

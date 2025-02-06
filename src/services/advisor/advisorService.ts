@@ -85,3 +85,15 @@ export const deleteSlot = async(slotId:string)=>{
   }
 }
 
+
+export const getBookedSlotsForAdvisor = async(advisorId:string)=>{
+  try{
+    console.log("advisorId-service :",advisorId)
+    const response = await axiosInstance.get(`${BASEURL}/fetchSlots/${advisorId}`)
+    console.log("response-data :",response.data)
+    return response.data
+  }catch(err){
+    console.error(err)
+    throw err
+  }
+}
