@@ -9,7 +9,11 @@ interface Slot {
     duration: number;
     maxBookings: number;
     status: 'Available' | 'Booked' | 'Cancelled';
-    bookedBy?: string;
+    bookedBy?: {
+        _id: string;
+        username: string;
+        email: string
+    };
     location: 'Virtual' | 'Physical';
     locationDetails?: string;
     description?: string;
@@ -73,7 +77,7 @@ const SlotTable: React.FC<{
                         <p><strong>Max Bookings:</strong> {selectedSlot.maxBookings}</p>
                         <p><strong>Status:</strong> {selectedSlot.status}</p>
                         {selectedSlot.status === 'Booked' && selectedSlot.bookedBy && (
-                        <p><strong>Booked By:</strong> {selectedSlot.bookedBy}</p>
+                        <p><strong>Booked By:</strong> {selectedSlot.bookedBy.email}</p>
                         )}
                         <p><strong>Location:</strong> {selectedSlot.location} {selectedSlot.locationDetails ? `- ${selectedSlot.locationDetails}` : ''}</p>
                         <p><strong>Description:</strong> {selectedSlot.description || 'N/A'}</p>
