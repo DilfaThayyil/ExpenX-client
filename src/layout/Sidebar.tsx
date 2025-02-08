@@ -22,6 +22,7 @@ const adminMenuItems = [
   { title: "Dashboard", url: "/admin/", icon: Home },
   { title: "Users", url: "/admin/users", icon: Users },
   { title: "Advisors", url: "/admin/advisors", icon: UsersRound },
+  { title: "Categories", url: "/admin/categories", icon: Inbox },
   { title: "Profile", url: "/admin/profile", icon: Settings },
 ];
      
