@@ -1,42 +1,32 @@
+interface TableProps<T> {
+  data: T[];
+  columns: { header: string; accessor: (item: T) => React.ReactNode }[];
+  actions?: (item: T) => React.ReactNode; // <-- Add this line
+}
 
-interface Column<T> {
-    header: string;
-    accessor: (item: T) => React.ReactNode;
-  }
-  
-  interface TableProps<T> {
-    data: T[];
-    columns: Column<T>[];
-  }
-  
-  const Table = <T,>({ data, columns }: TableProps<T>) => {
-    return (
-      <div className=" relative overflow-x-auto shadow-md sm:rounded-lg">
-        <table className="w-full text-sm text-center text-gray-500">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-            <tr>
-              {columns.map((column, index) => (
-                <th key={index} className="px-6 py-3">
-                  {column.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => (
-              <tr key={index} className="border-b ">
-                {columns.map((column, colIndex) => (
-                  <td key={colIndex} className="px-6 py-4">
-                    {column.accessor(item)}
-                  </td>
-                ))}
-              </tr>
+const Table = <T,>({ data, columns, actions }: TableProps<T>) => {
+  return (
+    <table className="min-w-full bg-white border border-gray-200">
+      <thead>
+        <tr>
+          {columns.map((col, index) => (
+            <th key={index} className="py-2 px-4 border-b">{col.header}</th>
+          ))}
+          {actions && <th className="py-2 px-4 border-b">Actions</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((item, rowIndex) => (
+          <tr key={rowIndex} className="border-b">
+            {columns.map((col, colIndex) => (
+              <td key={colIndex} className="py-2 px-4">{col.accessor(item)}</td>
             ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-  
-  export default Table;
-  
+            {actions && <td className="py-2 px-4">{actions(item)}</td>}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
+
+export default Table;

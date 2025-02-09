@@ -26,6 +26,7 @@ export const fetchUsers = async (page: number, limit: number) => {
   const response = await axios.get(`${BASEURL}/users`, {
     params: { page, limit },
   });
+  console.log("fetchUsers-response : ",response.data)
   return response.data;
 }
 
@@ -33,6 +34,7 @@ export const fetchAdvisors = async (page: number, limit: number) => {
   const response = await axios.get(`${BASEURL}/advisors`, {
     params: { page, limit },
   });
+  console.log("fetchAdvisors-reponse : ",response)
   return response.data;
 }
 
@@ -62,3 +64,35 @@ export const manageUser = async (action: string,type:'user'|'advisor', email: st
     console.log(err);
   }
 }
+
+export const fetchCategories = async(page:number,limit:number)=>{
+  try{
+    const response = await axios.get(`${BASEURL}/categories`,{
+      params:{page,limit}
+    })
+    console.log("response-data : ",response.data)
+    return response.data
+  }catch(err){
+    console.log(err)
+  }
+}
+
+export const manageCategory = async (action: string, id?: string, name?: string) => {
+  try {
+    if (action === "add") {
+      const response = await axios.post(`${BASEURL}/addCategory`, { name });
+      return response.data;
+    } else if (action === "edit") {
+      const response = await axios.patch(`${BASEURL}/updateCategory/${id}`, { name });
+      return response.data;
+    }else if(action === "delete"){
+      const response = await axios.delete(`${BASEURL}/deleteCategory/${id}`)
+      return response.data
+    } else {
+      throw new Error(`Invalid action: ${action}`);
+    }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

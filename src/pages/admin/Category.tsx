@@ -1,11 +1,82 @@
-import Layout from '@/layout/Sidebar';
+import DataTable from "@/components/admin/DataTable";   
+import { fetchCategories, manageCategory } from "@/services/admin/adminServices";
+import { useState } from "react";
+import CategoryModal from "@/components/modals/categoryModal"; 
+import Layout from "@/layout/Sidebar";
 
-const Categories = ()=>{
-    return (
-        <Layout role='admin'>
-            <h1>Categories</h1>
-        </Layout>
-    )
+interface Category {
+  _id: string;
+  name: string;
 }
 
-export default Categories
+const CategoryTable = () => {
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+
+  const columns = [
+    { header: "Category Name", accessor: (item: Category) => item.name },
+  ];
+
+
+
+  const actions = (item: Category) => (
+    <div className="flex gap-2">
+      <button
+        className="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-3 rounded"
+        onClick={() => {
+          setEditingCategory(item);
+          setModalOpen(true);
+        }}
+      >
+        Edit
+      </button>
+      <button
+        className="bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded"
+        onClick={() => manageCategory("delete", item._id)}
+      >
+        Delete
+      </button>
+    </div>
+  );
+
+  const handleEdit = (category: Category) => {
+    setEditingCategory(category);
+    setModalOpen(true);
+  };
+
+  return (
+    <Layout role='admin'>
+
+        <div>
+        <button
+            className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded mb-4"
+            onClick={() => {
+            setEditingCategory(null);
+            setModalOpen(true);
+            }}
+        >
+            Add Category
+        </button>
+
+        <DataTable<Category>
+            type="category"
+            fetchFunction={fetchCategories}
+            manageFunction={manageCategory}
+            columns={columns}
+            actions={actions}
+            onEdit={handleEdit}
+        />
+
+        {modalOpen && (
+            <CategoryModal
+            isOpen={modalOpen}
+            closeModal={() => setModalOpen(false)}
+            category={editingCategory}
+            />
+        )}
+        </div>
+    </Layout>
+  );
+};
+
+export default CategoryTable;
