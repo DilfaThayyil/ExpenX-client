@@ -45,9 +45,9 @@ export default function Layout({
     <SidebarProvider>
       <div className="flex">
         <AppSidebar menuItems={menuItems} role={role}/>
+            <SidebarTrigger />
         <div className="flex-1">
           <main className="p-4">
-            <SidebarTrigger />
             {children}
           </main>
         </div>

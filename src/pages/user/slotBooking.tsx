@@ -37,8 +37,6 @@ const SlotBooking: React.FC = () => {
     try {
       const response = await fetchSlots(currentPage,ITEMS_PER_PAGE)
       console.log("slots : ", response.data)
-      ///////////
-      //retrieve the slots and totalPages from response
       setSlots(response.data.slots)
       setTotalPages(response.data.totalPages)
     } catch (err) {
