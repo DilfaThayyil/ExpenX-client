@@ -6,6 +6,8 @@ import { Calendar, Plus } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
 import { toast } from 'react-toastify';
 import Store from '@/store/store';
+import Pagination from "@/components/admin/Pagination"; 
+
 
 
 interface Slot {
@@ -23,15 +25,20 @@ interface Slot {
 
 const SlotManage: React.FC = () => {
   const [slots, setSlots] = useState<Slot[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const ITEMS_PER_PAGE = 5;
   const advisor = Store(state=>state.user)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
 
   const fetchSlot = async () => {
     try {
-      const data = await fetchSlots()
-      console.log("slots : ", data.slots)
-      setSlots(data.slots)
+      const response = await fetchSlots(currentPage,ITEMS_PER_PAGE)
+      console.log("response : ", response.data)
+      const {slots,totalPages} = response.data
+      setSlots(slots)
+      setTotalPages(totalPages)
     } catch (err) {
       console.error(err)
     }
@@ -39,7 +46,7 @@ const SlotManage: React.FC = () => {
 
   useEffect(() => {
     fetchSlot()
-  }, [])
+  }, [currentPage])
 
   const createNewSlot = async (id:string,newSlot: Slot) => {
     try {
@@ -88,7 +95,7 @@ const SlotManage: React.FC = () => {
   return (
     <Layout role='advisor'>
 
-      <div className="container mx-auto p-6 bg-gray-50 min-h-screen">
+      <div className="container mx-auto   min-h-screen">
         <h1 className="text-3xl font-bold mb-6 text-gray-800 flex items-center">
           <Calendar className="mr-3 text-blue-600" /> Slot Management
         </h1>
@@ -132,7 +139,6 @@ const SlotManage: React.FC = () => {
         )}
 
         {/* Slots Table */}
-        <div className="bg-white shadow-md rounded-lg p-6">
           <div className="bg-white shadow-md rounded-lg">
             <SlotTable
               slots={slots}
@@ -143,7 +149,12 @@ const SlotManage: React.FC = () => {
               onDelete={handleDeleteSlot}
             />
           </div>
-        </div>
+
+          <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
 
         {/* Booked Appointments Table */}
         {/* <div className="mt-8 bg-white shadow-md rounded-lg">

@@ -6,6 +6,8 @@ import { bookSlot } from '@/services/user/userService';
 import Store from '@/store/store';
 import { toast } from 'react-toastify';
 import ConfirmationModal from '@/components/modals/confirmationModal'
+import Pagination from "@/components/admin/Pagination"; 
+
 
 interface Slot {
   _id: string;
@@ -25,22 +27,28 @@ const SlotBooking: React.FC = () => {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const ITEMS_PER_PAGE = 5;
   const user = Store((state) => state.user);
   const userId = user._id;
 
   const fetchSlot = async () => {
     try {
-      const data = await fetchSlots();
-      console.log('slots : ', data.slots);
-      setSlots(data.slots);
+      const response = await fetchSlots(currentPage,ITEMS_PER_PAGE)
+      console.log("slots : ", response.data)
+      ///////////
+      //retrieve the slots and totalPages from response
+      setSlots(response.data.slots)
+      setTotalPages(response.data.totalPages)
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
   };
 
   useEffect(() => {
     fetchSlot();
-  }, []);
+  }, [currentPage]);
 
   const handleBookSlot = (slotId: string) => {
     if (!slotId || !userId) {
@@ -73,13 +81,13 @@ const SlotBooking: React.FC = () => {
 
   return (
     <Layout role="user">
-      <div className="container mx-auto p-6 bg-gray-50 min-h-screen">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800 flex items-center">
+      <div className="container mx-auto p-2  min-h-screen">
+        <h1 className="text-3xl font-bold mb-2 text-gray-800 flex items-center">
           <Calendar className="mr-3 text-blue-600" /> Slot Booking
         </h1>
 
         {/* Slots Table */}
-        <div className="bg-white shadow-md rounded-lg p-6">
+        <div className="bg-white shadow-md rounded-lg ">
           {slots.length > 0 ? (
             <table className="w-full border-collapse border border-gray-300">
               <thead>
@@ -131,6 +139,11 @@ const SlotBooking: React.FC = () => {
             <p className="text-gray-600 text-center">No slots available</p>
           )}
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
 
       {/* Confirmation Modal */}

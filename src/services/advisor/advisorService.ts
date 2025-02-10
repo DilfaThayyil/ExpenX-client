@@ -52,9 +52,12 @@ export const createSlot = async (id:string,slotData:Slot) => {
   }
 }
 
-export const fetchSlots = async()=>{  
+export const fetchSlots = async(page:number,limit:number)=>{  
   try{
-    const response = await axiosInstance.get(`${BASEURL}/fetchSlots`)
+    console.log("page,limit: ",page," ",limit)
+    const response = await axiosInstance.get(`${BASEURL}/fetchSlots`,{
+      params:{page,limit}
+    })
     console.log("response-data : ",response.data)
     return response.data
   }catch(err){
@@ -86,10 +89,12 @@ export const deleteSlot = async(slotId:string)=>{
 }
 
 
-export const getBookedSlotsForAdvisor = async(advisorId:string)=>{
+export const getBookedSlotsForAdvisor = async(advisorId:string,page:number,limit:number)=>{
   try{
     console.log("advisorId-service :",advisorId)
-    const response = await axiosInstance.get(`${BASEURL}/fetchSlots/${advisorId}`)
+    const response = await axiosInstance.get(`${BASEURL}/fetchSlotsAdvisor/${advisorId}`,{
+      params:{page,limit}
+    })
     console.log("response-data :",response.data)
     return response.data
   }catch(err){

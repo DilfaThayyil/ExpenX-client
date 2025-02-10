@@ -80,7 +80,7 @@ const SlotCreationModal: React.FC<{
   
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
       <div className="bg-white p-6 rounded-lg w-full max-w-lg overflow-auto max-h-full">
         <h2 className="text-2xl font-bold mb-4 text-center">
           {existingSlot ? "Edit Slot" : "Create New Slot"}
