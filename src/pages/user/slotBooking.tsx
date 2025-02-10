@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar } from 'lucide-react';
+import { Calendar, MessageCircle } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
 import { fetchSlots } from '@/services/advisor/advisorService';
 import { bookSlot } from '@/services/user/userService';
 import Store from '@/store/store';
 import { toast } from 'react-toastify';
-import ConfirmationModal from '@/components/modals/confirmationModal'
-import Pagination from "@/components/admin/Pagination"; 
+import ConfirmationModal from '@/components/modals/confirmationModal';
+import Pagination from "@/components/admin/Pagination";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {useNavigate} from 'react-router-dom'
 
 
 interface Slot {
+  advisorId: any;
   _id: string;
   date: string;
   startTime: string;
@@ -26,21 +29,21 @@ interface Slot {
 const SlotBooking: React.FC = () => {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const ITEMS_PER_PAGE = 5;
   const user = Store((state) => state.user);
   const userId = user._id;
+  const navigate = useNavigate()
 
   const fetchSlot = async () => {
     try {
-      const response = await fetchSlots(currentPage,ITEMS_PER_PAGE)
-      console.log("slots : ", response.data)
-      setSlots(response.data.slots)
-      setTotalPages(response.data.totalPages)
+      const response = await fetchSlots(currentPage, ITEMS_PER_PAGE);
+      setSlots(response.data.slots);
+      setTotalPages(response.data.totalPages);
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
   };
 
@@ -54,14 +57,13 @@ const SlotBooking: React.FC = () => {
       return;
     }
     setSelectedSlot(slotId);
-    setIsModalOpen(true); 
+    setIsModalOpen(true);
   };
 
   const handleConfirmBooking = async () => {
     try {
       if (selectedSlot) {
-        const response = await bookSlot(selectedSlot, userId);
-        console.log('response : ', response);
+        await bookSlot(selectedSlot, userId);
         setSlots((prevSlots) =>
           prevSlots.map((slot) =>
             slot._id === selectedSlot
@@ -79,72 +81,92 @@ const SlotBooking: React.FC = () => {
 
   return (
     <Layout role="user">
-      <div className="container mx-auto p-2  min-h-screen">
-        <h1 className="text-3xl font-bold mb-2 text-gray-800 flex items-center">
-          <Calendar className="mr-3 text-blue-600" /> Slot Booking
-        </h1>
-
-        {/* Slots Table */}
-        <div className="bg-white shadow-md rounded-lg ">
-          {slots.length > 0 ? (
-            <table className="w-full border-collapse border border-gray-300">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="border p-3">Date</th>
-                  <th className="border p-3">Time</th>
-                  <th className="border p-3">Duration</th>
-                  <th className="border p-3">Location</th>
-                  <th className="border p-3">Status</th>
-                  <th className="border p-3">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {slots.map((slot) => (
-                  <tr key={slot._id} className="text-center">
-                    <td className="border p-3">{slot.date}</td>
-                    <td className="border p-3">
-                      {slot.startTime} - {slot.endTime}
-                    </td>
-                    <td className="border p-3">{slot.duration} mins</td>
-                    <td className="border p-3">{slot.location}</td>
-                    <td
-                      className={`border p-3 ${
-                        slot.status === 'Available'
-                          ? 'text-green-600'
-                          : 'text-red-600'
-                      }`}
-                    >
-                      {slot.status}
-                    </td>
-                    <td className="border p-3">
-                      <button
-                        className={`px-4 py-2 rounded ${
-                          slot.status === 'Available'
-                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                            : 'bg-gray-400 text-gray-700 cursor-not-allowed'
-                        }`}
-                        onClick={() => handleBookSlot(slot._id)}
-                        disabled={slot.status !== 'Available'}
-                      >
-                        {slot.status === 'Available' ? 'Book Now' : 'Booked'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className="text-gray-600 text-center">No slots available</p>
-          )}
-        </div>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+      <div className="container mx-auto p-4 space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-3 text-3xl font-bold text-gray-800">
+              <Calendar className="text-blue-600 h-8 w-8" />
+              <span>Slot Booking</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto rounded-lg">
+              {slots.length > 0 ? (
+                <div className="min-w-full">
+                  <table className="w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Date</th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Time</th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Duration</th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Location</th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Status</th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {slots.map((slot) => (
+                        <tr key={slot._id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{slot.date}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {slot.startTime} - {slot.endTime}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{slot.duration} mins</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{slot.location}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center space-x-2">
+                              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                ${slot.status === 'Available' 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-red-100 text-red-800'}`}>
+                                {slot.status}
+                              </span>
+                              {slot.status === 'Booked' && (
+                                <button 
+                                className="p-2 bg-green-500 rounded-full hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                                title='Start Messaging'
+                                  onClick={() =>{
+                                    const advisorId = slot.advisorId
+                                    navigate(`/chat?userId=${advisorId}`)}}>
+                                  <MessageCircle className="h-4 w-4 text-white" strokeWidth={2.5} />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors
+                                ${slot.status === 'Available'
+                                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+                              onClick={() => handleBookSlot(slot._id)}
+                              disabled={slot.status !== 'Available'}
+                            >
+                              {slot.status === 'Available' ? 'Book Now' : 'Booked'}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-500 text-lg">No slots available</p>
+                </div>
+              )}
+            </div>
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Confirmation Modal */}
       <ConfirmationModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}

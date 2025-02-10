@@ -1,6 +1,6 @@
 import { XCircle, Video, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Store from '@/store/store'
+// import Store from '@/store/store'
 
 
 interface Booking {
@@ -27,7 +27,7 @@ interface BookedAppointmentsTableProps {
 
 const BookedAppointmentsTable: React.FC<BookedAppointmentsTableProps> = ({ appointments }) => {
     const navigate = useNavigate();
-    const advisor = Store((state)=>state.user)
+    // const advisor = Store((state)=>state.user)
     // const advisorId = advisor._id
 
     const normalizedAppointments: Booking[] = Array.isArray(appointments) ? appointments : appointments ? [appointments] : [];
@@ -61,9 +61,9 @@ const BookedAppointmentsTable: React.FC<BookedAppointmentsTableProps> = ({ appoi
                                         title="Start Messaging"
                                         onClick={()=>{
                                             // const chatId = appointment._id
-                                            // const userId = appointment.bookedBy._id
-                                            navigate(`/chat`)}}
-                                    >
+                                            const userId = appointment.bookedBy._id
+                                            const name = appointment.bookedBy.username
+                                            navigate(`/chat?userId=${userId}&name=${name}`)}}>
                                         <MessageCircle size={20} />
                                     </button>
 
