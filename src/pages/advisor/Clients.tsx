@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Calendar } from "lucide-react";
 import Layout from "@/layout/Sidebar";
 import Store from "@/store/store";
-
+import Pagination from "@/components/admin/Pagination"; 
 
 interface Booking {
   date: string;
@@ -24,28 +24,33 @@ interface Booking {
 
 const Clients: React.FC = () => {
   const [bookedAppointments, setBookedAppointments] = useState<Booking[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const advisor = Store((state) => state.user);
   const advisorId = advisor?._id;
+  const ITEMS_PER_PAGE = 5;
 
   useEffect(() => {
     if (!advisorId) return;
-  
+
     const fetchBookedSlots = async () => {
       try {
-        const response = await getBookedSlotsForAdvisor(advisorId);
-        console.log("Fetched Booked Slots:", response);
-  
-        const slots = response?.slots;
-        setBookedAppointments(Array.isArray(slots) ? slots : slots ? [slots] : []);
+        const response = await getBookedSlotsForAdvisor(advisorId, currentPage, ITEMS_PER_PAGE);
+        console.log("Fetched Booked Slots:", response.data);
+
+        const { bookedSlots, totalPages } = response.data;
+        setBookedAppointments(Array.isArray(bookedSlots) ? bookedSlots : bookedSlots ? [bookedSlots] : []);
+        setTotalPages(totalPages);
       } catch (error) {
         console.error("Error fetching booked slots:", error);
         setBookedAppointments([]);
       }
     };
-  
+
     fetchBookedSlots();
-  }, [advisorId]);
-  
+  }, [advisorId, currentPage]);
+
+  console.log("bookedAppointments : ", bookedAppointments);
 
   return (
     <Layout role="advisor">
@@ -55,10 +60,15 @@ const Clients: React.FC = () => {
         </h1>
 
         <div className="bg-white shadow-md rounded-lg p-1">
-          <div className="bg-white shadow-md rounded-lg">
-            <BookedAppointmentsTable appointments={bookedAppointments} />
-          </div>
+          <BookedAppointmentsTable appointments={bookedAppointments} />
         </div>
+
+        {/* Pagination Component */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
     </Layout>
   );
