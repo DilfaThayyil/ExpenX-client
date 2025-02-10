@@ -94,6 +94,34 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
     }
   };
 
+  const handleBlock = async (action: string,type:'user'|'advisor', email: string)=>{
+    try{
+      const response = await manageUser(action,type,email)
+      console.log("response :",response)
+      setData((prevData) =>
+        prevData.map((item: any) =>
+          item.email === email ? { ...item, isBlocked: action === "block" } : item
+        )
+      );      
+      Toast(`${type} ${action}ed successfully`,'success',true)
+    }catch(err){
+      console.error(err)
+      Toast(`Failed to ${action} the ${type}`,'error',true)
+    }
+  }
+
+  const handleCategoryUpdate = (updatedCategory:any)=>{
+    setData((prevData) =>
+      prevData.map((item: any) =>
+        item._id === updatedCategory._id ? updatedCategory : item
+      )
+    );
+  }
+
+  const handleCategoryAdd = (newCategory:any)=>{
+    setData((prev)=>[...prev,newCategory])
+  }
+
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -142,14 +170,14 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
             : [
               { header: "Name", accessor: (item: any) => item.username },
               { header: "Email", accessor: (item: any) => item.email },
-              { header: "Status", accessor: (item: any) => (item.isBlock ? "Blocked" : "Active") },
+              { header: "Status", accessor: (item: any) => (item.isBlocked ? "Blocked" : "Active") },
               {
                 header: "Action", accessor: (item: any) => (
                   <button
-                    className={`px-4 py-2 rounded ${item.isBlock ? "bg-blue-500" : "bg-red-500"} text-white`}
-                    onClick={() => handleAction(item.isBlock ? "unblock" : "block", item.id)}
+                    className={`px-4 py-2 rounded ${item.isBlocked ? "bg-blue-500" : "bg-red-500"} text-white`}
+                    onClick={() => handleBlock(item.isBlocked ? "unblock" : "block",type, item.email)}
                   >
-                    {item.isBlock ? "Unblock" : "Block"}
+                    {item.isBlocked ? "Unblock" : "Block"}
                   </button>
                 ),
               },
@@ -164,6 +192,8 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
             isOpen={modalOpen}
             closeModal={() => setModalOpen(false)}
             category={selectedCategory}
+            onCategoryUpdate={handleCategoryUpdate}
+            onCategoryAdd={handleCategoryAdd}
             />
         )}
     </div>

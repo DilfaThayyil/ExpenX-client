@@ -16,7 +16,7 @@ const Users = () => {
     },
     {
       header: "Status",
-      accessor: (item: any) => (item.isBlock ? "Blocked" : "Active"),
+      accessor: (item: any) => (item.isBlocked ? "Blocked" : "Active"),
     },
   ];
 

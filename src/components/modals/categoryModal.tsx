@@ -12,9 +12,11 @@ interface ModalProps {
   isOpen: boolean;
   closeModal: () => void;
   category?: Category | null;
+  onCategoryUpdate: (updatedCategory: Category) => void;
+  onCategoryAdd: (newCategory: Category) => void;
 }
 
-const CategoryModal: React.FC<ModalProps> = ({ isOpen, closeModal, category }) => {
+const CategoryModal: React.FC<ModalProps> = ({ isOpen, closeModal, category, onCategoryUpdate, onCategoryAdd }) => {
   const [name, setName] = useState(category?.name || "");
   const Toast = useShowToast()
 
@@ -22,7 +24,8 @@ const CategoryModal: React.FC<ModalProps> = ({ isOpen, closeModal, category }) =
     if (category?._id) {
       try {
         const response = await manageCategory("edit", category._id, name);
-        console.log("res :", response);
+        const updatedCategory = response.data.updatedCategory;
+        onCategoryUpdate(updatedCategory);
         Toast(`Category edited successfully`, "success", true);
         closeModal();
       } catch (error) {
@@ -31,7 +34,8 @@ const CategoryModal: React.FC<ModalProps> = ({ isOpen, closeModal, category }) =
     } else {
       try {
         const response = await manageCategory("add", "", name);
-        console.log("Category created successfully:", response);
+        const newCategory = response.data.newCategory;
+        onCategoryAdd(newCategory);
         Toast(`Category created successfully`, "success", true);
         closeModal();
       } catch (error) {
@@ -39,6 +43,7 @@ const CategoryModal: React.FC<ModalProps> = ({ isOpen, closeModal, category }) =
       }
     }
   };
+  
 
   return isOpen ? (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
