@@ -9,12 +9,12 @@ import {fetchMessage} from '@/services/chat/chatServices'
 
 
 interface Message{
-    id: string;
-    senderId: string;
-    receiverId: string;
-    roomId: string;
-    text: string;
-    // time: string;
+  id: string;
+  senderId: string;
+  receiverId: string;
+  roomId: string;
+  text: string;
+  createdAt: string;
 }
 
 
@@ -79,7 +79,10 @@ const ChatApp:React.FC<ChatProps> = ({receivers}) => {
       try {
         const response = await fetchMessage(sender._id, activeContact._id);
         console.log("fetchMessage : ",response)
-        setMessages(response);
+        setMessages(response.map((msg: Message) => ({
+          ...msg,
+          createdAt: msg.createdAt, 
+        })));
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
@@ -103,17 +106,17 @@ const ChatApp:React.FC<ChatProps> = ({receivers}) => {
       receiverId: activeContact._id,
       roomId,
       text: message,
-      // time: new Date().toLocaleTimeString(),
+      createdAt: new Date().toISOString(),
     };
     console.log("Sending message:", {
       senderId: sender._id,
       receiverId: activeContact._id,
       roomId,
       text: message,
-      // time: new Date().toLocaleTimeString()
+      createdAt: new Date().toISOString(),    
     });
+    
     socket.emit("send_message", newMessage);
-    // setMessages(prev => [...prev, newMessage]);
     setNewMessage('');
   };
   

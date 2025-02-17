@@ -1,12 +1,14 @@
 import React from 'react';
 import Store from '@/store/store';
+import { format } from 'date-fns';
+
 
 interface Message {
   id: string;
   senderId: string;
   receiverId: string;
   text: string;
-  time: string;
+  createdAt: string;
 }
 
 interface MessageBubbleProps {
@@ -26,7 +28,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         }`}
       >
         <p>{message.text}</p>
-        <span className="text-xs text-gray-600 block mt-1">{message.time}</span>
+        <span className="text-xs text-gray-600 block mt-1">
+          {format(new Date(message.createdAt), 'hh:mm a')}
+        </span>
       </div>
     </div>
   );
