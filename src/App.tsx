@@ -23,7 +23,7 @@ import AdminProfile from '@/pages/admin/Profile'
 import Clients from './pages/advisor/Clients';
 import SlotBooking from './pages/user/slotBooking';
 import VideoCall from './components/advisor/appointments/videoCall';
-import ChatWindow from './components/chat/chat'
+// import ChatWindow from './components/chat/chat'
 import Categories from './pages/admin/Category';
 
 const GOOGLECLIENTID = import.meta.env.VITE_GOOGLECLIENTID;
@@ -51,7 +51,7 @@ const App = () => {
           <Route path='/advisor/slotManage' element={<SlotManage/>}/>
           <Route path='/advisor/clients' element={<Clients/>}/>
           <Route path='/videoCall' element={<VideoCall/>}/>
-          <Route path='/chat' element={<ChatWindow/>}/>
+          {/* <Route path='/chat' element={<ChatWindow/>}/> */}
 
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />

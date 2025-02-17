@@ -17,7 +17,7 @@ interface Slot {
 
 const SlotCreationModal: React.FC<{
   onClose: () => void;
-  onCreate: (id:string,slot: Slot) => void;
+  onCreate: (slot: Slot) => void;
   onUpdate: (slot: Slot) => void;
   existingSlot: Slot | null
 }> = ({ onClose, onCreate, onUpdate, existingSlot }) => {
@@ -72,7 +72,7 @@ const SlotCreationModal: React.FC<{
     if(existingSlot){
       onUpdate(slotData)
     }else{
-      onCreate('',slotData);
+      onCreate(slotData);
     }
     
     onClose();

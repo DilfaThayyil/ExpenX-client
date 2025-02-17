@@ -1,201 +1,237 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { initializeSocket } from '../../socket/socket';
-import Store from '@/store/store';
-import Layout from '@/layout/Sidebar';
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useSearchParams } from "react-router-dom";
-import { Send, Video, Phone, Paperclip, Smile, Mic } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { sendMessage, fetchMessage } from "@/services/chat/chatServices";
-import useUserStore from "@/store/store";
+import { useEffect, useState, useRef } from 'react';
+import { Search, Video, MoreVertical, Paperclip, Mic, Send } from 'lucide-react';
+import Store from '@/store/store'
+import { MessageBubble } from './MessageBubble';
+import { ContactItem } from './ContactItem';
+import {initializeSocket,socket} from '@/socket/socket'
+import {fetchMessage} from '@/services/chat/chatServices'
 
-interface Message {
-  id: string;
-  sender: string;
-  receiver: string;
-  text: string;
-  timestamp: string;
+
+
+interface Message{
+    id: string;
+    senderId: string;
+    receiverId: string;
+    roomId: string;
+    text: string;
+    // time: string;
 }
 
-const ChatWindow: React.FC = () => {
-  const { user } = useUserStore(); 
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [socket, setSocket] = useState<any>(null);
-  const [searchParams] = useSearchParams();
-  const userId = searchParams.get('userId');
-  const name = searchParams.get('name');
-  const advisor = Store((state) => state.user);
-  const advisorId = advisor._id;
 
-  // Fetch previous messages
-  const fetchMessages = async () => {
-    try {
-      const res = await fetchMessage(advisorId,userId!);
-      console.log("res : ",res)
-      console.log("res-data :",res.data)
-      setMessages(res.data || []);
-    } catch (error) {
-      console.error("Failed to load messages:", error);
-    }
-  };
+interface ChatProps{
+  receivers:{_id:string;username:string;email:string;profilePic:string}[]
+}
+
+
+// Main Chat App Component
+const ChatApp:React.FC<ChatProps> = ({receivers}) => {
+  const [activeContact, setActiveContact] = useState(receivers[0]);
+  const [messages , setMessages] = useState<Message[]>([])
+  const [newMessage, setNewMessage] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const sender = Store((state)=>state.user)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const filteredContacts = receivers.filter(contact => 
+    contact.username.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+  console.log("receivers : ",receivers)
+
+  // initialize socket
+  useEffect(() => {
+    initializeSocket();
+    return () => {
+      socket.disconnect();
+    };
+  }, [])
+  
 
   useEffect(() => {
-    const socketInstance = initializeSocket();
-    if(socketInstance){
-      setSocket(socketInstance);
+    if (!socket || !sender || !activeContact) return;
   
-      socketInstance.on("newMessage", (msg: Message) => {
-        setMessages((prevMessages) => [...prevMessages, msg]);
-      });
+    console.log("Socket connected:", socket)
+    console.log("Sender ID:", sender._id)
+    console.log("Receiver ID:", activeContact._id)
   
+    const roomId = [sender._id, activeContact._id].sort().join('_')
+    console.log("Joining Room ID:", roomId)
+  
+    socket.emit("joinRoom", roomId)
+  
+    const messageListener = (message:Message) => {
+      if (message.roomId === roomId) {
+        console.log("newMsg-listening : ",message)
+        setMessages((prev) => [...prev, message]);
+      }
+    }
+  
+    socket.on("receive_message", messageListener);
+  
+    return () => {
+      console.log("Leaving Room ID:", roomId);
+      socket.emit("leaveRoom", roomId); 
+      socket.off("receive_message", messageListener); 
+    };
+  }, [activeContact, sender]); 
+  
+  
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await fetchMessage(sender._id, activeContact._id);
+        console.log("fetchMessage : ",response)
+        setMessages(response);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+  
+    if (activeContact._id) {
       fetchMessages();
     }
-
-    return () => {
-      socketInstance?.disconnect();
-    };
-  }, []);
+  }, [activeContact]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+}, [messages]);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim() && socket) {
-      const msg: Message = {
-        id: crypto.randomUUID(),
-        sender: advisorId,
-        receiver: userId!,
-        text: newMessage,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      setMessages((prevMessages) => [...prevMessages, msg]);
-      sendMessage(msg);
-      setNewMessage("");     
-    }
+  const handleSendMessage = (message: string) => {
+    if (!message.trim()) return;
+    const roomId = [sender._id, activeContact._id].sort().join('_');
+    const newMessage = {
+      id: Date.now().toString(), 
+      senderId: sender._id,
+      receiverId: activeContact._id,
+      roomId,
+      text: message,
+      // time: new Date().toLocaleTimeString(),
+    };
+    console.log("Sending message:", {
+      senderId: sender._id,
+      receiverId: activeContact._id,
+      roomId,
+      text: message,
+      // time: new Date().toLocaleTimeString()
+    });
+    socket.emit("send_message", newMessage);
+    // setMessages(prev => [...prev, newMessage]);
+    setNewMessage('');
   };
+  
+
+
+
 
   return (
-    <Layout role='advisor'>
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-100 lg:pl-[250px] w-full h-full">
-        <div className="w-full max-w-6xl h-full lg:h-[95vh] lg:rounded-2xl bg-white shadow-xl border overflow-hidden flex flex-col">
-          
-          {/* Chat Header */}
-          <div className="bg-gray-50 p-4 md:p-6 flex items-center justify-between border-b">
-            <div className="flex items-center space-x-4">
-              <Avatar className="w-12 h-12 md:w-16 md:h-16">
-                <AvatarImage src={user.profilePic} alt="User avatar" />
-                <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div>
-                <h2 className="font-semibold text-base md:text-xl">{name}</h2>
-                <p className="text-sm text-green-600">Online</p>
-              </div>
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <div className="w-full sm:w-1/3 lg:w-1/4 bg-white border-r border-gray-200 flex flex-col">
+        {/* Sidebar Header */}
+        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search contacts..."
+              className="w-full p-2 pl-8 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+          </div>
+        </div>
+        
+        {/* Contacts List */}
+        <div className="flex-1 overflow-y-auto">
+          {filteredContacts.map(contact => (
+            <ContactItem 
+              key={contact._id} 
+              contact={contact} 
+              active={activeContact._id === contact._id}
+              onClick={() => setActiveContact(contact)}
+            />
+          ))}
+        </div>
+      </div>
+      
+      {/* Main Chat Area */}
+      <div className="hidden sm:flex flex-1 flex-col">
+        {/* Chat Header */}
+        <div className="px-4 py-2 bg-white border-b border-gray-200 flex justify-between items-center">
+          <div className="flex items-center">
+            <div className="relative">
+              <img src={activeContact.profilePic} alt={activeContact.username} className="rounded-full w-10 h-10" />
+              {activeContact.status === 'online' && 
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+              }
             </div>
-
-            <div className="flex items-center space-x-4">
-              {/* Video Call */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" className="text-gray-600">
-                    <Video className="h-6 w-6 mr-2" />
-                    <span className="hidden md:inline">Video Call</span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Video Call</DialogTitle>
-                  </DialogHeader>
-                  <p>Video call functionality coming soon</p>
-                </DialogContent>
-              </Dialog>
-
-              {/* Audio Call */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" className="text-gray-600">
-                    <Phone className="h-6 w-6 mr-2" />
-                    <span className="hidden md:inline">Audio Call</span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Audio Call</DialogTitle>
-                  </DialogHeader>
-                  <p>Audio call functionality coming soon</p>
-                </DialogContent>
-              </Dialog>
+            <div className="ml-3">
+              <h2 className="text-sm font-semibold">{activeContact.username}</h2>
+              <p className="text-xs text-gray-500">{activeContact.status === 'online' ? 'Online' : 'Offline'}</p>
             </div>
           </div>
-
-          {/* Messages Area */}
-          <div className="flex-grow overflow-hidden flex flex-col">
-            <div className="flex-grow overflow-y-auto p-4 md:p-6 space-y-4 bg-gray-50">
-            {messages?.length > 0 ? messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${msg.sender === advisorId ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[80%] p-3 md:p-4 rounded-xl shadow-sm text-base ${
-                      msg.sender === advisorId
-                        ? 'bg-blue-500 text-white rounded-br-none'
-                        : 'bg-white text-black rounded-bl-none border'
-                    }`}
-                  >
-                    <p className="text-sm md:text-base">{msg.text}</p>
-                    <span className="text-xs mt-1 opacity-70 block text-right">
-                      {msg.timestamp}
-                    </span>
-                  </div>
-                </div>
-              )): <p className="text-center text-gray-500">No messages yet</p>}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Message Input */}
-            <div className="p-4 md:p-6 bg-white border-t flex items-center space-x-4">
-              <div className="flex space-x-3">
-                <Button variant="ghost" size="icon" className="text-gray-600">
-                  <Paperclip className="h-6 w-6" />
-                </Button>
-
-                <Button variant="ghost" size="icon" className="text-gray-600">
-                  <Mic className="h-6 w-6" />
-                </Button>
-
-                <Button variant="ghost" size="icon" className="text-gray-600">
-                  <Smile className="h-6 w-6" />
-                </Button>
-              </div>
-
-              <div className="flex-grow mx-4">
-                <Input
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  className="w-full text-base py-2 px-4"
-                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                />
-              </div>
-
-              <Button
-                onClick={handleSendMessage}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md"
+          <div className="flex space-x-3">    
+            <button className="text-gray-600 hover:text-gray-800">
+              <Video className="h-5 w-5" />
+            </button>
+            <button className="text-gray-600 hover:text-gray-800">
+              {/* <Video className="h-5 w-5" /> */}
+            </button>
+            <button className="text-gray-600 hover:text-gray-800">
+              <MoreVertical className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+        
+        {/* Messages Container */}
+        <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
+          {messages.map((message,index) => (
+            <MessageBubble key={message.id || index} message={message} />
+          ))}
+           <div ref={messagesEndRef} />
+        </div>
+        
+        {/* Message Input Area */}
+        <div className="bg-white border-t border-gray-200 p-3">
+          <div className="flex items-center">
+            <button className="text-gray-500 hover:text-gray-700 mr-2">
+              <Paperclip className="h-5 w-5" />
+            </button>
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newMessage.trim()) {
+                  handleSendMessage(newMessage);
+                }
+              }}
+              placeholder="Type a message..."
+              className="flex-1 border border-gray-300 rounded-full py-2 px-4 mr-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+            {newMessage.trim() ? (
+              <button 
+                className="bg-green-500 text-white rounded-full p-2 hover:bg-green-600"
+                onClick={()=>handleSendMessage(newMessage)}
               >
-                <Send className="h-6 w-6" />
-              </Button>
-            </div>
+                <Send className="h-5 w-5" />
+              </button>
+            ) : (
+              <button className="text-gray-500 hover:text-gray-700">
+                <Mic className="h-5 w-5" />
+              </button>
+            )}
           </div>
         </div>
       </div>
-    </Layout>
+      
+      {/* Mobile view - show message when no chat is selected */}
+      {/* <div className="flex-1 flex items-center justify-center sm:hidden">
+        <div className="text-center p-4">
+          <h2 className="text-xl font-semibold text-gray-700">Welcome to Chat</h2>
+          <p className="text-gray-500 mt-2">Select a conversation to start messaging</p>
+        </div>
+      </div> */}
+    </div>
   );
-};
+}
 
-export default ChatWindow;
+export default ChatApp;

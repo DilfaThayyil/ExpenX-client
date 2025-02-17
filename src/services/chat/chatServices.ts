@@ -11,7 +11,7 @@ export interface Message{
   sender:string
   receiver:string
   text:string
-  timestamp?:string
+  // timestamp?:string
 }
 
 
@@ -30,13 +30,69 @@ export const sendMessage = async(message:Message)=>{
 export const fetchMessage = async (senderId: string, receiverId: string) => {
   try {
     const response = await axiosInstance.get(`${BASEURL}/fetchMessages/${senderId}/${receiverId}`);
-    console.log("res-data-fetchMessages :",response.data)
+    console.log("fetchMessages :",response.data)
     return response.data;
   } catch (error: any) {
     console.error("Error fetching messages:", error.response?.data || error.message);
     throw error;
   }
 };
+
+
+export const fetchUser = async(id:string)=>{
+  try{
+    const response = await axiosInstance.get(`${BASEURL}/fetchUser/${id}`)
+    console.log("response-fetchUser :",response.data)
+    return response.data
+  }catch(err){
+    console.error(err)
+  }
+}
+
+export const fetchAdvisor = async(id:string)=>{
+  try{
+    const response = await axiosInstance.get(`${BASEURL}/fetchAdvisor/${id}`)
+    console.log("response-fetchAdvisor :",response.data)
+    return response.data
+  }catch(err){
+    console.error(err)
+  }
+}
+
+
+export const fetchChats = async (userId: string) => {
+  try {
+    const response = await axiosInstance.get(`${BASEURL}/fetchChats/${userId}`);
+    console.log("response : ",response)
+    return response.data.result;
+  } catch (error) {
+    console.error("Error fetching chats:", error);
+    return [];
+  }
+};
+
+export const fetchAllChats = async () => {
+  try {
+    const response = await axiosInstance.get(`${BASEURL}/fetchAllChats`);
+    console.log("response : ",response)
+    return response.data.result;
+  } catch (error) {
+    console.error("Error fetching all chats:", error);
+    return [];
+  }
+};
+
+export const createChat = async (chatData: { user1: string; user2: string }) => {
+  try {
+    const response = await axiosInstance.post(`${BASEURL}/createChat`, chatData);
+    console.log("response : ",response)
+    return response.data;
+  } catch (error) {
+    console.error("Error creating chat:", error);
+    return null;
+  }
+};
+
 
 
 // export const findMyFriends= async(id:string)=>{

@@ -17,7 +17,7 @@ interface ModalProps {
 }
 
 const CategoryModal: React.FC<ModalProps> = ({ isOpen, closeModal, category, onCategoryUpdate, onCategoryAdd }) => {
-  const [name, setName] = useState(category?.name || "");
+  const [name, setName] = useState(category?.name || "")
   const Toast = useShowToast()
 
   const handleSubmit = async () => {

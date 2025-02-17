@@ -1,16 +1,17 @@
 import { io, Socket } from "socket.io-client";
-const BACKENDENDPOINT = "http://localhost:3000/socket"; 
+
+const BACKENDENDPOINT = "http://localhost:3000"; 
 
 export let socket: Socket;
 
 export const initializeSocket = () => {
-  console.log('initializing socket...')
+  
   if (!socket) {
+    console.log("Initializing socket...");
     socket = io(BACKENDENDPOINT, {
-      transports: ["websocket"],
+      transports: ["websocket", "polling"], 
       withCredentials: true,
     });
-    console.log('socket created... : ',socket)
 
     socket.on("connect", () => {
       console.log("Socket connected:", socket.id);
@@ -19,6 +20,10 @@ export const initializeSocket = () => {
     socket.on("disconnect", () => {
       console.log("Socket disconnected");
     });
-    return socket
+
+    socket.on("connect_error", (err) => {
+      console.error("Socket connection error:", err);
+    });
   }
+  return socket;
 };

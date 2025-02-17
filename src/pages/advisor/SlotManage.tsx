@@ -12,6 +12,12 @@ import Pagination from "@/components/admin/Pagination";
 
 interface Slot {
   _id: string;
+  advisorId?:{
+    id:string;
+    username:string;
+    email:string;
+    profilePic:string
+  },
   date: string;
   startTime: string;
   endTime: string;
@@ -48,7 +54,7 @@ const SlotManage: React.FC = () => {
     fetchSlot()
   }, [currentPage])
 
-  const createNewSlot = async (id:string,newSlot: Slot) => {
+  const createNewSlot = async (newSlot: Slot) => {
     try {
       const id = advisor._id
       console.log("advisorId : ",id)
@@ -56,7 +62,7 @@ const SlotManage: React.FC = () => {
       const response = await createSlot(id,newSlot)
       console.log("newSlot : ", response.Slot)
       toast.success("Slot created successfully")
-      setSlots([...slots, response.Slot]);
+      setSlots([...slots, response.Slot]);    
       setIsCreateModalOpen(false);
     } catch (err) {
       console.error(err)
