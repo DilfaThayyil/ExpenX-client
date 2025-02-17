@@ -1,14 +1,16 @@
 import { useEffect, useState, useRef } from 'react';
-import { Search, Video, MoreVertical, Paperclip, Mic, Send } from 'lucide-react';
+import { Search, Video, MoreVertical, Paperclip, Mic, Send, MessageCircleMore  } from 'lucide-react';
 import Store from '@/store/store'
 import { MessageBubble } from './MessageBubble';
 import { ContactItem } from './ContactItem';
-import {initializeSocket,socket} from '@/socket/socket'
-import {fetchMessage} from '@/services/chat/chatServices'
+import { initializeSocket, socket } from '@/socket/socket'
+import { fetchMessage } from '@/services/chat/chatServices'
+// import debounce from "lodash.debounce"
+import { debounce } from 'lodash'
 
 
 
-interface Message{
+interface Message {
   id: string;
   senderId: string;
   receiverId: string;
@@ -18,23 +20,24 @@ interface Message{
 }
 
 
-interface ChatProps{
-  receivers:{_id:string;username:string;email:string;profilePic:string}[]
+interface ChatProps {
+  receivers: { _id: string; username: string; email: string; profilePic: string }[]
 }
 
 
 // Main Chat App Component
-const ChatApp:React.FC<ChatProps> = ({receivers}) => {
+const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   const [activeContact, setActiveContact] = useState(receivers[0]);
-  const [messages , setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const sender = Store((state)=>state.user)
+  const [isTyping, setIsTyping] = useState<boolean>(false)
+  const sender = Store((state) => state.user)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const filteredContacts = receivers.filter(contact => 
+  const filteredContacts = receivers.filter(contact =>
     contact.username.toLowerCase().includes(searchQuery.toLowerCase())
   )
-  console.log("receivers : ",receivers)
+  const [typingUser, setTypingUser] = useState<string | null>(null);
 
   // initialize socket
   useEffect(() => {
@@ -43,65 +46,85 @@ const ChatApp:React.FC<ChatProps> = ({receivers}) => {
       socket.disconnect();
     };
   }, [])
-  
 
+  /////////////////////
   useEffect(() => {
     if (!socket || !sender || !activeContact) return;
-  
+
     console.log("Socket connected:", socket)
     console.log("Sender ID:", sender._id)
     console.log("Receiver ID:", activeContact._id)
-  
+
     const roomId = [sender._id, activeContact._id].sort().join('_')
     console.log("Joining Room ID:", roomId)
-  
+
     socket.emit("joinRoom", roomId)
-  
-    const messageListener = (message:Message) => {
+
+    const messageListener = (message: Message) => {
       if (message.roomId === roomId) {
-        console.log("newMsg-listening : ",message)
+        console.log("newMsg-listening : ", message)
         setMessages((prev) => [...prev, message]);
       }
     }
-  
+
     socket.on("receive_message", messageListener);
-  
+
     return () => {
       console.log("Leaving Room ID:", roomId);
-      socket.emit("leaveRoom", roomId); 
-      socket.off("receive_message", messageListener); 
+      socket.emit("leaveRoom", roomId);
+      socket.off("receive_message", messageListener);
     };
-  }, [activeContact, sender]); 
-  
-  
+  }, [activeContact, sender]);
+
+  ///////////////////////
+  useEffect(() => {
+    socket.on('display_typing', ({ senderId }) => {
+      console.log("display_typing...", senderId)
+      setTypingUser(senderId)
+    });
+
+    socket.on('hide_typing', () => {
+      console.log("hide_typing...")
+      setTypingUser(null);
+    });
+
+    return () => {
+      socket.off('display_typing');
+      socket.off('hide_typing');
+    };
+  }, []);
+
+
+  ///////////////////////
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         const response = await fetchMessage(sender._id, activeContact._id);
-        console.log("fetchMessage : ",response)
+        console.log("fetchMessage : ", response)
         setMessages(response.map((msg: Message) => ({
           ...msg,
-          createdAt: msg.createdAt, 
+          createdAt: msg.createdAt,
         })));
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
     };
-  
+
     if (activeContact._id) {
       fetchMessages();
     }
   }, [activeContact]);
 
+  ////////////////
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-}, [messages]);
+  }, [messages]);
 
   const handleSendMessage = (message: string) => {
     if (!message.trim()) return;
     const roomId = [sender._id, activeContact._id].sort().join('_');
     const newMessage = {
-      id: Date.now().toString(), 
+      id: Date.now().toString(),
       senderId: sender._id,
       receiverId: activeContact._id,
       roomId,
@@ -113,15 +136,30 @@ const ChatApp:React.FC<ChatProps> = ({receivers}) => {
       receiverId: activeContact._id,
       roomId,
       text: message,
-      createdAt: new Date().toISOString(),    
+      createdAt: new Date().toISOString(),
     });
-    
+
     socket.emit("send_message", newMessage);
     setNewMessage('');
   };
-  
 
 
+  const handleTyping = () => {
+    const roomId = [sender._id, activeContact._id].sort().join('_');
+    if (!isTyping) {
+      setIsTyping(true);
+      console.log("handleTyping...")
+      socket.emit("typing", { senderId: sender._id, roomId });
+    }
+    debounceStopTyping();
+  };
+
+  const debounceStopTyping = debounce(() => {
+    const roomId = [sender._id, activeContact._id].sort().join('_');
+    setIsTyping(false);
+    console.log("debounceStopTyping...")
+    socket.emit("stop_typing", { senderId: sender._id, roomId });
+  }, 1500);
 
 
   return (
@@ -141,20 +179,20 @@ const ChatApp:React.FC<ChatProps> = ({receivers}) => {
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
           </div>
         </div>
-        
+
         {/* Contacts List */}
         <div className="flex-1 overflow-y-auto">
           {filteredContacts.map(contact => (
-            <ContactItem 
-              key={contact._id} 
-              contact={contact} 
+            <ContactItem
+              key={contact._id}
+              contact={contact}
               active={activeContact._id === contact._id}
               onClick={() => setActiveContact(contact)}
             />
           ))}
         </div>
       </div>
-      
+
       {/* Main Chat Area */}
       <div className="hidden sm:flex flex-1 flex-col">
         {/* Chat Header */}
@@ -162,16 +200,21 @@ const ChatApp:React.FC<ChatProps> = ({receivers}) => {
           <div className="flex items-center">
             <div className="relative">
               <img src={activeContact.profilePic} alt={activeContact.username} className="rounded-full w-10 h-10" />
-              {activeContact.status === 'online' && 
+              {/* {activeContact.status === 'online' &&
                 <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-              }
+              } */}
             </div>
             <div className="ml-3">
               <h2 className="text-sm font-semibold">{activeContact.username}</h2>
-              <p className="text-xs text-gray-500">{activeContact.status === 'online' ? 'Online' : 'Offline'}</p>
+              {typingUser && typingUser === activeContact._id && (
+                  <div className="animate-pulse">
+                    <span className="font-semibold text-gray-500 text-sm">typing...</span>
+                  </div>
+              )}
+              {/* <p className="text-xs text-gray-500">{activeContact.status === 'online' ? 'Online' : 'Offline'}</p> */}
             </div>
           </div>
-          <div className="flex space-x-3">    
+          <div className="flex space-x-3">
             <button className="text-gray-600 hover:text-gray-800">
               <Video className="h-5 w-5" />
             </button>
@@ -183,15 +226,22 @@ const ChatApp:React.FC<ChatProps> = ({receivers}) => {
             </button>
           </div>
         </div>
-        
+
         {/* Messages Container */}
         <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
-          {messages.map((message,index) => (
+          {messages.map((message, index) => (
             <MessageBubble key={message.id || index} message={message} />
           ))}
-           <div ref={messagesEndRef} />
+          <div ref={messagesEndRef} />
         </div>
-        
+        {/* {typingUser && typingUser === activeContact._id && (
+          <div className="flex items-center mt-2">
+            <div className="w-3 h-3 bg-gray-300 rounded-full animate-ping-slow"></div>
+            <div className="w-3 h-3 bg-gray-300 rounded-full animate-ping-slow ml-1"></div>
+            <div className="w-3 h-3 bg-gray-300 rounded-full animate-ping-slow ml-1"></div>
+          </div>
+        )} */}
+
         {/* Message Input Area */}
         <div className="bg-white border-t border-gray-200 p-3">
           <div className="flex items-center">
@@ -201,7 +251,7 @@ const ChatApp:React.FC<ChatProps> = ({receivers}) => {
             <input
               type="text"
               value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              onChange={(e) => { setNewMessage(e.target.value); handleTyping() }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && newMessage.trim()) {
                   handleSendMessage(newMessage);
@@ -211,9 +261,9 @@ const ChatApp:React.FC<ChatProps> = ({receivers}) => {
               className="flex-1 border border-gray-300 rounded-full py-2 px-4 mr-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             {newMessage.trim() ? (
-              <button 
+              <button
                 className="bg-green-500 text-white rounded-full p-2 hover:bg-green-600"
-                onClick={()=>handleSendMessage(newMessage)}
+                onClick={() => handleSendMessage(newMessage)}
               >
                 <Send className="h-5 w-5" />
               </button>
@@ -225,7 +275,7 @@ const ChatApp:React.FC<ChatProps> = ({receivers}) => {
           </div>
         </div>
       </div>
-      
+
       {/* Mobile view - show message when no chat is selected */}
       {/* <div className="flex-1 flex items-center justify-center sm:hidden">
         <div className="text-center p-4">

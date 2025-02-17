@@ -9,7 +9,7 @@ export const initializeSocket = () => {
   if (!socket) {
     console.log("Initializing socket...");
     socket = io(BACKENDENDPOINT, {
-      transports: ["websocket", "polling"], 
+      transports: ["websocket", "polling"],
       withCredentials: true,
     });
 
