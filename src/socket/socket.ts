@@ -5,7 +5,7 @@ const BACKENDENDPOINT = "http://localhost:3000";
 export let socket: Socket;
 
 export const initializeSocket = () => {
-  
+
   if (!socket) {
     console.log("Initializing socket...");
     socket = io(BACKENDENDPOINT, {

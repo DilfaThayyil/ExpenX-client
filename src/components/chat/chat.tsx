@@ -1,14 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
-import { Search, Video, MoreVertical, Paperclip, Mic, Send, MessageCircleMore  } from 'lucide-react';
+import { Search, Video, MoreVertical, Paperclip, Mic, Send } from 'lucide-react';
 import Store from '@/store/store'
 import { MessageBubble } from './MessageBubble';
 import { ContactItem } from './ContactItem';
+import { FilePreview, getFileType } from './FilePreview'
 import { initializeSocket, socket } from '@/socket/socket'
-import { fetchMessage } from '@/services/chat/chatServices'
-// import debounce from "lodash.debounce"
+import { fetchMessage, uploadChatFile } from '@/services/chat/chatServices'
 import { debounce } from 'lodash'
-
-
+import Loading from '@/style/loading'
 
 interface Message {
   id: string;
@@ -16,16 +15,17 @@ interface Message {
   receiverId: string;
   roomId: string;
   text: string;
+  url?: string;
+  fileType?: string;
+  fileName?: string;
   createdAt: string;
 }
-
 
 interface ChatProps {
   receivers: { _id: string; username: string; email: string; profilePic: string }[]
 }
 
 
-// Main Chat App Component
 const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   const [activeContact, setActiveContact] = useState(receivers[0]);
   const [messages, setMessages] = useState<Message[]>([])
@@ -34,10 +34,16 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   const [isTyping, setIsTyping] = useState<boolean>(false)
   const sender = Store((state) => state.user)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [typingUser, setTypingUser] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState<boolean>(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [dragActive, setDragActive] = useState<boolean>(false);
+
   const filteredContacts = receivers.filter(contact =>
     contact.username.toLowerCase().includes(searchQuery.toLowerCase())
   )
-  const [typingUser, setTypingUser] = useState<string | null>(null);
 
   // initialize socket
   useEffect(() => {
@@ -47,81 +53,58 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     };
   }, [])
 
-  /////////////////////
   useEffect(() => {
     if (!socket || !sender || !activeContact) return;
-
-    console.log("Socket connected:", socket)
-    console.log("Sender ID:", sender._id)
-    console.log("Receiver ID:", activeContact._id)
-
     const roomId = [sender._id, activeContact._id].sort().join('_')
-    console.log("Joining Room ID:", roomId)
-
     socket.emit("joinRoom", roomId)
-
     const messageListener = (message: Message) => {
       if (message.roomId === roomId) {
-        console.log("newMsg-listening : ", message)
         setMessages((prev) => [...prev, message]);
       }
     }
-
     socket.on("receive_message", messageListener);
-
     return () => {
-      console.log("Leaving Room ID:", roomId);
       socket.emit("leaveRoom", roomId);
       socket.off("receive_message", messageListener);
     };
   }, [activeContact, sender]);
 
-  ///////////////////////
   useEffect(() => {
     socket.on('display_typing', ({ senderId }) => {
-      console.log("display_typing...", senderId)
       setTypingUser(senderId)
     });
-
     socket.on('hide_typing', () => {
-      console.log("hide_typing...")
       setTypingUser(null);
     });
-
     return () => {
       socket.off('display_typing');
       socket.off('hide_typing');
     };
   }, []);
 
-
-  ///////////////////////
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         const response = await fetchMessage(sender._id, activeContact._id);
-        console.log("fetchMessage : ", response)
         setMessages(response.map((msg: Message) => ({
           ...msg,
           createdAt: msg.createdAt,
         })));
       } catch (error) {
-        console.error("Error fetching messages:", error);
+        console.error("Error fetching messages:", error)
       }
-    };
-
-    if (activeContact._id) {
-      fetchMessages();
     }
-  }, [activeContact]);
+    if (activeContact._id) {
+      fetchMessages()
+    }
+  }, [activeContact])
 
-  ////////////////
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages])
 
-  const handleSendMessage = (message: string) => {
-    if (!message.trim()) return;
+  const handleSendMessage = (message: string, url?: string, fileInfo?: { type: string, name: string }) => {
+    if ((!message.trim() && !url)) return;
     const roomId = [sender._id, activeContact._id].sort().join('_');
     const newMessage = {
       id: Date.now().toString(),
@@ -129,26 +112,20 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
       receiverId: activeContact._id,
       roomId,
       text: message,
+      url,
+      fileType: fileInfo?.type,
+      fileName: fileInfo?.name,
       createdAt: new Date().toISOString(),
-    };
-    console.log("Sending message:", {
-      senderId: sender._id,
-      receiverId: activeContact._id,
-      roomId,
-      text: message,
-      createdAt: new Date().toISOString(),
-    });
-
+    }
+    console.log("sendingMessage : ", newMessage)
     socket.emit("send_message", newMessage);
     setNewMessage('');
   };
-
 
   const handleTyping = () => {
     const roomId = [sender._id, activeContact._id].sort().join('_');
     if (!isTyping) {
       setIsTyping(true);
-      console.log("handleTyping...")
       socket.emit("typing", { senderId: sender._id, roomId });
     }
     debounceStopTyping();
@@ -157,16 +134,96 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   const debounceStopTyping = debounce(() => {
     const roomId = [sender._id, activeContact._id].sort().join('_');
     setIsTyping(false);
-    console.log("debounceStopTyping...")
     socket.emit("stop_typing", { senderId: sender._id, roomId });
   }, 1500);
 
+  const handleFileUpload = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return
+    processFile(file);
+  }
+
+  const processFile = (file: File) => {
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      alert("File size exceeds the 10MB limit.");
+      return;
+    }
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  }
+
+  const removeSelectedFile = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+  }
+
+  const MAX_VIDEO_SIZE = 100 * 1024 * 1024
+  const MAX_OTHER_SIZE = 10 * 1024 * 1024;
+
+  const uploadFile = async (file: File) => {
+    setUploading(true)
+    try {
+      const maxSize = file.type.startsWith('video/') ? MAX_VIDEO_SIZE : MAX_OTHER_SIZE;
+      if (file.size > maxSize) {
+        alert(`File is too large! Max allowed: ${maxSize / (1024 * 1024)}MB`);
+        setUploading(false);
+        return;
+      }
+      const formData = new FormData();
+      formData.append('file', file);
+      console.log("formData : ", formData)
+      const response = await uploadChatFile(formData)
+      console.log("response : ", response)
+      if (response.url) {
+        handleSendMessage('', response.url, {
+          type: getFileType(file),
+          name: file.name
+        })
+        removeSelectedFile()
+      } else {
+        throw new Error('File upload failed')
+      }
+    } catch (err) {
+      console.error('file upload error : ', err)
+    }
+    setUploading(false)
+  }
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processFile(e.dataTransfer.files[0]);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
       <div className="w-full sm:w-1/3 lg:w-1/4 bg-white border-r border-gray-200 flex flex-col">
-        {/* Sidebar Header */}
         <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
           <div className="relative">
             <input
@@ -180,7 +237,6 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
           </div>
         </div>
 
-        {/* Contacts List */}
         <div className="flex-1 overflow-y-auto">
           {filteredContacts.map(contact => (
             <ContactItem
@@ -193,25 +249,19 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
         </div>
       </div>
 
-      {/* Main Chat Area */}
       <div className="hidden sm:flex flex-1 flex-col">
-        {/* Chat Header */}
         <div className="px-4 py-2 bg-white border-b border-gray-200 flex justify-between items-center">
           <div className="flex items-center">
             <div className="relative">
               <img src={activeContact.profilePic} alt={activeContact.username} className="rounded-full w-10 h-10" />
-              {/* {activeContact.status === 'online' &&
-                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-              } */}
             </div>
             <div className="ml-3">
               <h2 className="text-sm font-semibold">{activeContact.username}</h2>
               {typingUser && typingUser === activeContact._id && (
-                  <div className="animate-pulse">
-                    <span className="font-semibold text-gray-500 text-sm">typing...</span>
-                  </div>
+                <div className="animate-pulse">
+                  <span className="font-semibold text-gray-500 text-sm">typing...</span>
+                </div>
               )}
-              {/* <p className="text-xs text-gray-500">{activeContact.status === 'online' ? 'Online' : 'Offline'}</p> */}
             </div>
           </div>
           <div className="flex space-x-3">
@@ -219,70 +269,104 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
               <Video className="h-5 w-5" />
             </button>
             <button className="text-gray-600 hover:text-gray-800">
-              {/* <Video className="h-5 w-5" /> */}
-            </button>
-            <button className="text-gray-600 hover:text-gray-800">
               <MoreVertical className="h-5 w-5" />
             </button>
           </div>
         </div>
 
-        {/* Messages Container */}
         <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
           {messages.map((message, index) => (
             <MessageBubble key={message.id || index} message={message} />
           ))}
           <div ref={messagesEndRef} />
         </div>
-        {/* {typingUser && typingUser === activeContact._id && (
-          <div className="flex items-center mt-2">
-            <div className="w-3 h-3 bg-gray-300 rounded-full animate-ping-slow"></div>
-            <div className="w-3 h-3 bg-gray-300 rounded-full animate-ping-slow ml-1"></div>
-            <div className="w-3 h-3 bg-gray-300 rounded-full animate-ping-slow ml-1"></div>
-          </div>
-        )} */}
 
-        {/* Message Input Area */}
-        <div className="bg-white border-t border-gray-200 p-3">
+        <div
+          className={`bg-white border-t border-gray-200 p-3 ${dragActive ? 'bg-blue-50 border-blue-200' : ''}`}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        >
+          {selectedFile && previewUrl && (
+            <FilePreview
+              file={selectedFile}
+              previewUrl={previewUrl}
+              onRemove={removeSelectedFile}
+            />
+          )}
+
           <div className="flex items-center">
-            <button className="text-gray-500 hover:text-gray-700 mr-2">
+            <button
+              className="text-gray-500 hover:text-blue-600 mr-2 rounded-full p-2 hover:bg-blue-50 transition-colors"
+              onClick={handleFileUpload}
+            >
               <Paperclip className="h-5 w-5" />
             </button>
             <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => { setNewMessage(e.target.value); handleTyping() }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && newMessage.trim()) {
-                  handleSendMessage(newMessage);
-                }
-              }}
-              placeholder="Type a message..."
-              className="flex-1 border border-gray-300 rounded-full py-2 px-4 mr-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleFileChange}
+              accept="image/*,video/*,application/pdf"
             />
-            {newMessage.trim() ? (
+
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => { setNewMessage(e.target.value); handleTyping() }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && (newMessage.trim() || selectedFile)) {
+                    if (selectedFile) {
+                      uploadFile(selectedFile);
+                    } else {
+                      handleSendMessage(newMessage);
+                    }
+                  }
+                }}
+                placeholder={dragActive ? "Drop file here..." : "Type a message..."}
+                className={`w-full border border-gray-300 rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-1 focus:ring-blue-500 ${dragActive ? 'border-blue-300 bg-blue-50' : ''}`}
+              />
+              {selectedFile && (
+                <button
+                  onClick={() => uploadFile(selectedFile)}
+                  disabled={uploading}
+                  className="absolute right-12 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded-full text-xs"
+                >
+                  {uploading ? "Sending..." : "Send File"}
+                </button>
+              )}
+            </div>
+
+            {newMessage.trim() || selectedFile ? (
               <button
-                className="bg-green-500 text-white rounded-full p-2 hover:bg-green-600"
-                onClick={() => handleSendMessage(newMessage)}
+                className="ml-2 bg-green-500 text-white rounded-full p-2 hover:bg-green-600 transition-colors flex items-center justify-center"
+                onClick={() => {
+                  if (selectedFile) {
+                    uploadFile(selectedFile);
+                  } else {
+                    handleSendMessage(newMessage);
+                  }
+                }}
+                disabled={uploading}
               >
-                <Send className="h-5 w-5" />
+                {uploading ? <Loading /> : <Send className="h-5 w-5" />}
               </button>
             ) : (
-              <button className="text-gray-500 hover:text-gray-700">
+              <button className="ml-2 text-gray-500 hover:text-gray-700 rounded-full p-2 hover:bg-gray-100 transition-colors">
                 <Mic className="h-5 w-5" />
               </button>
             )}
           </div>
+
+          {dragActive && (
+            <div className="mt-2 text-center text-sm text-blue-600">
+              Drop your file here to share
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Mobile view - show message when no chat is selected */}
-      {/* <div className="flex-1 flex items-center justify-center sm:hidden">
-        <div className="text-center p-4">
-          <h2 className="text-xl font-semibold text-gray-700">Welcome to Chat</h2>
-          <p className="text-gray-500 mt-2">Select a conversation to start messaging</p>
-        </div>
-      </div> */}
     </div>
   );
 }

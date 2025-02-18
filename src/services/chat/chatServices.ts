@@ -93,6 +93,20 @@ export const createChat = async (chatData: { user1: string; user2: string }) => 
   }
 };
 
+export const uploadChatFile =  async (formData:FormData)=>{
+  try{
+    console.log("formData-serv : ",formData)
+    const response = await axiosInstance.post(`${BASEURL}/uploadChatFile`,formData,{
+      headers: {'Content-type': 'multipart/form-data'}
+    })
+    console.log("response : ",response)
+    return response.data 
+  }catch(err){
+    console.error('Error uploading file : ',err)
+    throw err
+  }
+}
+
 
 
 // export const findMyFriends= async(id:string)=>{
