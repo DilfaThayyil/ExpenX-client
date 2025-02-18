@@ -8,6 +8,9 @@ import { initializeSocket, socket } from '@/socket/socket'
 import { fetchMessage, uploadChatFile } from '@/services/chat/chatServices'
 import { debounce } from 'lodash'
 import Loading from '@/style/loading'
+import { NewMessageIndicator } from './MessageIndicator';
+import notification from '@/assets/audio/mixkit-correct-answer-tone-2870.wav'
+import { TypingIndicator } from './TypingIndicator';
 
 interface Message {
   id: string;
@@ -40,6 +43,10 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState<boolean>(false);
+  const [unreadMessages, setUnreadMessages] = useState<Map<string, number>>(new Map());
+  const notificationSound = useRef<HTMLAudioElement | null>(null);
+
+
 
   const filteredContacts = receivers.filter(contact =>
     contact.username.toLowerCase().includes(searchQuery.toLowerCase())
@@ -60,14 +67,39 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     const messageListener = (message: Message) => {
       if (message.roomId === roomId) {
         setMessages((prev) => [...prev, message]);
+        if (message.senderId !== sender._id) {
+          if (!document.hasFocus() || activeContact._id !== message.senderId) {
+            notificationSound.current?.play()
+              .catch(err => console.log("Error playing notification:", err));
+          }
+          setUnreadMessages(prev => {
+            const newUnreadMessages = new Map(prev);
+            newUnreadMessages.set(
+              message.senderId, 
+              (newUnreadMessages.get(message.senderId) || 0) + 1
+            );
+            return newUnreadMessages;
+          });
+        }
       }
-    }
+    };
     socket.on("receive_message", messageListener);
     return () => {
       socket.emit("leaveRoom", roomId);
       socket.off("receive_message", messageListener);
     };
   }, [activeContact, sender]);
+
+  useEffect(() => {
+    if (activeContact) {
+      setUnreadMessages(prev => {
+        const newUnreadMessages = new Map(prev);
+        newUnreadMessages.set(activeContact._id, 0);
+        return newUnreadMessages;
+      });
+    }
+  }, [activeContact]);
+
 
   useEffect(() => {
     socket.on('display_typing', ({ senderId }) => {
@@ -102,6 +134,19 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages])
+
+  useEffect(() => {
+    notificationSound.current = new Audio(notification)
+    if (notificationSound.current) {
+      notificationSound.current.volume = 0.4
+    }
+    return () => {
+      if (notificationSound.current) {
+        notificationSound.current.pause();
+        notificationSound.current = null;
+      }
+    };
+  }, []);
 
   const handleSendMessage = (message: string, url?: string, fileInfo?: { type: string, name: string }) => {
     if ((!message.trim() && !url)) return;
@@ -238,15 +283,21 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {filteredContacts.map(contact => (
-            <ContactItem
-              key={contact._id}
-              contact={contact}
-              active={activeContact._id === contact._id}
-              onClick={() => setActiveContact(contact)}
-            />
-          ))}
+          {filteredContacts.map(contact => {
+            const unreadCount = unreadMessages.get(contact._id) || 0;
+            return (
+              <ContactItem
+                key={contact._id}
+                contact={contact}
+                active={activeContact._id === contact._id}
+                onClick={() => setActiveContact(contact)}
+              >
+                <NewMessageIndicator count={unreadCount} />
+              </ContactItem>
+            );
+          })}
         </div>
+
       </div>
 
       <div className="hidden sm:flex flex-1 flex-col">
@@ -257,11 +308,7 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
             </div>
             <div className="ml-3">
               <h2 className="text-sm font-semibold">{activeContact.username}</h2>
-              {typingUser && typingUser === activeContact._id && (
-                <div className="animate-pulse">
-                  <span className="font-semibold text-gray-500 text-sm">typing...</span>
-                </div>
-              )}
+              {typingUser && typingUser === activeContact._id && <TypingIndicator />}
             </div>
           </div>
           <div className="flex space-x-3">
