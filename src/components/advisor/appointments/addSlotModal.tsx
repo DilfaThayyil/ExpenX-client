@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import FormInput from "@/components/InputField";
-import { toast } from "react-toastify";
+import { message } from 'antd'
+
 
 interface Slot {
-  _id: string ;
+  _id: string;
   date: string;
   startTime: string;
   endTime: string;
@@ -22,7 +23,7 @@ const SlotCreationModal: React.FC<{
   existingSlot: Slot | null
 }> = ({ onClose, onCreate, onUpdate, existingSlot }) => {
   const [slotData, setSlotData] = useState<Slot>({
-    _id: existingSlot?._id || "", 
+    _id: existingSlot?._id || "",
     date: existingSlot?.date || "",
     startTime: existingSlot?.startTime || "",
     endTime: existingSlot?.endTime || "",
@@ -32,14 +33,15 @@ const SlotCreationModal: React.FC<{
     location: existingSlot?.location || "Virtual",
     locationDetails: existingSlot?.locationDetails || "",
     description: existingSlot?.description || "",
-});
+  });
 
 
   useEffect(() => {
     if (existingSlot) {
-      setSlotData(existingSlot);
+      setSlotData((prev) => ({ ...prev, ...existingSlot }));
     }
   }, [existingSlot]);
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -49,35 +51,35 @@ const SlotCreationModal: React.FC<{
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     // Basic validation
     if (!slotData.date || !slotData.startTime || !slotData.endTime) {
-      toast.error("Please fill in all required fields.");
+      message.error("Please fill in all required fields.");
       return;
     }
-  
+
     // Validate time
     const start = new Date(`1970-01-01T${slotData.startTime}:00`);
     const end = new Date(`1970-01-01T${slotData.endTime}:00`);
     if (start >= end) {
-      toast.error("Start time must be before end time.");
-      return;
-    }
-  
-    if (slotData.location === "Physical" && !slotData.locationDetails) {
-      toast.error("Please provide location details for a physical session.");
+      message.error("Start time must be before end time.");
       return;
     }
 
-    if(existingSlot){
+    if (slotData.location === "Physical" && !slotData.locationDetails) {
+      message.error("Please provide location details for a physical session.");
+      return;
+    }
+
+    if (existingSlot) {
       onUpdate(slotData)
-    }else{
+    } else {
       onCreate(slotData);
     }
-    
+
     onClose();
   };
-  
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">

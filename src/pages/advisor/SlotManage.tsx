@@ -4,7 +4,7 @@ import { createSlot, fetchSlots, updateSlot, deleteSlot } from '@/services/advis
 import React, { useEffect, useState } from 'react';
 import { Calendar, Plus } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
-import { toast } from 'react-toastify';
+import {message} from 'antd'
 import Store from '@/store/store';
 import Pagination from "@/components/admin/Pagination"; 
 
@@ -61,7 +61,7 @@ const SlotManage: React.FC = () => {
       console.log("newSlot-frontent: ", newSlot)
       const response = await createSlot(id,newSlot)
       console.log("newSlot : ", response.Slot)
-      toast.success("Slot created successfully")
+      message.success("Slot created successfully")
       setSlots([...slots, response.Slot]);    
       setIsCreateModalOpen(false);
     } catch (err) {
@@ -76,11 +76,11 @@ const SlotManage: React.FC = () => {
       const response = await updateSlot(updatedSlot,updatedSlot._id);
       console.log("response-slot : ",response.slot)
       setSlots(slots.map(slot => (slot._id === updatedSlot._id ? response.slot : slot)));
-      toast.success("Slot updated successfully");
+      message.success(response.message);
       setIsCreateModalOpen(false);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to update slot");
+      message.error("Failed to update slot");
     }
   };
 
@@ -91,10 +91,10 @@ const SlotManage: React.FC = () => {
       const response = await deleteSlot(slotId)
       setSlots(slots.filter(slot => slot._id !== slotId));
       console.log("response : ",response)
-      toast.success("Slot deleted successfully")
+      message.success("Slot deleted successfully")
     }catch(err){
       console.error(err)
-      toast.error('Failed to delete slot')
+      message.error('Failed to delete slot')
     }
   };
 
@@ -105,24 +105,6 @@ const SlotManage: React.FC = () => {
         <h1 className="text-3xl font-bold mb-6 text-gray-800 flex items-center">
           <Calendar className="mr-3 text-blue-600" /> Slot Management
         </h1>
-
-        {/* Dashboard Overview */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <Clock className="mr-2 text-green-600" /> Upcoming Appointments
-            </h2>
-            <p className="text-gray-500">{bookedAppointments.length} appointments</p>
-          </div>
-          <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <MapPin className="mr-2 text-blue-600" /> Available Slots
-            </h2>
-            <p className="text-gray-500">{slots.length} slots</p>
-          </div>
-          <div className="bg-white shadow-md rounded-lg p-6">
-          </div>
-        </div> */}
         <button
           onClick={() => setIsCreateModalOpen(true)}
           className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition flex items-center justify-center"
