@@ -5,3 +5,4 @@ export const APPID = import.meta.env.VITE_APPID;
 export const SERVERSECRET = import.meta.env.VITE_SERVERSECRET;
 export const GOOGLECLIENTID=import.meta.env.VITE_GOOGLECLIENTID
 export const GOOGLECLIENTSECRET=import.meta.env.VITE_GOOGLECLIENTSECRET
+export const STRIPE_PUBLISHABLE_KEY=import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY

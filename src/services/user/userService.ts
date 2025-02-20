@@ -160,3 +160,15 @@ export const bookSlot = async(slotId:string, userId:string)=>{
   }
 }
 
+export const paymentInitiate = async(slotId:string,userId:string,advisorId:string,amount:number)=>{
+  try{
+    const response = await axiosInstance.post(`${BASEURL}/paymentInitiate`,{
+      slotId,userId,advisorId,amount
+    })
+    console.log("response : ",response.data)
+    return response.data
+  }catch(err){
+    console.error(err)
+    throw err
+  }
+}

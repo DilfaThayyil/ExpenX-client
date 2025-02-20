@@ -1,23 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Calendar, MessageCircle, X } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
 import { fetchSlots } from '@/services/advisor/advisorService';
-import { bookSlot } from '@/services/user/userService';
 import Store from '@/store/store';
-import { toast } from 'react-toastify';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ConfirmationModal from '@/components/modals/confirmationModal';
 import Pagination from "@/components/admin/Pagination";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ChatWindow from '@/components/chat/chat';
-import { createChat, fetchChats } from '@/services/chat/chatServices';
+import { message } from 'antd'
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import PaymentForm from '@/components/user/PaymentForm'
+import { bookSlot,paymentInitiate } from '@/services/user/userService'
+import {STRIPE_PUBLISHABLE_KEY} from '@/utility/env'
 
+
+const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
 interface Slot {
   advisorId: {
-    _id:string;
-    username:string;
-    email:string;
-    profilePic:string;
+    _id: string;
+    username: string;
+    email: string;
+    profilePic: string;
   };
   _id: string;
   date: string;
@@ -33,18 +38,25 @@ interface Slot {
 }
 
 const SlotBooking: React.FC = () => {
+
+  const [paymentIntent, setPaymentIntent] = useState<{
+    clientSecret: string;
+    paymentId: string;
+  } | null>(null);
+
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [advisorList, setAdvisorList] = useState<{
-    _id:string;
-    username:string;
-    email:string;
-    profilePic:string
+    _id: string;
+    username: string;
+    email: string;
+    profilePic: string
   }[]>([])
-  const [showChat,setShowChat] = useState<boolean>(false)
+  const [showChat, setShowChat] = useState<boolean>(false)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [slots, setSlots] = useState<Slot[]>([]);
+  const [isPayModal,setIsPayModal] = useState<boolean>(false)
   const sender = Store((state) => state.user);
   const ITEMS_PER_PAGE = 5;
   const userId = sender._id;
@@ -65,7 +77,7 @@ const SlotBooking: React.FC = () => {
 
   const handleBookSlot = (slotId: string) => {
     if (!slotId || !userId) {
-      toast.error('Slot and user are required for booking');
+      message.error('Slot and user are required for booking');
       return;
     }
     setSelectedSlot(slotId);
@@ -75,34 +87,51 @@ const SlotBooking: React.FC = () => {
   const handleConfirmBooking = async () => {
     try {
       if (selectedSlot) {
-        await bookSlot(selectedSlot, userId);
-        setSlots((prevSlots) =>
-          prevSlots.map((slot) =>
-            slot._id === selectedSlot
-              ? { ...slot, status: 'Booked', bookedBy: userId }
-              : slot
-          )
-        );
-        toast.success('Slot booked successfully');
+        const advisorId = slots.find(slot => slot._id === selectedSlot)?.advisorId._id;
+        console.log("1 paymentInitiate - parameters : ",selectedSlot,userId,advisorId,100)
+        if (!advisorId) throw new Error("Advisor ID not found");
+        console.log("2 paymentInitiate - parameters : ",selectedSlot,userId,advisorId,100)
+        const response = await paymentInitiate(
+          selectedSlot,
+          userId,
+          advisorId,
+          100
+        )
+        console.log("response : ", response)
+        setPaymentIntent(response);
+        setIsPayModal(false)
       }
     } catch (error) {
-      console.error('Error booking slot', error);
-      toast.error('Error booking slot');
+      console.error('Error initiating payment', error);
+      message.error('Error initiating payment');
     }
   };
 
-  const handleShowChat = ()=>{
+  const handleShowChat = () => {
     const uniqueAdvisors = new Map()
-    slots.forEach((slot)=>{
-      if(!uniqueAdvisors.has(slot.advisorId._id)){
-        uniqueAdvisors.set(slot.advisorId._id,slot.advisorId)
+    slots.forEach((slot) => {
+      if (!uniqueAdvisors.has(slot.advisorId._id)) {
+        uniqueAdvisors.set(slot.advisorId._id, slot.advisorId)
       }
     })
     const advisorArray = Array.from(uniqueAdvisors.values())
-    console.log("Unique Advisors : ",advisorArray)
+    console.log("Unique Advisors : ", advisorArray)
     setAdvisorList(advisorArray)
     setShowChat(true)
   }
+
+  const handlePaymentSuccess = async () => {
+    await bookSlot(selectedSlot!, userId);
+    setSlots(prevSlots =>
+      prevSlots.map(slot =>
+        slot._id === selectedSlot
+          ? { ...slot, status: 'Booked', bookedBy: userId }
+          : slot
+      )
+    );
+    message.success('Payment successful and slot booked!');
+    setPaymentIntent(null);
+  };
 
 
   return (
@@ -119,23 +148,23 @@ const SlotBooking: React.FC = () => {
           {/* Full-Screen Chat Window */}
           <ChatWindow receivers={advisorList} />
         </div>
-      ):(
+      ) : (
         <div className="container mx-auto p-4 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-3 text-3xl font-bold text-gray-800">
-              <h1 className="text-3xl font-bold mb-6 text-gray-800 flex items-center justify-between">
-                <span className="flex items-center">
-                  <Calendar className="mr-3 text-blue-600" /> Slot Booking
-                </span>
-                <button
-                  className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition"
-                  title="Start Messaging"
-                  onClick={handleShowChat}
-                >
-                  <MessageCircle size={20} />
-                </button>
-              </h1>
+                <h1 className="text-3xl font-bold mb-6 text-gray-800 flex items-center justify-between">
+                  <span className="flex items-center">
+                    <Calendar className="mr-3 text-blue-600" /> Slot Booking
+                  </span>
+                  <button
+                    className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition"
+                    title="Start Messaging"
+                    onClick={handleShowChat}
+                  >
+                    <MessageCircle size={20} />
+                  </button>
+                </h1>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -223,7 +252,28 @@ const SlotBooking: React.FC = () => {
             onConfirm={handleConfirmBooking}
             slot={selectedSlot || ''}
           />
-      </div>
+          {paymentIntent && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">Complete Payment</h2>
+                  <button
+                    onClick={() => setPaymentIntent(null)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                <Elements stripe={stripePromise} options={{ clientSecret: paymentIntent.clientSecret }}>
+                  <PaymentForm
+                    clientSecret={paymentIntent.clientSecret}
+                    onSuccess={handlePaymentSuccess}
+                  />
+                </Elements>
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </Layout>
   );
