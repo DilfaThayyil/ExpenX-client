@@ -1,3 +1,4 @@
+import { transformGroups } from '@/utility/groupTransformer';
 import axiosInstance from '../axios/axios';
 const BASEURL = 'http://localhost:3000/user';
 
@@ -87,31 +88,9 @@ export const createGroup = async (formData: { name: string; members: string[]; s
 
 export const getUserGroups = async (email: string) => {
   try {
-    console.log("email --- ", email)
     const response = await axiosInstance.get(`${BASEURL}/getUserGroups/${email}`);
-
-    const transformedGroups = response.data.groups.map((group: any) => ({
-      id: group._id || group.id,
-      name: group.name,
-      totalExpenses: 0,
-      memberCount: group.members ? group.members.length : 0,
-      balance: 0,
-      lastActivity: group.expenses && group.expenses.length > 0
-        ? group.expenses[group.expenses.length - 1].description
-        : 'No recent activity',
-      members: group.members
-        ? group.members.map((memberEmail: string) => ({
-          id: memberEmail.replace('@', '_'),
-          name: memberEmail.split('@')[0],
-          avatar: `https://ui-avatars.com/api/?name=${memberEmail.split('@')[0]}`,
-          paid: 0,
-          owed: 0
-        }))
-        : [],
-      expenses: group.expenses || [],
-      splitMethod: group.splitMethod || 'equal'
-    }));
-
+    const transformedGroups = transformGroups(response.data.groups)
+    console.log("transofromed-serv : ", transformedGroups)
     return transformedGroups;
 
   } catch (error) {
@@ -126,8 +105,13 @@ export const addMember = async (groupId: string, memberEmail: string) => {
     const response = await axiosInstance.post(`${BASEURL}/addMember/${groupId}`, {
       memberEmail
     })
-    console.log("response in frontService : ", response.data)
-    return response.data
+    const transformedGroup = transformGroups([response.data.groups])
+    console.log("transformed : ", transformedGroup)
+    return {
+      success: response.data.success,
+      message: response.data.message, 
+      transformedGroup
+    };
   } catch (error) {
     console.error(error)
     throw error
@@ -139,8 +123,8 @@ export const addExpenseInGroup = async (groupId: string,
   expenseData: { description: string; amount: number; paidBy: string; date: string; splitMethod: string }
 ) => {
   try {
-    console.log("groupId : ",groupId)
-    console.log("expenseData: ",expenseData)
+    console.log("groupId : ", groupId)
+    console.log("expenseData: ", expenseData)
     const response = await axiosInstance.post(`${BASEURL}/addExpenseInGroup/${groupId}`, expenseData)
     return response.data;
   } catch (error) {
@@ -149,25 +133,25 @@ export const addExpenseInGroup = async (groupId: string,
   }
 };
 
-export const bookSlot = async(slotId:string, userId:string)=>{
-  try{
-    const response = await axiosInstance.patch(`${BASEURL}/bookslot`,{slotId,userId})
-    console.log("response-data :",response.data)
+export const bookSlot = async (slotId: string, userId: string) => {
+  try {
+    const response = await axiosInstance.patch(`${BASEURL}/bookslot`, { slotId, userId })
+    console.log("response-data :", response.data)
     return response.data
-  }catch(err){
+  } catch (err) {
     console.error(err)
     throw err
   }
 }
 
-export const paymentInitiate = async(slotId:string,userId:string,advisorId:string,amount:number)=>{
-  try{
-    const response = await axiosInstance.post(`${BASEURL}/paymentInitiate`,{
-      slotId,userId,advisorId,amount
+export const paymentInitiate = async (slotId: string, userId: string, advisorId: string, amount: number) => {
+  try {
+    const response = await axiosInstance.post(`${BASEURL}/paymentInitiate`, {
+      slotId, userId, advisorId, amount
     })
-    console.log("response : ",response.data)
+    console.log("response : ", response.data)
     return response.data
-  }catch(err){
+  } catch (err) {
     console.error(err)
     throw err
   }
