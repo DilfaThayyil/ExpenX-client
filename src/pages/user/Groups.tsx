@@ -108,7 +108,7 @@ const GroupsPage = () => {
         splitMethod: ''
     })
     const [groups, setGroups] = useState<Group[]>([])
-    const [memberError,setMemberError] = useState('')
+    const [memberError, setMemberError] = useState('')
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
     const email = Store((state) => state.user.email)
     const [emailError, setEmailError] = useState<string | null>(null)
@@ -220,7 +220,6 @@ const GroupsPage = () => {
             Toaster('All fields are required for the expense.', 'error');
             return;
         }
-
         try {
             setLoading(true)
             console.log("handleAddExpense......")
@@ -229,14 +228,20 @@ const GroupsPage = () => {
                 date: new Date().toISOString(),
                 splitMethod: newExpense.splitMethod || selectedGroup.splitMethod || 'equal'
             })
+            console.log("response : ", response)
             if (response.success) {
+                const updatedGroup = response.transformed[0]; 
+                if (!updatedGroup) {
+                    console.error("Invalid response format:", response);
+                    Toaster('Failed to update group', 'error');
+                    return;
+                }
                 setGroups(prev =>
                     prev.map(group =>
-                        group.id === selectedGroup.id ? response.data.group : group
+                        group.id === selectedGroup.id ? updatedGroup : group
                     )
-                )
-                console.log("response : ", response.data)
-                setSelectedGroup(response.data.group)
+                );
+                setSelectedGroup(updatedGroup);
                 setNewExpense({
                     id: '',
                     date: new Date().toISOString(),
@@ -269,7 +274,7 @@ const GroupsPage = () => {
 
     return (
         <Layout role='user'>
-            <div className="min-h-screen bg-gray-50 p-6">
+            <div className="min-h-screen bg-muted  p-6 border rounded-2xl">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">My Groups</h1>
@@ -396,13 +401,13 @@ const GroupsPage = () => {
                                     </div>
                                     <div className="flex items-center gap-2 mb-4">
                                         <div className="flex -space-x-2">
-                                            {group.members.slice(0, 3).map((member) => (
+                                            {group.members?.slice(0, 3).map((member) => (
                                                 <Avatar key={member.email} className="border-2 border-white">
                                                     <AvatarImage src={member.avatar} alt={member.name} />
                                                     <AvatarFallback>{member.name}</AvatarFallback>
                                                 </Avatar>
                                             ))}
-                                            {group.members.length > 3 && (
+                                            {group.members?.length > 3 && (
                                                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium border-2 border-white">
                                                     +{group.members.length - 3}
                                                 </div>

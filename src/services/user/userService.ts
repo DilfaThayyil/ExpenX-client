@@ -126,7 +126,14 @@ export const addExpenseInGroup = async (groupId: string,
     console.log("groupId : ", groupId)
     console.log("expenseData: ", expenseData)
     const response = await axiosInstance.post(`${BASEURL}/addExpenseInGroup/${groupId}`, expenseData)
-    return response.data;
+    console.log("response- serv : ",response.data)
+    const transformed = transformGroups([response.data.groups])
+    console.log("tranformed : ",transformed)
+    return {
+      success: response.data.success,
+      message: response.data.message, 
+      transformed
+    };
   } catch (error) {
     console.error(error);
     throw error;
