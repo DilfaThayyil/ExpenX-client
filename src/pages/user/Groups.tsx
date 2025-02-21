@@ -108,7 +108,7 @@ const GroupsPage = () => {
         splitMethod: ''
     })
     const [groups, setGroups] = useState<Group[]>([])
-
+    const [memberError,setMemberError] = useState('')
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
     const email = Store((state) => state.user.email)
     const [emailError, setEmailError] = useState<string | null>(null)
@@ -140,16 +140,24 @@ const GroupsPage = () => {
 
 
     const handleAddMember = async () => {
-        if (!selectedGroup?.id || !member) {
-            Toaster('Member email is required', 'error');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(member)) {
+            setMemberError("Please enter a valid email address");
             return;
         }
-
+        if (newGroup.members.includes(member)) {
+            setMemberError("This email is already added");
+            return;
+        }
+        if (!selectedGroup?.id || !member) {
+            setMemberError('Member email is required');
+            return;
+        }
+        setMemberError("");
         try {
             setLoading(true);
             const response = await addMember(selectedGroup.id, member);
             console.log("response : ", response)
-
             if (response.success) {
                 Toaster(response.message, 'success');
                 setSelectedGroup(response.transformedGroup[0])
@@ -304,7 +312,7 @@ const GroupsPage = () => {
                                         onKeyPress={(e) => {
                                             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                                             if (e.key === 'Enter') {
-                                                e.preventDefault(); 
+                                                e.preventDefault();
                                                 if (emailRegex.test(e.currentTarget.value)) {
                                                     if (!newGroup.members.includes(e.currentTarget.value)) {
                                                         setNewGroup((prev) => ({
@@ -475,12 +483,14 @@ const GroupsPage = () => {
                                             ))}
                                             <input
                                                 type="text"
-                                                placeholder='Enter email address'
+                                                placeholder="Enter email address"
                                                 value={member}
                                                 onChange={(e) => setMember(e.target.value)}
+                                                className={`border ${memberError ? "border-red-500" : "border-gray-300"} rounded px-2 py-1`}
                                             />
-                                            <Button variant="outline" className="h-full"
-                                                onClick={handleAddMember} disabled={loading}>
+                                            {memberError && <p className="text-red-500 text-sm">{memberError}</p>}
+
+                                            <Button variant="outline" className="h-full" onClick={handleAddMember} disabled={loading}>
                                                 {loading ? (
                                                     <div className="flex items-center">
                                                         <span className="animate-spin mr-2">◌</span>
