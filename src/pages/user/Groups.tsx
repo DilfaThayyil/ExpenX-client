@@ -65,14 +65,15 @@ interface Group {
 }
 
 interface GroupMember {
-    id: string;
     name: string;
+    email: string;
     avatar: string;
     paid: number;
     owed: number;
 }
 
 interface GroupExpense {
+    id: string;
     date: string;
     description: string;
     amount: number;
@@ -92,7 +93,9 @@ const GroupsPage = () => {
     const [member, setMember] = useState('')
     const [loading, setLoading] = useState<boolean>(false)
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+    const [isExpenseDialogOpen, setIsExpenseDialogOpen] = useState(false);
     const [newExpense, setNewExpense] = useState<GroupExpense>({
+        id: '',
         date: new Date().toISOString(),
         description: '',
         amount: 0,
@@ -108,7 +111,7 @@ const GroupsPage = () => {
 
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
     const email = Store((state) => state.user.email)
-
+    const [emailError, setEmailError] = useState<string | null>(null)
     const [refreshGroups, setRefreshGroups] = useState(false)
 
     useEffect(() => {
@@ -120,6 +123,7 @@ const GroupsPage = () => {
                 }
                 console.log("email : ", email)
                 const response = await getUserGroups(email)
+                console.log("response : ", response)
                 if (Array.isArray(response)) {
                     setGroups(response)
                 } else {
@@ -127,7 +131,7 @@ const GroupsPage = () => {
                     Toaster('Error fetching groups: Invalid format', 'error')
                 }
             } catch (error) {
-                console.error('Error creating group', error)
+                console.error('Error fetching groups', error)
                 Toaster('errrr fetching groups', 'error')
             }
         }
@@ -144,11 +148,13 @@ const GroupsPage = () => {
         try {
             setLoading(true);
             const response = await addMember(selectedGroup.id, member);
+            console.log("response : ", response)
 
             if (response.success) {
-                Toaster('Member added successfully', 'success');
+                Toaster(response.message, 'success');
+                setSelectedGroup(response.transformedGroup[0])
                 setMember('');
-                setRefreshGroups(prev => !prev);
+                // setRefreshGroups(prev => !prev);
             } else {
                 Toaster(response.message || 'Failed to add member', 'error');
             }
@@ -184,10 +190,11 @@ const GroupsPage = () => {
         }
         setLoading(true)
         try {
+            console.log("creatingGroup : ", newGroup)
             const response = await createGroup(newGroup)
             // setGroups((prev)=>[...prev,response])
             console.log("-------------response : ", response)
-            Toaster('Group creation successfull', 'success')
+            Toaster('Group creation successful', 'success')
             setNewGroup({ name: '', members: [], splitMethod: '' })
             setIsDialogOpen(false)
             setRefreshGroups(prev => !prev)
@@ -220,15 +227,17 @@ const GroupsPage = () => {
                         group.id === selectedGroup.id ? response.data.group : group
                     )
                 )
+                console.log("response : ", response.data)
                 setSelectedGroup(response.data.group)
                 setNewExpense({
+                    id: '',
                     date: new Date().toISOString(),
                     description: '',
                     amount: 0,
                     paidBy: '',
                     splitMethod: 'equal'
                 });
-                setIsDialogOpen(false)
+                setIsExpenseDialogOpen(false)
                 Toaster('Expense added successfully', 'success')
             } else {
                 Toaster(response.message || 'Failed to add expense', 'error')
@@ -241,8 +250,8 @@ const GroupsPage = () => {
         }
     }
 
-    const handleChange = (e:React.ChangeEvent<HTMLInputElement | HTMLSelectElement>)=>{
-        const {name,value} = e.target
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target
         setNewExpense({
             ...newExpense,
             [name]: name === 'amount' ? parseFloat(value) : value
@@ -294,21 +303,27 @@ const GroupsPage = () => {
                                         placeholder="Enter email addresses"
                                         onKeyPress={(e) => {
                                             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                                            if (e.key === 'Enter' && emailRegex.test(e.currentTarget.value)) {
-                                                if (!newGroup.members.includes(e.currentTarget.value)) {
-                                                    setNewGroup((prev) => ({
-                                                        ...prev,
-                                                        members: [...prev.members, e.currentTarget.value],
-                                                    }));
-                                                    e.currentTarget.value = '';
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault(); 
+                                                if (emailRegex.test(e.currentTarget.value)) {
+                                                    if (!newGroup.members.includes(e.currentTarget.value)) {
+                                                        setNewGroup((prev) => ({
+                                                            ...prev,
+                                                            members: [...prev.members, e.currentTarget.value],
+                                                        }));
+                                                        setEmailError("")
+                                                        e.currentTarget.value = ''
+                                                    } else {
+                                                        setEmailError("This email is already added");
+                                                    }
                                                 } else {
-                                                    alert('This email is already added.');
+                                                    setEmailError("Please enter a valid email");
                                                 }
-                                            } else if (e.key === 'Enter') {
-                                                alert('Please enter a valid email address.');
                                             }
                                         }}
                                     />
+                                    {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
+
                                 </div>
                                 <div>
                                     {newGroup.members.length > 0 && (
@@ -337,8 +352,16 @@ const GroupsPage = () => {
                             <Button
                                 onClick={handleCreateGroup}
                                 className="w-full bg-emerald-600 hover:bg-emerald-700"
+                                disabled={loading}
                             >
-                                Create Group
+                                {loading ? (
+                                    <div className="flex items-center">
+                                        <span className="animate-spin mr-2">◌</span>
+                                        Creating...
+                                    </div>
+                                ) : (
+                                    'Create Group'
+                                )}
                             </Button>
 
                         </DialogContent>
@@ -366,9 +389,9 @@ const GroupsPage = () => {
                                     <div className="flex items-center gap-2 mb-4">
                                         <div className="flex -space-x-2">
                                             {group.members.slice(0, 3).map((member) => (
-                                                <Avatar key={member.id} className="border-2 border-white">
+                                                <Avatar key={member.email} className="border-2 border-white">
                                                     <AvatarImage src={member.avatar} alt={member.name} />
-                                                    <AvatarFallback>{member.name[0]}</AvatarFallback>
+                                                    <AvatarFallback>{member.name}</AvatarFallback>
                                                 </Avatar>
                                             ))}
                                             {group.members.length > 3 && (
@@ -432,11 +455,11 @@ const GroupsPage = () => {
                                         <h3 className="text-lg font-semibold mb-4">Members</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             {selectedGroup.members.map((member) => (
-                                                <div key={member.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                <div key={member.email} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                                     <div className="flex items-center gap-3">
                                                         <Avatar>
                                                             <AvatarImage src={member.avatar} alt={member.name} />
-                                                            <AvatarFallback>{member.name[0]}</AvatarFallback>
+                                                            <AvatarFallback>{member.name}</AvatarFallback>
                                                         </Avatar>
                                                         <div>
                                                             <p className="font-medium">{member.name}</p>
@@ -457,8 +480,17 @@ const GroupsPage = () => {
                                                 onChange={(e) => setMember(e.target.value)}
                                             />
                                             <Button variant="outline" className="h-full"
-                                                onClick={handleAddMember}>
-                                                <Users className="mr-2 h-4 w-4" /> Add Member
+                                                onClick={handleAddMember} disabled={loading}>
+                                                {loading ? (
+                                                    <div className="flex items-center">
+                                                        <span className="animate-spin mr-2">◌</span>
+                                                        Adding...
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <Users className="mr-2 h-4 w-4" /> Add Member
+                                                    </>
+                                                )}
                                             </Button>
                                         </div>
                                     </div>
@@ -467,7 +499,7 @@ const GroupsPage = () => {
                                     <div className="mb-6">
                                         <div className="flex justify-between items-center mb-4">
                                             <h3 className="text-lg font-semibold">Recent Expenses</h3>
-                                            <Dialog>
+                                            <Dialog open={isExpenseDialogOpen} onOpenChange={setIsExpenseDialogOpen}>
                                                 <DialogTrigger asChild>
                                                     <Button>
                                                         <Receipt className="mr-2 h-4 w-4" /> Add Expense
@@ -477,43 +509,70 @@ const GroupsPage = () => {
                                                     <DialogHeader>
                                                         <DialogTitle>Add New Expense</DialogTitle>
                                                     </DialogHeader>
-                                                    <form onSubmit={handleAddExpense} className='grid gap-4 py-4'>
-
+                                                    <form onSubmit={handleAddExpense} className="grid gap-4 py-4">
                                                         <div className="grid gap-2">
                                                             <label>Description</label>
                                                             <Input
-                                                                name='description'
+                                                                name="description"
                                                                 placeholder="What was this expense for?"
                                                                 value={newExpense.description}
                                                                 onChange={handleChange}
+                                                                required
                                                             />
                                                         </div>
                                                         <div className="grid gap-2">
                                                             <label>Amount</label>
                                                             <Input
                                                                 type="number"
-                                                                name='amount'
+                                                                name="amount"
                                                                 placeholder="Enter amount"
-                                                                value={newExpense.amount}
+                                                                value={newExpense.amount || ''}
                                                                 onChange={handleChange}
+                                                                required
+                                                                min="0"
+                                                                step="0.01"
                                                             />
-                                                        </div>                                                        
+                                                        </div>
                                                         <div className="grid gap-2">
                                                             <label>Paid By</label>
-                                                            <Select onValueChange={(value) => handleChange({target: {name:'paidBy',value}} as any)}>
+                                                            <Select
+                                                                value={newExpense.paidBy}
+                                                                onValueChange={(value) => {
+                                                                    setNewExpense(prev => ({
+                                                                        ...prev,
+                                                                        paidBy: value
+                                                                    }));
+                                                                }}
+                                                            >
                                                                 <SelectTrigger>
                                                                     <SelectValue placeholder="Who paid?" />
                                                                 </SelectTrigger>
                                                                 <SelectContent>
                                                                     {selectedGroup.members.map(member => (
-                                                                        <SelectItem key={member.id} value={member.name}>
-                                                                            {member.name}
+                                                                        <SelectItem
+                                                                            key={member.email}
+                                                                            value={member.email}
+                                                                        >
+                                                                            {member.email}
                                                                         </SelectItem>
                                                                     ))}
                                                                 </SelectContent>
                                                             </Select>
                                                         </div>
-                                                        <Button className="w-full">Add Expense</Button>
+                                                        <Button
+                                                            type="submit"
+                                                            className="w-full"
+                                                            disabled={loading || !newExpense.description || !newExpense.amount || !newExpense.paidBy}
+                                                        >
+                                                            {loading ? (
+                                                                <div className="flex items-center">
+                                                                    <span className="animate-spin mr-2">◌</span>
+                                                                    Adding...
+                                                                </div>
+                                                            ) : (
+                                                                'Add Expense'
+                                                            )}
+                                                        </Button>
                                                     </form>
                                                 </DialogContent>
                                             </Dialog>
@@ -528,9 +587,9 @@ const GroupsPage = () => {
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
-                                                {selectedGroup.expenses.map((expense) => (  
+                                                {selectedGroup.expenses.map((expense) => (
                                                     <TableRow key={expense.id}>
-                                                        <TableCell>{expense.date}</TableCell>
+                                                        <TableCell>{new Date(expense.date).toLocaleDateString()}</TableCell>
                                                         <TableCell>{expense.description}</TableCell>
                                                         <TableCell>{expense.paidBy}</TableCell>
                                                         <TableCell className="text-right">
