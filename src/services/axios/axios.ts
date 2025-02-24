@@ -21,9 +21,12 @@ axiosInstance.interceptors.response.use(
         originalRequest._retry = true;
 
         try {
+          console.log("going through refreshToken route")
           await axiosInstance.post("/user/auth/refresh-token");
           return axiosInstance(originalRequest);
         } catch (err) {
+          await axiosInstance.post("/user/auth/logout")
+        
           window.location.href = "/login";
           clearCookie('accessToken')
           clearCookie('refreshToken')

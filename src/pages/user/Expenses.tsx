@@ -84,7 +84,6 @@ console.log("frontent user Id  : ",userId)
                 setExpenses(data)
             } catch (error) {
                 console.error('Error fetching expenses:', error);
-                Toaster('Failed to fetch expenses','error')
             }
         };
         fetchExpenses();
