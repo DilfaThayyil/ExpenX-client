@@ -74,9 +74,10 @@ export const getExpenses = async (userId: string) => {
 // };
 
 
-export const createGroup = async (formData: { name: string; members: string[]; splitMethod: string }) => {
+export const createGroup = async (userId:string,name:string,members:string[]) => {
   try {
-    const response = await axiosInstance.post(`${BASEURL}/createGroup`, formData);
+    console.log(userId,name,members)
+    const response = await axiosInstance.post(`${BASEURL}/createGroup`, {userId,name,members});
     console.log('Response in service:', response);
     return response.data;
   } catch (error) {
@@ -86,13 +87,11 @@ export const createGroup = async (formData: { name: string; members: string[]; s
 };
 
 
-export const getUserGroups = async (email: string) => {
+export const getUserGroups = async (userId: string) => {
   try {
-    const response = await axiosInstance.get(`${BASEURL}/getUserGroups/${email}`);
-    const transformedGroups = transformGroups(response.data.groups)
-    console.log("transofromed-serv : ", transformedGroups)
-    return transformedGroups;
-
+    const response = await axiosInstance.get(`${BASEURL}/getUserGroups/${userId}`);
+    console.log("response : ",response)
+    return response.data.groups
   } catch (error) {
     console.error('Error fetching groups:', error);
     throw error;
@@ -105,13 +104,8 @@ export const addMember = async (groupId: string, memberEmail: string) => {
     const response = await axiosInstance.post(`${BASEURL}/addMember/${groupId}`, {
       memberEmail
     })
-    const transformedGroup = transformGroups([response.data.groups])
-    console.log("transformed : ", transformedGroup)
-    return {
-      success: response.data.success,
-      message: response.data.message, 
-      transformedGroup
-    };
+    console.log("response : ",response)
+    return response.data
   } catch (error) {
     console.error(error)
     throw error
@@ -120,20 +114,14 @@ export const addMember = async (groupId: string, memberEmail: string) => {
 
 
 export const addExpenseInGroup = async (groupId: string,
-  expenseData: { description: string; amount: number; paidBy: string; date: string; splitMethod: string }
+  expenseData: { title: string; totalAmount: number; paidBy: string; date: string; splitMethod: string }
 ) => {
   try {
     console.log("groupId : ", groupId)
     console.log("expenseData: ", expenseData)
     const response = await axiosInstance.post(`${BASEURL}/addExpenseInGroup/${groupId}`, expenseData)
     console.log("response- serv : ",response.data)
-    const transformed = transformGroups([response.data.groups])
-    console.log("tranformed : ",transformed)
-    return {
-      success: response.data.success,
-      message: response.data.message, 
-      transformed
-    };
+    return response.data
   } catch (error) {
     console.error(error);
     throw error;

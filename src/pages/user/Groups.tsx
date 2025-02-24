@@ -4,46 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-// import {
-//   PieChart,
-//   Pie,
-//   Cell,
-//   ResponsiveContainer,
-//   Tooltip
-// } from 'recharts';
-import {
-    Users,
-    Plus,
-    //   Settings,
-    //   LogOut,
-    Calendar as CalendarIcon,
-    Receipt,
-    //   ArrowRight,
-    //   ChevronRight,
-    //   UserPlus
-} from 'lucide-react';
+import SplitExpenseDialog from '@/components/user/splitExpenseDialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
+import { Users, Plus, Receipt, Trash2 } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
 import { createGroup, getUserGroups, addMember, addExpenseInGroup } from '../../services/user/userService'
 import useShowToast from '@/customHook/showToaster';
@@ -51,9 +15,9 @@ import useShowToast from '@/customHook/showToaster';
 import Store from '../../store/store'
 
 
-// Types
+
 interface Group {
-    id: string;
+    _id: string;
     name: string;
     totalExpenses: number;
     memberCount: number;
@@ -61,9 +25,7 @@ interface Group {
     lastActivity: string;
     members: GroupMember[];
     expenses: GroupExpense[];
-    splitMethod?: string;
 }
-
 interface GroupMember {
     name: string;
     email: string;
@@ -71,59 +33,45 @@ interface GroupMember {
     paid: number;
     owed: number;
 }
-
-interface GroupExpense {
-    id: string;
+export interface GroupExpense {
+    id?: string;
     date: string;
-    description: string;
-    amount: number;
+    title: string;
+    totalAmount: number;
     paidBy: string;
-    splitMethod?: string;
+    splitMethod: string;
+    splits?: Record<string, number>;
 }
-
 interface Group1 {
     name: string;
     members: string[];
-    splitMethod: string;
 }
 
 const GroupsPage = () => {
-
     const Toaster = useShowToast()
     const [member, setMember] = useState('')
     const [loading, setLoading] = useState<boolean>(false)
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [isExpenseDialogOpen, setIsExpenseDialogOpen] = useState(false);
-    const [newExpense, setNewExpense] = useState<GroupExpense>({
-        id: '',
-        date: new Date().toISOString(),
-        description: '',
-        amount: 0,
-        paidBy: '',
-        splitMethod: 'equal'
-    })
-    const [newGroup, setNewGroup] = useState<Group1>({
-        name: '',
-        members: [],
-        splitMethod: ''
-    })
+    const [newExpense, setNewExpense] = useState<GroupExpense>({ id: '', date: new Date().toISOString(), title: '', totalAmount: 0, paidBy: '', splitMethod: 'equal' })
+    const [newGroup, setNewGroup] = useState<Group1>({ name: '', members: [] })
     const [groups, setGroups] = useState<Group[]>([])
     const [memberError, setMemberError] = useState('')
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
     const email = Store((state) => state.user.email)
+    const userId = Store((state) => state.user._id)
     const [emailError, setEmailError] = useState<string | null>(null)
     const [refreshGroups, setRefreshGroups] = useState(false)
 
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-                if (!email) {
-                    console.error('email is required')
+                if (!userId) {
+                    console.error('userId is required')
                     return
                 }
-                console.log("email : ", email)
-                const response = await getUserGroups(email)
-                console.log("response : ", response)
+                const response = await getUserGroups(userId)
+                console.log("fetchGroups--response : ", response)
                 if (Array.isArray(response)) {
                     setGroups(response)
                 } else {
@@ -138,8 +86,10 @@ const GroupsPage = () => {
         fetchGroups()
     }, [email, refreshGroups])
 
-
     const handleAddMember = async () => {
+        console.log("GroupMembers : ", newGroup.members)
+        console.log("addignMember : ", member)
+        console.log("groupId : ", selectedGroup?._id)
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(member)) {
             setMemberError("Please enter a valid email address");
@@ -149,20 +99,18 @@ const GroupsPage = () => {
             setMemberError("This email is already added");
             return;
         }
-        if (!selectedGroup?.id || !member) {
+        if (!selectedGroup?._id || !member) {
             setMemberError('Member email is required');
             return;
         }
         setMemberError("");
         try {
             setLoading(true);
-            const response = await addMember(selectedGroup.id, member);
-            console.log("response : ", response)
+            const response = await addMember(selectedGroup._id, member);
             if (response.success) {
                 Toaster(response.message, 'success');
-                setSelectedGroup(response.transformedGroup[0])
+                setSelectedGroup(response.groups)
                 setMember('');
-                // setRefreshGroups(prev => !prev);
             } else {
                 Toaster(response.message || 'Failed to add member', 'error');
             }
@@ -172,22 +120,14 @@ const GroupsPage = () => {
         } finally {
             setLoading(false);
         }
-    };
-    //   const categoryData = [
-    //     { name: "Food", value: 400, color: "#10B981" },
-    //     { name: "Transport", value: 300, color: "#3B82F6" },
-    //     { name: "Hotel", value: 800, color: "#F59E0B" },
-    //     { name: "Activities", value: 200, color: "#EF4444" }
-    //   ];
+    }
 
     const validateForm = () => {
         const errors: string[] = []
         if (!newGroup.name) errors.push('Name is required')
-        if (!newGroup.splitMethod) errors.push('splitmethod is required.')
         if (newGroup.members.length === 0) errors.push('Members are required.')
         return errors
     }
-
 
     const handleCreateGroup = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -198,12 +138,10 @@ const GroupsPage = () => {
         }
         setLoading(true)
         try {
-            console.log("creatingGroup : ", newGroup)
-            const response = await createGroup(newGroup)
-            // setGroups((prev)=>[...prev,response])
-            console.log("-------------response : ", response)
+            const response = await createGroup(userId, newGroup.name, newGroup.members)
+            console.log("response : ", response)
             Toaster('Group creation successful', 'success')
-            setNewGroup({ name: '', members: [], splitMethod: '' })
+            setNewGroup({ name: '', members: [] })
             setIsDialogOpen(false)
             setRefreshGroups(prev => !prev)
         } catch (error) {
@@ -214,54 +152,33 @@ const GroupsPage = () => {
         }
     }
 
-    const handleAddExpense = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!selectedGroup?.id || !newExpense.description || !newExpense.amount || !newExpense.paidBy) {
-            Toaster('All fields are required for the expense.', 'error');
+    const handleAddExpense = async (expense: GroupExpense) => {
+        console.log("selectedGroup : ", selectedGroup)
+        console.log("expense : ", expense)
+        if (!selectedGroup) {
+            Toaster("Please select a group first.", "error");
             return;
         }
+        setLoading(true);
         try {
-            setLoading(true)
-            console.log("handleAddExpense......")
-            const response = await addExpenseInGroup(selectedGroup.id, {
-                ...newExpense,
-                date: new Date().toISOString(),
-                splitMethod: newExpense.splitMethod || selectedGroup.splitMethod || 'equal'
-            })
+            const response = await addExpenseInGroup(selectedGroup._id, { ...expense });
             console.log("response : ", response)
             if (response.success) {
-                const updatedGroup = response.transformed[0]; 
-                if (!updatedGroup) {
-                    console.error("Invalid response format:", response);
-                    Toaster('Failed to update group', 'error');
-                    return;
-                }
-                setGroups(prev =>
-                    prev.map(group =>
-                        group.id === selectedGroup.id ? updatedGroup : group
-                    )
-                );
-                setSelectedGroup(updatedGroup);
-                setNewExpense({
-                    id: '',
-                    date: new Date().toISOString(),
-                    description: '',
-                    amount: 0,
-                    paidBy: '',
-                    splitMethod: 'equal'
-                });
-                setIsExpenseDialogOpen(false)
-                Toaster('Expense added successfully', 'success')
+                Toaster(response.message, "success");
+                setRefreshGroups((prev) => !prev);
+                setIsExpenseDialogOpen(false);
             } else {
-                Toaster(response.message || 'Failed to add expense', 'error')
+                throw new Error(response.message || "Failed to add expense");
             }
-        } catch (error) {
-            console.error('Error adding expense:', error)
-            Toaster('Failed to add expense', 'error')
+        } catch (error: any) {
+            console.error("Error adding expense:", error);
+            Toaster(error.message || "Something went wrong", "error");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
+
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target
@@ -298,22 +215,9 @@ const GroupsPage = () => {
                                     />
                                 </div>
                                 <div className="grid gap-2">
-                                    <label>Split Method</label>
-                                    <Select onValueChange={(value) => setNewGroup({ ...newGroup, splitMethod: value })}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select split method" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="equal">Equal Split</SelectItem>
-                                            <SelectItem value="percentage">Percentage Split</SelectItem>
-                                            <SelectItem value="custom">Custom Split</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="grid gap-2">
                                     <label>Add Members</label>
                                     <Input
-                                        placeholder="Enter email addresses"
+                                        placeholder="Type email address & press Enter"
                                         onKeyPress={(e) => {
                                             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                                             if (e.key === 'Enter') {
@@ -354,7 +258,7 @@ const GroupsPage = () => {
                                                             }));
                                                         }}
                                                     >
-                                                        Remove
+                                                        <Trash2 />
                                                     </Button>
                                                 </li>
                                             ))}
@@ -387,17 +291,17 @@ const GroupsPage = () => {
                     <div className="space-y-4">
                         {groups.map((group) => (
                             <Card
-                                key={group.id}
-                                className={`cursor-pointer transition-all hover:shadow-md ${selectedGroup?.id === group.id ? 'ring-2 ring-emerald-500' : ''
+                                key={group._id}
+                                className={`cursor-pointer transition-all hover:shadow-md ${selectedGroup?._id === group._id ? 'ring-2 ring-emerald-500' : ''
                                     }`}
                                 onClick={() => setSelectedGroup(group)}
                             >
                                 <CardContent className="p-6">
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-lg font-semibold">{group.name}</h3>
-                                        <Badge variant={group.balance < 0 ? "destructive" : "secondary"}>
+                                        {/* <Badge variant={group.balance < 0 ? "destructive" : "secondary"}>
                                             {group.balance < 0 ? "You owe" : "You're owed"} ${Math.abs(group.balance)}
-                                        </Badge>
+                                        </Badge> */}
                                     </div>
                                     <div className="flex items-center gap-2 mb-4">
                                         <div className="flex -space-x-2">
@@ -418,8 +322,8 @@ const GroupsPage = () => {
                                         </span>
                                     </div>
                                     <div className="text-sm text-gray-600">
-                                        <p>Total Expenses: ${group.totalExpenses}</p>
-                                        <p className="mt-1">{group.lastActivity}</p>
+                                        <p>Total Expenses: ${group.expenses.reduce((sum, expense) => sum + expense.totalAmount, 0)}</p>
+                                        <p className="mt-1">{group.expenses.length > 0 ? group.expenses[group.expenses.length - 1].title : "No expenses yet"}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -432,37 +336,8 @@ const GroupsPage = () => {
                             <Card>
                                 <CardHeader className="flex flex-row items-center justify-between">
                                     <CardTitle>{selectedGroup.name}</CardTitle>
-                                    {/* <div className="flex gap-2">
-                    <Button variant="outline" size="icon">
-                        <Settings className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="text-red-600">
-                        <LogOut className="h-4 w-4" />
-                    </Button>
-                    </div> */}
                                 </CardHeader>
                                 <CardContent>
-                                    {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-600">Total Expenses</p>
-                        <p className="text-2xl font-bold text-emerald-600">
-                        ${selectedGroup.totalExpenses}
-                        </p>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-600">Your Share</p>
-                        <p className="text-2xl font-bold text-blue-600">
-                        ${selectedGroup.totalExpenses / selectedGroup.memberCount}
-                        </p>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-600">Your Balance</p>
-                        <p className={`text-2xl font-bold ${selectedGroup.balance < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
-                        ${selectedGroup.balance}
-                        </p>
-                    </div>
-                    </div> */}
-
                                     {/* Members List */}
                                     <div className="mb-6">
                                         <h3 className="text-lg font-semibold mb-4">Members</h3>
@@ -509,94 +384,27 @@ const GroupsPage = () => {
                                             </Button>
                                         </div>
                                     </div>
-
                                     {/* Expenses Table */}
                                     <div className="mb-6">
                                         <div className="flex justify-between items-center mb-4">
                                             <h3 className="text-lg font-semibold">Recent Expenses</h3>
-                                            <Dialog open={isExpenseDialogOpen} onOpenChange={setIsExpenseDialogOpen}>
-                                                <DialogTrigger asChild>
-                                                    <Button>
-                                                        <Receipt className="mr-2 h-4 w-4" /> Add Expense
-                                                    </Button>
-                                                </DialogTrigger>
-                                                <DialogContent>
-                                                    <DialogHeader>
-                                                        <DialogTitle>Add New Expense</DialogTitle>
-                                                    </DialogHeader>
-                                                    <form onSubmit={handleAddExpense} className="grid gap-4 py-4">
-                                                        <div className="grid gap-2">
-                                                            <label>Description</label>
-                                                            <Input
-                                                                name="description"
-                                                                placeholder="What was this expense for?"
-                                                                value={newExpense.description}
-                                                                onChange={handleChange}
-                                                                required
-                                                            />
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <label>Amount</label>
-                                                            <Input
-                                                                type="number"
-                                                                name="amount"
-                                                                placeholder="Enter amount"
-                                                                value={newExpense.amount || ''}
-                                                                onChange={handleChange}
-                                                                required
-                                                                min="0"
-                                                                step="0.01"
-                                                            />
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <label>Paid By</label>
-                                                            <Select
-                                                                value={newExpense.paidBy}
-                                                                onValueChange={(value) => {
-                                                                    setNewExpense(prev => ({
-                                                                        ...prev,
-                                                                        paidBy: value
-                                                                    }));
-                                                                }}
-                                                            >
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Who paid?" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    {selectedGroup.members.map(member => (
-                                                                        <SelectItem
-                                                                            key={member.email}
-                                                                            value={member.email}
-                                                                        >
-                                                                            {member.email}
-                                                                        </SelectItem>
-                                                                    ))}
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-                                                        <Button
-                                                            type="submit"
-                                                            className="w-full"
-                                                            disabled={loading || !newExpense.description || !newExpense.amount || !newExpense.paidBy}
-                                                        >
-                                                            {loading ? (
-                                                                <div className="flex items-center">
-                                                                    <span className="animate-spin mr-2">◌</span>
-                                                                    Adding...
-                                                                </div>
-                                                            ) : (
-                                                                'Add Expense'
-                                                            )}
-                                                        </Button>
-                                                    </form>
-                                                </DialogContent>
-                                            </Dialog>
+                                            <Button onClick={() => setIsExpenseDialogOpen(true)}>
+                                                <Receipt className="mr-2 h-4 w-4" /> Add Expense
+                                            </Button>
+
+                                            <SplitExpenseDialog
+                                                isOpen={isExpenseDialogOpen}
+                                                onClose={() => setIsExpenseDialogOpen(false)}
+                                                group={selectedGroup}
+                                                onSubmit={handleAddExpense}
+                                                loading={loading}
+                                            />
                                         </div>
                                         <Table>
                                             <TableHeader>
                                                 <TableRow>
                                                     <TableHead>Date</TableHead>
-                                                    <TableHead>Description</TableHead>
+                                                    <TableHead>Title</TableHead>
                                                     <TableHead>Paid By</TableHead>
                                                     <TableHead className="text-right">Amount</TableHead>
                                                 </TableRow>
@@ -604,56 +412,17 @@ const GroupsPage = () => {
                                             <TableBody>
                                                 {selectedGroup.expenses.map((expense) => (
                                                     <TableRow key={expense.id}>
-                                                        <TableCell>{new Date(expense.date).toLocaleDateString()}</TableCell>
-                                                        <TableCell>{expense.description}</TableCell>
+                                                        <TableCell>{expense.date}</TableCell>
+                                                        <TableCell>{expense.title}</TableCell>
                                                         <TableCell>{expense.paidBy}</TableCell>
                                                         <TableCell className="text-right">
-                                                            ${expense.amount}
+                                                            ${expense.totalAmount}
                                                         </TableCell>
                                                     </TableRow>
                                                 ))}
                                             </TableBody>
                                         </Table>
                                     </div>
-
-                                    {/* Spending Categories
-                    <div>
-                    <h3 className="text-lg font-semibold mb-4">Spending by Category</h3>
-                    <div className="h-[300px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                            data={categoryData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={80}
-                            paddingAngle={5}
-                            dataKey="value"
-                            >
-                            {categoryData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                            </Pie>
-                            <Tooltip />
-                        </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 mt-4">
-                        {categoryData.map((category) => (
-                        <div key={category.name} className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                            <div 
-                                className="w-3 h-3 rounded-full" 
-                                style={{ backgroundColor: category.color }}
-                            />
-                            <span className="text-sm">{category.name}</span>
-                            </div>
-                            <span className="font-medium">${category.value}</span>
-                        </div>
-                        ))}
-                    </div>
-                    </div> */}
                                 </CardContent>
                             </Card>
                         </div>
@@ -669,4 +438,3 @@ const GroupsPage = () => {
 };
 
 export default GroupsPage;
-
