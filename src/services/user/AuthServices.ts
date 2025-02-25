@@ -139,9 +139,4 @@ export const userGoogleAuth = async (userCredential:JwtPayload) => {
   } catch (err) {
     console.log(err);
   }
-};
-
-// export const logout = () => {
-//   localStorage.removeItem("userAccessToken");
-//   localStorage.removeItem("userRefreshToken");
-// };
+}
