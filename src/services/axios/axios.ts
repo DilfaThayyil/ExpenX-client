@@ -1,11 +1,12 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 import { BACKENDENDPOINT } from "../../utility/env";
-
+import Store from "@/store/store";
 
 const clearCookie = (cookieName: string) => {
   document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
 }
+
 const axiosInstance = axios.create({
   baseURL: BACKENDENDPOINT,
   withCredentials: true,
@@ -21,20 +22,29 @@ axiosInstance.interceptors.response.use(
         originalRequest._retry = true;
 
         try {
-          console.log("going through refreshToken route")
-          await axiosInstance.post("/user/auth/refresh-token");
+          console.log("🔄 Refreshing access token...");
+          const { data } = await axiosInstance.post("/user/auth/refresh-token");
+
+          // ✅ FIX: Store new access token in cookies
+          document.cookie = `accessToken=${data.accessToken}; path=/;`;
+
+          console.log("✅ Token refreshed successfully.");
           return axiosInstance(originalRequest);
         } catch (err) {
-          await axiosInstance.post("/user/auth/logout")
+          console.log("❌ Token refresh failed. Logging out...");
+
+          await axiosInstance.post("/user/auth/logout");
+          Store.getState().clearUser()
         
           window.location.href = "/login";
-          clearCookie('accessToken')
-          clearCookie('refreshToken')
+          clearCookie('accessToken');
+          clearCookie('refreshToken');
           return Promise.reject(err);
         }
-      } else if (error.response.status === 403) {
-        localStorage.clear();
-        console.log('you have been blocked!')
+      } 
+      
+      if (error.response.status === 403) {
+        console.log('❌ User is blocked by admin!');
         Swal.fire({
           icon: "error",
           title: "Access Denied",
