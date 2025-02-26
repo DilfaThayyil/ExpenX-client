@@ -12,20 +12,37 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
+console.log("axiosInstance.......29837549832")
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
     if (error.response) {
+      console.log(" ### ........if error in axiosInstance.....#####")
       if (error.response.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
+
+        // ❗ Check if refresh token exists in cookies before trying to refresh
+        const refreshToken = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("refreshToken="));
+
+        if (!refreshToken) {
+          console.log("❌ No refresh token found! Logging out...");
+          await axiosInstance.post("/user/auth/logout");
+          Store.getState().clearUser();
+          clearCookie("accessToken");
+          clearCookie("refreshToken");
+          window.location.href = "/";
+          return Promise.reject(error);
+        }
 
         try {
           console.log("🔄 Refreshing access token...");
           const { data } = await axiosInstance.post("/user/auth/refresh-token");
 
-          // ✅ FIX: Store new access token in cookies
+          // ✅ Store new access token in cookies
           document.cookie = `accessToken=${data.accessToken}; path=/;`;
 
           console.log("✅ Token refreshed successfully.");
@@ -34,17 +51,16 @@ axiosInstance.interceptors.response.use(
           console.log("❌ Token refresh failed. Logging out...");
 
           await axiosInstance.post("/user/auth/logout");
-          Store.getState().clearUser()
-        
-          window.location.href = "/login";
-          clearCookie('accessToken');
-          clearCookie('refreshToken');
+          Store.getState().clearUser();
+          clearCookie("accessToken");
+          clearCookie("refreshToken");
+          window.location.href = "/";
           return Promise.reject(err);
         }
-      } 
-      
+      }
+
       if (error.response.status === 403) {
-        console.log('❌ User is blocked by admin!');
+        console.log("❌ User is blocked by admin!");
         Swal.fire({
           icon: "error",
           title: "Access Denied",
@@ -52,7 +68,7 @@ axiosInstance.interceptors.response.use(
           timer: 6000,
           timerProgressBar: true,
           willClose: () => {
-            window.location.href = "/login";
+            window.location.href = "/";
           },
         });
         return Promise.reject(error);

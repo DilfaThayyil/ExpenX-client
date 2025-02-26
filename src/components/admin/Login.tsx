@@ -11,8 +11,6 @@ import useAdminStore from '@/store/adminStore'
 const AdminLogin: React.FC = () => {
 
   const setAdminEmail = useAdminStore((state) => state.setAdminEmail)
-  const setAdminName = useAdminStore((state)=> state.setAdminName)
-  const [username, setUsername] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -28,12 +26,6 @@ const AdminLogin: React.FC = () => {
     const errors: string[] = [];
     const validEmail = isValidateEmail(email);
     const validPassword = isValidatePassword(password);
-
-    if(!username){
-      errors.push('username is required.')
-    }else if(username.length<3){
-      errors.push('at least 3 characters required.')
-    }
 
     if (!email) {
       errors.push('Email is required.');
@@ -62,23 +54,16 @@ const AdminLogin: React.FC = () => {
     }
 
     try {
-      const response=await adminLogin(username,email,password)
+      const response=await adminLogin(email,password)
       console.log("**response** : ",response)
         if(response.error){
             Toaster(response.error,'error',true)
         }else{
           Toaster("admin logged in successfully",'success',true)
           setAdminEmail(email)
-          setAdminName(username)
           navigate('/admin')
         }
 
-  //       if(response.message){
-  //         adminEmail(email)
-  //         Toaster(response.message,'success',true)
-  //         navigate('/admin')
-  //       }
-      
     } catch (error) {
       console.error(error)
       Toaster('Login failed','error',true);
@@ -94,17 +79,6 @@ const AdminLogin: React.FC = () => {
         <form className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
           <div>
             <h3 className="text-2xl font-bold mb-6"> Admin Login</h3>
-            <div className="mb-4">
-              <FormInput
-                id="username"
-                name="username"
-                type="username"
-                label="Name"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-            </div>
             <div className="mb-4">
               <FormInput
                 id="email"
