@@ -1,10 +1,10 @@
-import { useEffect, useState, useRef } from 'react';
-import { Search, Video, MoreVertical, Paperclip, Mic, Send } from 'lucide-react';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { Search, MoreVertical, Paperclip, Mic, Send } from 'lucide-react';
 import Store from '@/store/store'
 import { MessageBubble } from './MessageBubble';
 import { ContactItem } from './ContactItem';
 import { FilePreview, getFileType } from './FilePreview'
-import { initializeSocket, socket } from '@/socket/socket'
+import { initializeSocket, socket, identifyUser } from '@/socket/socket'
 import { fetchMessage, uploadChatFile } from '@/services/chat/chatServices'
 import { debounce } from 'lodash'
 import Loading from '@/style/loading'
@@ -28,7 +28,6 @@ interface ChatProps {
   receivers: { _id: string; username: string; email: string; profilePic: string }[]
 }
 
-
 const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   const [activeContact, setActiveContact] = useState(receivers[0]);
   const [messages, setMessages] = useState<Message[]>([])
@@ -45,101 +44,162 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   const [dragActive, setDragActive] = useState<boolean>(false);
   const [unreadMessages, setUnreadMessages] = useState<Map<string, number>>(new Map());
   const notificationSound = useRef<HTMLAudioElement | null>(null);
-
-
+  const [currentRoomId, setCurrentRoomId] = useState<string>('');
+  const [socketInitialized, setSocketInitialized] = useState<boolean>(false);
 
   const filteredContacts = receivers.filter(contact =>
     contact.username.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  // initialize socket
+  // Initialize socket once
   useEffect(() => {
-    initializeSocket();
-    return () => {
-      socket.disconnect();
-    };
-  }, [])
+    if (!socketInitialized && sender?._id) {
+      const newSocket = initializeSocket();
+      
+      if (newSocket) {
+        // Register the user with their ID to the socket
+        identifyUser(sender._id);
+        setSocketInitialized(true);
+      }
+    }
 
+    return () => {
+      if (socket && socketInitialized) {
+        socket.disconnect();
+      }
+    };
+  }, [sender, socketInitialized]);
+
+  // Handle room joining when active contact changes
   useEffect(() => {
-    if (!socket || !sender || !activeContact) return;
-    const roomId = [sender._id, activeContact._id].sort().join('_')
-    socket.emit("joinRoom", roomId)
+    if (!socket || !sender || !activeContact || !socketInitialized) return;
+    
+    // Leave previous room if exists
+    if (currentRoomId) {
+      socket.emit("leaveRoom", currentRoomId);
+    }
+    
+    // Join new room
+    const roomId = [sender._id, activeContact._id].sort().join('_');
+    setCurrentRoomId(roomId);
+    socket.emit("joinRoom", roomId);
+    
+    console.log(`Joined room: ${roomId}`);
+    
+    return () => {
+      if (roomId) {
+        socket.emit("leaveRoom", roomId);
+      }
+    };
+  }, [activeContact, sender, socketInitialized]);
+
+  // Handle message receiving
+  useEffect(() => {
+    if (!socket || !socketInitialized) return;
+
     const messageListener = (message: Message) => {
-      if (message.roomId === roomId) {
-        setMessages((prev) => [...prev, message]);
-        if (message.senderId !== sender._id) {
-          if (!document.hasFocus() || activeContact._id !== message.senderId) {
-            notificationSound.current?.play()
-              .catch(err => console.log("Error playing notification:", err));
+      console.log("Received message:", message);
+      
+      // Check if this message belongs to current room or should update badge counter
+      if (message.roomId === currentRoomId) {
+        setMessages(prev => {
+          // Check if message already exists to prevent duplicates
+          if (!prev.some(m => m.id === message.id)) {
+            return [...prev, message];
           }
-          setUnreadMessages(prev => {
-            const newUnreadMessages = new Map(prev);
+          return prev;
+        });
+      }
+      
+      // Handle notifications and unread counts
+      if (message.senderId !== sender?._id) {
+        // Play sound if document not focused or message is from non-active contact
+        if (!document.hasFocus() || activeContact._id !== message.senderId) {
+          notificationSound.current?.play()
+            .catch(err => console.log("Error playing notification:", err));
+        }
+        
+        // Update unread counter
+        setUnreadMessages(prev => {
+          const newUnreadMessages = new Map(prev);
+          if (activeContact._id !== message.senderId) {
             newUnreadMessages.set(
               message.senderId, 
               (newUnreadMessages.get(message.senderId) || 0) + 1
             );
-            return newUnreadMessages;
-          });
-        }
+          }
+          return newUnreadMessages;
+        });
       }
     };
+
     socket.on("receive_message", messageListener);
+    
     return () => {
-      socket.emit("leaveRoom", roomId);
       socket.off("receive_message", messageListener);
     };
-  }, [activeContact, sender]);
+  }, [currentRoomId, activeContact, sender, socketInitialized]);
 
+  // Handle typing indicators
   useEffect(() => {
-    if (activeContact) {
-      setUnreadMessages(prev => {
-        const newUnreadMessages = new Map(prev);
-        newUnreadMessages.set(activeContact._id, 0);
-        return newUnreadMessages;
-      });
-    }
-  }, [activeContact]);
-
-
-  useEffect(() => {
+    if (!socket || !socketInitialized) return;
+    
     socket.on('display_typing', ({ senderId }) => {
-      setTypingUser(senderId)
+      setTypingUser(senderId);
     });
+    
     socket.on('hide_typing', () => {
       setTypingUser(null);
     });
+    
     return () => {
       socket.off('display_typing');
       socket.off('hide_typing');
     };
-  }, []);
+  }, [socketInitialized]);
 
+  // Fetch messages when active contact changes
   useEffect(() => {
     const fetchMessages = async () => {
       try {
+        if (!sender?._id || !activeContact?._id) return;
+        
         const response = await fetchMessage(sender._id, activeContact._id);
-        setMessages(response.map((msg: Message) => ({
-          ...msg,
-          createdAt: msg.createdAt,
-        })));
+        // Sort by createdAt date to ensure proper ordering
+        const sortedMessages = response.sort((a: Message, b: Message) => 
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+        
+        setMessages(sortedMessages);
+        
+        // Clear unread count for this contact
+        setUnreadMessages(prev => {
+          const newUnreadMessages = new Map(prev);
+          newUnreadMessages.set(activeContact._id, 0);
+          return newUnreadMessages;
+        });
       } catch (error) {
-        console.error("Error fetching messages:", error)
+        console.error("Error fetching messages:", error);
       }
+    };
+    
+    if (activeContact?._id && sender?._id) {
+      fetchMessages();
     }
-    if (activeContact._id) {
-      fetchMessages()
-    }
-  }, [activeContact])
+  }, [activeContact, sender]);
 
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages])
+  }, [messages]);
 
+  // Initialize notification sound
   useEffect(() => {
-    notificationSound.current = new Audio(notification)
+    notificationSound.current = new Audio(notification);
     if (notificationSound.current) {
-      notificationSound.current.volume = 0.4
+      notificationSound.current.volume = 0.4;
     }
+    
     return () => {
       if (notificationSound.current) {
         notificationSound.current.pause();
@@ -148,11 +208,13 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     };
   }, []);
 
-  const handleSendMessage = (message: string, url?: string, fileInfo?: { type: string, name: string }) => {
-    if ((!message.trim() && !url)) return;
+  // Handle sending messages
+  const handleSendMessage = useCallback((message: string, url?: string, fileInfo?: { type: string, name: string }) => {
+    if ((!message.trim() && !url) || !socket || !socketInitialized) return;
+    
     const roomId = [sender._id, activeContact._id].sort().join('_');
-    const newMessage = {
-      id: Date.now().toString(),
+    const newMessageObj = {
+      id: `temp_${Date.now().toString()}`,
       senderId: sender._id,
       receiverId: activeContact._id,
       roomId,
@@ -161,36 +223,50 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
       fileType: fileInfo?.type,
       fileName: fileInfo?.name,
       createdAt: new Date().toISOString(),
-    }
-    console.log("sendingMessage : ", newMessage)
-    socket.emit("send_message", newMessage);
+    };
+    
+    console.log("Sending message:", newMessageObj);
+    
+    // Optimistically add message to the UI
+    setMessages(prev => [...prev, newMessageObj]);
+    
+    // Send message through socket
+    socket.emit("send_message", newMessageObj);
     setNewMessage('');
-  };
+  }, [sender, activeContact, socketInitialized]);
 
-  const handleTyping = () => {
+  // Handle typing indicators
+  const handleTyping = useCallback(() => {
+    if (!socket || !socketInitialized) return;
+    
     const roomId = [sender._id, activeContact._id].sort().join('_');
     if (!isTyping) {
       setIsTyping(true);
       socket.emit("typing", { senderId: sender._id, roomId });
     }
     debounceStopTyping();
-  };
+  }, [sender, activeContact, isTyping, socketInitialized]);
 
-  const debounceStopTyping = debounce(() => {
-    const roomId = [sender._id, activeContact._id].sort().join('_');
-    setIsTyping(false);
-    socket.emit("stop_typing", { senderId: sender._id, roomId });
-  }, 1500);
+  const debounceStopTyping = useCallback(
+    debounce(() => {
+      if (!socket || !socketInitialized) return;
+      
+      const roomId = [sender._id, activeContact._id].sort().join('_');
+      setIsTyping(false);
+      socket.emit("stop_typing", { senderId: sender._id, roomId });
+    }, 1500),
+    [sender, activeContact, socketInitialized]
+  );
 
   const handleFileUpload = () => {
-    fileInputRef.current?.click()
-  }
+    fileInputRef.current?.click();
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return
+    if (!file) return;
     processFile(file);
-  }
+  };
 
   const processFile = (file: File) => {
     const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -200,18 +276,23 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     }
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
-  }
+  };
 
   const removeSelectedFile = () => {
     setSelectedFile(null);
-    setPreviewUrl(null);
-  }
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+  };
 
-  const MAX_VIDEO_SIZE = 100 * 1024 * 1024
+  const MAX_VIDEO_SIZE = 100 * 1024 * 1024;
   const MAX_OTHER_SIZE = 10 * 1024 * 1024;
 
   const uploadFile = async (file: File) => {
-    setUploading(true)
+    if (!socketInitialized) return;
+    
+    setUploading(true);
     try {
       const maxSize = file.type.startsWith('video/') ? MAX_VIDEO_SIZE : MAX_OTHER_SIZE;
       if (file.size > maxSize) {
@@ -219,25 +300,27 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
         setUploading(false);
         return;
       }
+      
       const formData = new FormData();
       formData.append('file', file);
-      console.log("formData : ", formData)
-      const response = await uploadChatFile(formData)
-      console.log("response : ", response)
+      
+      const response = await uploadChatFile(formData);
+      
       if (response.url) {
         handleSendMessage('', response.url, {
           type: getFileType(file),
           name: file.name
-        })
-        removeSelectedFile()
+        });
+        removeSelectedFile();
       } else {
-        throw new Error('File upload failed')
+        throw new Error('File upload failed');
       }
     } catch (err) {
-      console.error('file upload error : ', err)
+      console.error('File upload error:', err);
+      alert("Failed to upload file. Please try again.");
     }
-    setUploading(false)
-  }
+    setUploading(false);
+  };
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
@@ -266,6 +349,17 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     }
   };
 
+  const handleContactChange = (contact: any) => {
+    setActiveContact(contact);
+    
+    // Clear unread messages for this contact
+    setUnreadMessages(prev => {
+      const newUnreadMessages = new Map(prev);
+      newUnreadMessages.set(contact._id, 0);
+      return newUnreadMessages;
+    });
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="w-full sm:w-1/3 lg:w-1/4 bg-white border-r border-gray-200 flex flex-col">
@@ -289,133 +383,150 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
               <ContactItem
                 key={contact._id}
                 contact={contact}
-                active={activeContact._id === contact._id}
-                onClick={() => setActiveContact(contact)}
+                active={activeContact?._id === contact._id}
+                onClick={() => handleContactChange(contact)}
               >
                 <NewMessageIndicator count={unreadCount} />
               </ContactItem>
             );
           })}
         </div>
-
       </div>
 
       <div className="hidden sm:flex flex-1 flex-col">
-        <div className="px-4 py-2 bg-white border-b border-gray-200 flex justify-between items-center">
-          <div className="flex items-center">
-            <div className="relative">
-              <img src={activeContact.profilePic} alt={activeContact.username} className="rounded-full w-10 h-10" />
-            </div>
-            <div className="ml-3">
-              <h2 className="text-sm font-semibold">{activeContact.username}</h2>
-              {typingUser && typingUser === activeContact._id && <TypingIndicator />}
-            </div>
-          </div>
-          <div className="flex space-x-3">
-            <button className="text-gray-600 hover:text-gray-800">
-              <Video className="h-5 w-5" />
-            </button>
-            <button className="text-gray-600 hover:text-gray-800">
-              <MoreVertical className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
-          {messages.map((message, index) => (
-            <MessageBubble key={message.id || index} message={message} />
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-
-        <div
-          className={`bg-white border-t border-gray-200 p-3 ${dragActive ? 'bg-blue-50 border-blue-200' : ''}`}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        >
-          {selectedFile && previewUrl && (
-            <FilePreview
-              file={selectedFile}
-              previewUrl={previewUrl}
-              onRemove={removeSelectedFile}
-            />
-          )}
-
-          <div className="flex items-center">
-            <button
-              className="text-gray-500 hover:text-blue-600 mr-2 rounded-full p-2 hover:bg-blue-50 transition-colors"
-              onClick={handleFileUpload}
-            >
-              <Paperclip className="h-5 w-5" />
-            </button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={handleFileChange}
-              accept="image/*,video/*,application/pdf"
-            />
-
-            <div className="relative flex-1">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => { setNewMessage(e.target.value); handleTyping() }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && (newMessage.trim() || selectedFile)) {
-                    if (selectedFile) {
-                      uploadFile(selectedFile);
-                    } else {
-                      handleSendMessage(newMessage);
-                    }
-                  }
-                }}
-                placeholder={dragActive ? "Drop file here..." : "Type a message..."}
-                className={`w-full border border-gray-300 rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-1 focus:ring-blue-500 ${dragActive ? 'border-blue-300 bg-blue-50' : ''}`}
-              />
-              {selectedFile && (
-                <button
-                  onClick={() => uploadFile(selectedFile)}
-                  disabled={uploading}
-                  className="absolute right-12 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded-full text-xs"
-                >
-                  {uploading ? "Sending..." : "Send File"}
+        {activeContact ? (
+          <>
+            <div className="px-4 py-2 bg-white border-b border-gray-200 flex justify-between items-center">
+              <div className="flex items-center">
+                <div className="relative">
+                  <img src={activeContact.profilePic} alt={activeContact.username} className="rounded-full w-10 h-10" />
+                </div>
+                <div className="ml-3">
+                  <h2 className="text-sm font-semibold">{activeContact.username}</h2>
+                  {typingUser && typingUser === activeContact._id && <TypingIndicator />}
+                </div>
+              </div>
+              <div className="flex space-x-3">
+                {/* <button className="text-gray-600 hover:text-gray-800">
+                  <Video className="h-5 w-5" />
+                </button> */}
+                <button className="text-gray-600 hover:text-gray-800">
+                  <MoreVertical className="h-5 w-5" />
                 </button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
+              {messages.length > 0 ? (
+                messages.map((message, index) => (
+                  <MessageBubble 
+                    key={message.id || index} 
+                    message={message} 
+                  />
+                ))
+              ) : (
+                <div className="flex h-full items-center justify-center text-gray-500">
+                  No messages yet. Start a conversation!
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            <div
+              className={`bg-white border-t border-gray-200 p-3 ${dragActive ? 'bg-blue-50 border-blue-200' : ''}`}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+            >
+              {selectedFile && previewUrl && (
+                <FilePreview
+                  file={selectedFile}
+                  previewUrl={previewUrl}
+                  onRemove={removeSelectedFile}
+                />
+              )}
+
+              <div className="flex items-center">
+                <button
+                  className="text-gray-500 hover:text-blue-600 mr-2 rounded-full p-2 hover:bg-blue-50 transition-colors"
+                  onClick={handleFileUpload}
+                >
+                  <Paperclip className="h-5 w-5" />
+                </button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleFileChange}
+                  accept="image/*,video/*,application/pdf"
+                />
+
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => { setNewMessage(e.target.value); handleTyping(); }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey && (newMessage.trim() || selectedFile)) {
+                        e.preventDefault();
+                        if (selectedFile) {
+                          uploadFile(selectedFile);
+                        } else {
+                          handleSendMessage(newMessage);
+                        }
+                      }
+                    }}
+                    placeholder={dragActive ? "Drop file here..." : "Type a message..."}
+                    className={`w-full border border-gray-300 rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-1 focus:ring-blue-500 ${dragActive ? 'border-blue-300 bg-blue-50' : ''}`}
+                  />
+                  {selectedFile && (
+                    <button
+                      onClick={() => uploadFile(selectedFile)}
+                      disabled={uploading}
+                      className="absolute right-12 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded-full text-xs"
+                    >
+                      {uploading ? "Sending..." : "Send File"}
+                    </button>
+                  )}
+                </div>
+
+                {newMessage.trim() || selectedFile ? (
+                  <button
+                    className="ml-2 bg-green-500 text-white rounded-full p-2 hover:bg-green-600 transition-colors flex items-center justify-center"
+                    onClick={() => {
+                      if (selectedFile) {
+                        uploadFile(selectedFile);
+                      } else {
+                        handleSendMessage(newMessage);
+                      }
+                    }}
+                    disabled={uploading}
+                  >
+                    {uploading ? <Loading /> : <Send className="h-5 w-5" />}
+                  </button>
+                ) : (
+                  <button className="ml-2 text-gray-500 hover:text-gray-700 rounded-full p-2 hover:bg-gray-100 transition-colors">
+                    <Mic className="h-5 w-5" />
+                  </button>
+                )}
+              </div>
+
+              {dragActive && (
+                <div className="mt-2 text-center text-sm text-blue-600">
+                  Drop your file here to share
+                </div>
               )}
             </div>
-
-            {newMessage.trim() || selectedFile ? (
-              <button
-                className="ml-2 bg-green-500 text-white rounded-full p-2 hover:bg-green-600 transition-colors flex items-center justify-center"
-                onClick={() => {
-                  if (selectedFile) {
-                    uploadFile(selectedFile);
-                  } else {
-                    handleSendMessage(newMessage);
-                  }
-                }}
-                disabled={uploading}
-              >
-                {uploading ? <Loading /> : <Send className="h-5 w-5" />}
-              </button>
-            ) : (
-              <button className="ml-2 text-gray-500 hover:text-gray-700 rounded-full p-2 hover:bg-gray-100 transition-colors">
-                <Mic className="h-5 w-5" />
-              </button>
-            )}
+          </>
+        ) : (
+          <div className="flex h-full items-center justify-center text-gray-500">
+            Select a contact to start chatting
           </div>
-
-          {dragActive && (
-            <div className="mt-2 text-center text-sm text-blue-600">
-              Drop your file here to share
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
-}
+};
 
 export default ChatApp;
