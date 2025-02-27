@@ -1,7 +1,6 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 import { BACKENDENDPOINT } from "@/utility/env";
-import { toast } from "react-toastify";
 import useAdminStore from "@/store/adminStore";
 
 const axiosInstance = axios.create({
@@ -31,6 +30,7 @@ axiosInstance.interceptors.response.use(
             window.location.href = "/admin/login";
           },
         });
+        await axiosInstance.post("/admin/logout")
         clearAdminEmail();
         return Promise.reject(error);
       }
@@ -46,7 +46,7 @@ axiosInstance.interceptors.response.use(
             window.location.href = "/admin/login";
           },
         });
-
+        await axiosInstance.post("/admin/logout")
         clearAdminEmail();
         return Promise.reject(error);
       }

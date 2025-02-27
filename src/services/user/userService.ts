@@ -1,4 +1,3 @@
-import { transformGroups } from '@/utility/groupTransformer';
 import axiosInstance from '../axios/axios';
 const BASEURL = 'http://localhost:3000/user';
 
@@ -151,3 +150,5 @@ export const paymentInitiate = async (slotId: string, userId: string, advisorId:
     throw err
   }
 }
+
+
