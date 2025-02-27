@@ -5,7 +5,7 @@ import Users from '@/pages/admin/Users';
 import Advisors from '@/pages/admin/Advisors';
 import AdminProfile from '@/pages/admin/Profile';
 import Categories from '@/pages/admin/Category';
-import { NotFound } from '@/pages/NotFound/404';
+import { NotFound } from '@/pages/404/404';
 import AdminProtectedRoute from './AdminProtectedRoutes'
 
 const AdminRoutes = () => {

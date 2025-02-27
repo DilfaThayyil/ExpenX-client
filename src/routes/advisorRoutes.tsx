@@ -7,16 +7,19 @@ import ProfileAd from '@/pages/advisor/Profile';
 import SlotManage from '@/pages/advisor/SlotManage';
 import ResetPassword from '@/components/user/ResetPassword';
 import Clients from '@/pages/advisor/Clients';
-import { NotFound } from '@/pages/NotFound/404';
+import { NotFound } from '@/pages/404/404';
 import AdvisorProtectedRoute from './advisorProtectedRoutes'
+// import PublicRoute from './publicRoute'
 
 const AdvisorRoutes = () => {
     return (
         <Routes>
             <Route path="*" element={<NotFound />} />
             <Route path="" element={<AdvisorLanding />} />
-            <Route path="register" element={<AdvisorRegister />} />
-            <Route path="login" element={<AdvisorLogin />} />
+            {/* <Route element={<PublicRoute/>}> */}
+                <Route path="register" element={<AdvisorRegister />} />
+                <Route path="login" element={<AdvisorLogin />} />
+            {/* </Route> */}
             <Route path="resetPassword" element={<ResetPassword />} />
             <Route element={<AdvisorProtectedRoute />}>
                 <Route path="home" element={<DashboardAd />} />

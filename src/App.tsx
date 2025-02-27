@@ -3,7 +3,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import UserRoutes from "./routes/userRoutes";
 import AdvisorRoutes from "./routes/advisorRoutes";
 import AdminRoutes from "./routes/adminRoutes";
-import { NotFound } from "@/pages/NotFound/404"; 
+import { NotFound } from "@/pages/404/404"; 
 
 const GOOGLECLIENTID = import.meta.env.VITE_GOOGLECLIENTID;
 
