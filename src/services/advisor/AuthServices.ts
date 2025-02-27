@@ -143,3 +143,14 @@ export const advisorGoogleAuth = async (userCredential:JwtPayload) => {
     console.log(err);
   }
 }
+
+export const advisorLogout = async()=>{
+  try{
+    const response = await axiosInstance.post(`${BASEURL}/logout`)
+    return response.data
+  }catch(err){
+    console.error(err)
+    throw err
+  }
+}
+
