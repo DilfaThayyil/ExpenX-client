@@ -23,7 +23,7 @@ axiosInstance.interceptors.response.use(
 
         try {
           console.log("🔄 Refreshing access token...");
-          const { data } = await axiosInstance.post("/user/auth/refresh-token");
+          const { data } = await axiosInstance.post(`${BACKENDENDPOINT}/user/auth/refresh-token`);
           console.log("data : ",data)
           document.cookie = `accessToken=${data.accessToken}; path=/;`;
 
@@ -32,7 +32,7 @@ axiosInstance.interceptors.response.use(
         } catch (err) {
           console.log("❌ Token refresh failed. Logging out...");
 
-          await axiosInstance.post("/user/auth/logout");
+          await axiosInstance.post(`${BACKENDENDPOINT}/user/auth/logout`);
           Store.getState().clearUser()
         
           window.location.href = "/";

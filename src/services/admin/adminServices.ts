@@ -4,6 +4,7 @@ const BASEURL = "http://localhost:3000/admin";
 
 
 
+
 export const adminLogin = async (email: string, password: string) => {
   try {
     const response = await axiosInstance.post(`${BASEURL}/login`, {
@@ -78,7 +79,7 @@ export const fetchCategories = async(page:number,limit:number)=>{
 
 export const manageCategory = async (action: string, id?: string, name?: string) => {
   try {
-    if (action === "add") {
+    if (action === "add") { 
       const response = await axiosInstance.post(`${BASEURL}/addCategory`, { name });
       return response.data;
     } else if (action === "edit") {
@@ -94,6 +95,16 @@ export const manageCategory = async (action: string, id?: string, name?: string)
     console.error(error);
     throw error;
   }
+}
+
+
+
+export const fetchReports = async(page:number,limit:number)=>{
+  const reponse = await axiosInstance.get(`${BASEURL}/reports`,{
+    params:{page,limit}
+  })
+  console.log("res - service : ",reponse.data)
+  return reponse.data
 }
 
 export const adminLogout = async()=>{

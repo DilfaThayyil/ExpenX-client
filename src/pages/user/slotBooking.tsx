@@ -11,8 +11,9 @@ import { message } from 'antd'
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import PaymentForm from '@/components/user/PaymentForm'
-import { bookSlot,paymentInitiate } from '@/services/user/userService'
-import {STRIPE_PUBLISHABLE_KEY} from '@/utility/env'
+import { bookSlot, paymentInitiate } from '@/services/user/userService'
+import { STRIPE_PUBLISHABLE_KEY } from '@/utility/env'
+import ReportModal, { IReportData } from '@/components/modals/reportModal';
 
 
 const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
@@ -38,12 +39,12 @@ interface Slot {
 }
 
 const SlotBooking: React.FC = () => {
-
+  const [advisorReport, setAdvisorReport] = useState<IReportData | null>(null)
+  const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
   const [paymentIntent, setPaymentIntent] = useState<{
     clientSecret: string;
     paymentId: string;
   } | null>(null);
-
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [advisorList, setAdvisorList] = useState<{
     _id: string;
@@ -56,7 +57,7 @@ const SlotBooking: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [slots, setSlots] = useState<Slot[]>([]);
-  const [isPayModal,setIsPayModal] = useState<boolean>(false)
+  const [isPayModal, setIsPayModal] = useState<boolean>(false)
   const sender = Store((state) => state.user);
   const ITEMS_PER_PAGE = 5;
   const userId = sender._id;
@@ -88,9 +89,9 @@ const SlotBooking: React.FC = () => {
     try {
       if (selectedSlot) {
         const advisorId = slots.find(slot => slot._id === selectedSlot)?.advisorId._id;
-        console.log("1 paymentInitiate - parameters : ",selectedSlot,userId,advisorId,100)
+        console.log("1 paymentInitiate - parameters : ", selectedSlot, userId, advisorId, 100)
         if (!advisorId) throw new Error("Advisor ID not found");
-        console.log("2 paymentInitiate - parameters : ",selectedSlot,userId,advisorId,100)
+        console.log("2 paymentInitiate - parameters : ", selectedSlot, userId, advisorId, 100)
         const response = await paymentInitiate(
           selectedSlot,
           userId,
@@ -196,7 +197,9 @@ const SlotBooking: React.FC = () => {
                                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                                   ${slot.status === 'Available'
                                     ? 'bg-green-100 text-green-800'
-                                    : 'bg-red-100 text-red-800'}`}>
+                                    : slot.status === 'Booked'
+                                      ? 'bg-blue-100 text-blue-800'
+                                      : 'bg-red-100 text-red-800'}`}>
                                   {slot.status}
                                 </span>
                                 {/* {slot.status === 'Booked' && (
@@ -217,20 +220,46 @@ const SlotBooking: React.FC = () => {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <button
                                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors
-                                  ${slot.status === 'Available'
-                                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
-                                onClick={() => handleBookSlot(slot._id)}
-                                disabled={slot.status !== 'Available'}
+    ${slot.status === 'Available'
+                                    ? 'bg-green-600 text-white hover:bg-green-700'
+                                    : slot.status === 'Booked'
+                                      ? advisorReport?.status === 'pending'
+                                        ? 'bg-yellow-500 text-white'
+                                        : 'bg-red-600 text-white hover:bg-red-700'
+                                      : 'bg-gray-600 text-white hover:bg-gray-700'}`}
+                                onClick={() =>
+                                  slot.status === 'Available'
+                                    ? handleBookSlot(slot._id)
+                                    : advisorReport?.status === 'pending'
+                                      ? null // Do nothing when pending
+                                      : setIsReportModalOpen(true)
+                                }
+                                disabled={slot.status === 'Cancelled' || advisorReport?.status === 'pending'}
                               >
-                                {slot.status === 'Available' ? 'Book Now' : 'Booked'}
+                                {slot.status === 'Available'
+                                  ? 'Book Now'
+                                  : slot.status === 'Booked'
+                                    ? advisorReport?.status === 'pending'
+                                      ? 'Report Pending'
+                                      : 'Report'
+                                    : 'Cancelled'}
                               </button>
+                              {isReportModalOpen && (
+                                <ReportModal
+                                  isOpen={isReportModalOpen}
+                                  onClose={() => setIsReportModalOpen(false)}
+                                  advisorId={slot.advisorId._id}
+                                  userId={userId}
+                                  setReport={setAdvisorReport}
+                                />
+                              )}
                             </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
+
                 ) : (
                   <div className="text-center py-8">
                     <p className="text-gray-500 text-lg">No slots available</p>
@@ -275,6 +304,7 @@ const SlotBooking: React.FC = () => {
           )}
         </div>
       )}
+
     </Layout>
   );
 };

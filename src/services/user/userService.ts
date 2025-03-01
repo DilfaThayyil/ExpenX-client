@@ -1,5 +1,6 @@
 import axiosInstance from '../axios/axios';
 const BASEURL = 'http://localhost:3000/user';
+import {IReportData} from '@/components/modals/reportModal'
 
 
 export const uploadImageToCloudinary = async (formData: FormData) => {
@@ -151,4 +152,14 @@ export const paymentInitiate = async (slotId: string, userId: string, advisorId:
   }
 }
 
-
+export const reportAdvisor = async (reportData: IReportData) => {
+  try {
+    console.log("reportData : ",reportData)
+      const response = await axiosInstance.post(`${BASEURL}/reportAdvisor`, reportData);
+      console.log("response-data:", response.data);
+      return response.data;
+  } catch (err) {
+      console.error(err);
+      throw err;
+  }
+};
