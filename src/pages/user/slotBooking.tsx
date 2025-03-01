@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Calendar, MessageCircle, X } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
-import { fetchSlots } from '@/services/advisor/advisorService';
+import { fetchSlotsByUser } from '@/services/user/userService';
 import Store from '@/store/store';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ConfirmationModal from '@/components/modals/confirmationModal';
@@ -64,7 +64,8 @@ const SlotBooking: React.FC = () => {
 
   const fetchSlot = async () => {
     try {
-      const response = await fetchSlots(currentPage, ITEMS_PER_PAGE);
+      const response = await fetchSlotsByUser(userId, currentPage, ITEMS_PER_PAGE);
+      console.log("response : ",response)
       setSlots(response.data.slots);
       setTotalPages(response.data.totalPages);
     } catch (err) {

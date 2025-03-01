@@ -152,6 +152,17 @@ export const paymentInitiate = async (slotId: string, userId: string, advisorId:
   }
 }
 
+export const fetchSlotsByUser = async (userId: string, page: number, limit: number) => {
+  try {
+    const response = await axiosInstance.get(`${BASEURL}/fetchSlotsByUser/${userId}?page=${page}&limit=${limit}`)
+    console.log("response : ", response.data)
+    return response.data
+  } catch (err) {
+    console.error(err)
+    throw err
+  }
+}
+
 export const reportAdvisor = async (reportData: IReportData) => {
   try {
     console.log("reportData : ",reportData)

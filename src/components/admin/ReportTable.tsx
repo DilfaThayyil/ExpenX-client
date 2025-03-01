@@ -7,10 +7,9 @@ import useShowToast from '@/customHook/showToaster';
 
 interface User {
   _id: string;
+  username: string;
   email: string;
-  firstName: string;
-  secondName: string;
-  isBlock:boolean
+  isBlocked:boolean
 }
 
 interface Report {
@@ -18,6 +17,7 @@ interface Report {
   userId: User;
   advisorId: User;
   reason: string;
+  customReason?: string;
   createdAt: string;
 }
 
@@ -36,8 +36,8 @@ const ReportTable = () => {
         const response = await fetchReports(currentPage, limit);
         console.log("response : ",response)
         if (response) {
-          setReports(response.data.reports);
-          setTotalPages(response.data.totalReports);
+          setReports(response.data.reports.reports);
+          setTotalPages(response.data.reports.totalReports);
         }
       } catch (error) {
         console.error('Error fetching reports:', error);
@@ -46,23 +46,23 @@ const ReportTable = () => {
 
     fetchData();
   }, [currentPage]);
-
+  console.log("Reports after state update:", reports);
   const columns = [
     {
-      header: 'Reported User',
-      accessor: (item: Report) => item.user,
+      header: 'Advisor Name',
+      accessor: (item: Report) => item.advisorId.username,
     },
     {
-      header: 'Reported User Email',
-      accessor: (item: Report) => item.reportedUserId.email,
+      header: 'Email',
+      accessor: (item: Report) => item.advisorId.email,
     },
     {
-      header: 'Reporter',
-      accessor: (item: Report) => item.reporterUserId.firstName + ' ' + item.reporterUserId.secondName,
+      header: 'User Name',
+      accessor: (item: Report) => item.userId.username
     },
     {
-      header: 'Reporter Email',
-      accessor: (item: Report) => item.reporterUserId.email,
+      header: 'Email',
+      accessor: (item: Report) => item.userId.email,
     },
     {
       header: 'Reason',
@@ -79,18 +79,18 @@ const ReportTable = () => {
     },
     {
       header: "Action",
-      accessor: (user: Report) =>
-        user.reportedUserId.isBlock? (
+      accessor: (report: Report) =>
+        report.advisorId.isBlocked? (
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            // onClick={() => handleUser("unblock", user.reportedUserId.email)}
+            onClick={() => handleUser("unblock",'advisor',report.advisorId.email)}
           >
             Unblock
           </button>
         ) : (
           <button
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            // onClick={() => handleUser("block", user.reportedUserId.email)}
+            onClick={() => handleUser("block",'advisor',report.advisorId.email)}
           >
             Block
           </button>
@@ -98,30 +98,30 @@ const ReportTable = () => {
     },
   ];
   
-//   const handleUser = async (action: string, email: string) => {
-//     try {
-//       const response = await manageUser(action, email);
-//       if (response.message) {
-//         Toast(`User ${action}ed successfully`, "success", true);
+  const handleUser = async (action: string,type:'advisor'| 'user',email: string) => {
+    try {
+      const response = await manageUser(action,type,email);
+      if (response.message) {
+        Toast(`User ${action}ed successfully`, "success", true);
   
-//         setReports(
-//           users.map((user) =>
-//             user.reportedUserId.email === email
-//               ? {
-//                   ...user,
-//                   reportedUserId: {
-//                     ...user.reportedUserId,
-//                     isBlock: action === "block", 
-//                   },
-//                 }
-//               : user
-//           )
-//         );
-//       }
-//     } catch (err) {
-//       console.log(err);
-//     }
-//   };
+        setReports(
+          reports.map((report) =>
+            report.advisorId.email === email
+              ? {
+                  ...report,
+                  advisorId: {
+                    ...report.advisorId,
+                    isBlocked: action === "block", 
+                  },
+                }
+              : report
+          )
+        );
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
   
 
   return (

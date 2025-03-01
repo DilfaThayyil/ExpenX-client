@@ -6,6 +6,7 @@ import Advisors from '@/pages/admin/Advisors';
 import AdminProfile from '@/pages/admin/Profile';
 import Categories from '@/pages/admin/Category';
 import { NotFound } from '@/pages/404/404';
+import Reports from '@/pages/admin/Reports'
 import AdminProtectedRoute from './AdminProtectedRoutes'
 
 const AdminRoutes = () => {
@@ -19,6 +20,7 @@ const AdminRoutes = () => {
                 <Route path="advisors" element={<Advisors />} />
                 <Route path="categories" element={<Categories />} />
                 <Route path="profile" element={<AdminProfile />} />
+                <Route path="reports" element={<Reports/>}/>
             </Route>
         </Routes>
     );
