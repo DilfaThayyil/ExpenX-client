@@ -10,6 +10,7 @@ import Profile from '@/pages/user/Profile';
 import SlotBooking from '@/pages/user/slotBooking';
 import { NotFound } from '@/pages/404/404';
 import UserProtectedRoute from './UserProtectedRoutes'
+import Advisors from '@/pages/user/Advisors'
 // import PublicRoute from './publicRoute'
 
 const UserRoutes = () => {
@@ -28,6 +29,7 @@ const UserRoutes = () => {
                 <Route path="groups" element={<Groups />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="slotBooking" element={<SlotBooking />} />
+                <Route path='Advisors' element={<Advisors/>}/>
             </Route>
         </Routes>
     );

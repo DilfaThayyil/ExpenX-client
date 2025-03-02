@@ -1,13 +1,14 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { Calendar, Home, Inbox, Search, Settings, Users, UsersRound, FileWarning } from "lucide-react";
+import {Calendar,Home,Inbox,Search,Settings,Users,UsersRound,FileWarning,UserCircle} from "lucide-react";
 
 const userMenuItems = [
   { title: "Dashboard", url: "/home", icon: Home },
   { title: "Expenses", url: "/expenses", icon: Inbox },
   { title: "Groups", url: "/groups", icon: Calendar },
-  { title: "Advisors", url: "/slotBooking", icon: Search },
+  { title: "Slot Booking", url: "/slotBooking", icon: Search },
   { title: "Profile", url: "/profile", icon: Settings },
+  { title: "Advisors", url: "/advisors", icon: UserCircle }
 ];
 
 const advisorMenuItems = [
@@ -24,7 +25,7 @@ const adminMenuItems = [
   { title: "Advisors", url: "/admin/advisors", icon: UsersRound },
   { title: "Categories", url: "/admin/categories", icon: Inbox },
   { title: "Profile", url: "/admin/profile", icon: Settings },
-  { title: "user Reports", url: "/admin/reports", icon: FileWarning }
+  { title: "User Reports", url: "/admin/reports", icon: FileWarning }
 ];
      
 

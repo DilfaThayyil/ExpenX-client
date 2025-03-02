@@ -49,30 +49,7 @@ export const getExpenses = async (userId: string) => {
     console.error('Error fetching expenses:', error);
     throw error;
   }
-};
-
-
-// export const updateExpense = async (expenseId: number, expense: any) => {
-//   try {
-//     const response = await axiosInstance.patch(`${BASEURL}/updateExpense/${expenseId}`, expense);
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error updating expense:', error);
-//     throw error;
-//   }
-// };
-
-
-// export const deleteExpense = async (expenseId: number) => {
-//   try {
-//     const response = await axiosInstance.delete(`${BASEURL}/deleteExpense/${expenseId}`);
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error deleting expense:', error);
-//     throw error;
-//   }
-// };
-
+}
 
 export const createGroup = async (userId:string,name:string,members:string[]) => {
   try {
@@ -174,3 +151,4 @@ export const reportAdvisor = async (reportData: IReportData) => {
       throw err;
   }
 };
+

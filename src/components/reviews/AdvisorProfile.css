@@ -1,0 +1,260 @@
+/* Add to your global CSS or create a reviews.css file */
+
+/* Reviews list styling */
+.reviews-container {
+    width: 100%;
+  }
+  
+  .reviews-header {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .reviews-summary {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .average-rating {
+    font-weight: 600;
+    font-size: 1.125rem;
+  }
+  
+  .average-rating span {
+    color: #27c092;
+    font-size: 1.5rem;
+  }
+  
+  .reviews-count {
+    color: #6b7280;
+  }
+  
+  .write-review-button {
+    align-self: flex-start;
+    background-color: #27c092;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  
+  .write-review-button:hover {
+    background-color: #118663;
+  }
+  
+  /* Review items */
+  .review-item {
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f3f4f6;
+  }
+  
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .avatar, .avatar-small {
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  
+  .avatar-small {
+    width: 2rem;
+    height: 2rem;
+  }
+  
+  .username {
+    font-weight: 600;
+    color: #111827;
+  }
+  
+  .review-date, .reply-date {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+  
+  .review-rating {
+    margin-bottom: 0.75rem;
+  }
+  
+  .review-content {
+    color: #374151;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+  
+  .review-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .review-actions button {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .reply-button {
+    color: #4f46e5;
+  }
+  
+  .edit-button {
+    color: #059669;
+  }
+  
+  .delete-button {
+    color: #dc2626;
+  }
+  
+  /* Replies */
+  .replies-section {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .replies-section h4 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    color: #4b5563;
+  }
+  
+  .reply-item {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    background-color: white;
+    border-radius: 0.375rem;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .own-reply {
+    background-color: #f0f9ff;
+    border-color: #bae6fd;
+  }
+  
+  .reply-content {
+    color: #4b5563;
+    font-size: 0.9375rem;
+  }
+  
+  /* Forms */
+  .review-form-container, .reply-form {
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .review-form-container h3 {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+    color: #111827;
+  }
+  
+  .error-message {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .rating-container, .review-input-container {
+    margin-bottom: 1rem;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #4b5563;
+    font-weight: 500;
+  }
+  
+  textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-family: inherit;
+    resize: vertical;
+  }
+  
+  .submit-button, .cancel-button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .submit-button {
+    background-color: #27c092;
+    color: white;
+    border: none;
+  }
+  
+  .submit-button:hover {
+    background-color: #118663;
+  }
+  
+  .cancel-button {
+    background-color: white;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+    margin-left: 0.5rem;
+  }
+  
+  .cancel-button:hover {
+    background-color: #f3f4f6;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
+  
+  /* Star Rating */
+  .star-rating {
+    display: flex;
+    gap: 0.25rem;
+  }
+  
+  .star {
+    font-size: 1.5rem;
+  }
+  
+  .filled {
+    color: #FFD700;
+  }
+  
+  .empty {
+    color: #e4e5e9;
+  }
