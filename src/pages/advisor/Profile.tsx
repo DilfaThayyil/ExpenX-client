@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, Globe, Languages, LogOut, Edit2, X, UploadCloud, MessageCircle, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,20 +10,41 @@ import FormInput from '@/components/InputField';
 // import Progresss from '@/components/progressBar'
 import useShowToast from '@/customHook/showToaster';
 import { updateUser, uploadImageToCloudinary } from '@/services/advisor/advisorService';
-import {advisorLogout} from '@/services/advisor/AuthServices'
+import { getReviewsForAdvisor,addReplyToReview } from '@/services/review/reviewServices'
+import { advisorLogout } from '@/services/advisor/AuthServices'
+import Loading from '@/style/loading';
+import ReplyItem from '@/components/reviews/ReplyItem';
+import ReplyForm from '@/components/reviews/ReplyForm';
 
 
-interface UserFeedback {
+interface Feedback {
+  _id: string;
+  advisorId: string;
+  userId: {
+    _id: string
+    username: string
+    profilePic: string
+  }
   username: string;
+  profilePic: string;
   rating: number;
-  comment: string;
-  date: string;
+  review: string;
+  replies: FeedbackReply[];
+  createdAt: string;
+}
+
+interface FeedbackReply {
+  _id: string;
+  advisorId: string;
+  text: string;
+  createdAt: string;
 }
 
 const ProfileAd = () => {
 
   const Toaster = useShowToast()
   const user = Store(state => state.user)
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
   const [profilePic, setProfilePic] = useState<File | null>(null)
   const [previewPic, setPreviewPic] = useState(user.profilePic)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -40,6 +61,24 @@ const ProfileAd = () => {
     country: '',
     language: ''
   })
+  const [showReplyForm, setShowReplyForm] = useState<string | null>(null);
+  const fetchReviews = async () => {
+    try {
+      const response = await getReviewsForAdvisor(user._id)
+      console.log('response : ', response)
+      setFeedbacks(response.data);
+    } catch (error) {
+      console.error("Error fetching advisors:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+  if (loading) return <Loading />
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -122,20 +161,16 @@ const ProfileAd = () => {
     }
   }
 
-  const [feedbacks] = useState<UserFeedback[]>([
-    {
-      username: "Emily Johnson",
-      rating: 5,
-      comment: "Absolutely fantastic advisor! Helped me create a comprehensive financial plan.",
-      date: "2024-01-15"
-    },
-    {
-      username: "Michael Chen",
-      rating: 4,
-      comment: "Great insights and personalized advice. Highly recommended!",
-      date: "2024-02-01"
+  const handleReplySubmit = async (reviewId: string, text: string) => {
+    try {
+      const response = await addReplyToReview(user._id,reviewId, text);
+      console.log("response : ",response)
+      setShowReplyForm(null);
+      fetchReviews();
+    } catch (error) {
+      console.error("Error submitting reply:", error);
     }
-  ]);
+  };
 
   const renderStars = (rating: number) => {
     return [...Array(5)].map((_, index) => (
@@ -154,13 +189,13 @@ const ProfileAd = () => {
     return Math.floor((completedFields.length / fields.length) * 100);
   };
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     await advisorLogout()
     Store.getState().clearUser();  // Clears user from Zustand store
     localStorage.removeItem('user'); // Removes user from local storage
     window.location.href = '/advisor/login'; // Redirect to login page
   };
-  
+
 
   return (
     <Layout role='advisor'>
@@ -235,33 +270,71 @@ const ProfileAd = () => {
             </CardContent>
           </Card>
 
-          {/* Expense Goals Card */}
+          {/* Client feedbacks Card */}
           <Card>
             <CardHeader>
               <CardTitle>Client Feedbacks</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {feedbacks.map((feedback, index) => (
-                  <div key={index} className="space-y-2 border-b pb-4 last:border-b-0">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <MessageCircle className="h-4 w-4 text-emerald-500" />
-                        <span className="font-medium">{feedback.username}</span>
+                {feedbacks.length > 0 ? (
+                  feedbacks.map((review, index) => (
+                    <div key={index} className="space-y-2 border-b pb-4 last:border-b-0">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <img src={review.profilePic} alt="Profile" className="h-6 w-6 rounded-full" />
+                          <span className="font-medium">{review.username}</span>
+                        </div>
+                        <span className="text-sm text-gray-500">
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </span>
                       </div>
-                      <span className="text-sm text-gray-500">
-                        {new Date(feedback.date).toLocaleDateString()}
-                      </span>
+                      <div className="flex items-center space-x-1 mb-2">
+                        {renderStars(review.rating)}
+                      </div>
+                      <p className="text-sm text-gray-700">{review.review}</p>
+
+                      {/* Replies Section */}
+                      {review.replies && review.replies.length > 0 && (
+                        <div className="replies-section bg-gray-100 p-2 rounded-md mt-2">
+                          <h4 className="font-medium text-gray-700">Replies</h4>
+                          {review.replies.map((reply) => (
+                            <ReplyItem
+                              key={reply._id}
+                              reply={reply}
+                              isOwnReply={false}
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Reply Button */}
+                      <button
+                        className="text-blue-500 text-sm mt-2"
+                        onClick={() => setShowReplyForm(review._id)}
+                      >
+                        Reply
+                      </button>
+
+                      {/* Reply Form (conditionally rendered for the selected review) */}
+                      {showReplyForm === review._id && (
+                        <ReplyForm
+                          onSubmit={(text) => handleReplySubmit(review._id, text)}
+                          onCancel={() => setShowReplyForm(null)}
+                        />
+                      )}
                     </div>
-                    <div className="flex items-center space-x-1 mb-2">
-                      {renderStars(feedback.rating)}
-                    </div>
-                    <p className="text-sm text-gray-700">{feedback.comment}</p>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">No feedback available.</p>
+                )}
               </div>
             </CardContent>
           </Card>
+
+
+
+
         </div>
 
         <Button

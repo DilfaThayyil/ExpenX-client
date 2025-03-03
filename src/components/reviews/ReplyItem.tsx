@@ -1,21 +1,16 @@
 import React from 'react';
 import { format } from 'date-fns';
 
-interface User {
-  _id: string;
-  name: string;
-  avatar?: string;
-}
 
-interface Reply {
+interface FeedbackReply {
   _id: string;
-  userId: User;
+  advisorId: string;
   text: string;
   createdAt: string;
 }
 
 interface ReplyItemProps {
-  reply: Reply;
+  reply: FeedbackReply;
   isOwnReply: boolean;
 }
 
@@ -24,14 +19,14 @@ const ReplyItem: React.FC<ReplyItemProps> = ({ reply, isOwnReply }) => {
     <div className={`reply-item ${isOwnReply ? 'own-reply' : ''}`}>
       <div className="reply-header">
         <div className="user-info">
-          {reply.userId.avatar && (
+          {reply.advisorId.profilePic && (
             <img 
-              src={reply.userId.avatar} 
-              alt={reply.userId.name} 
+              src={reply.advisorId.profilePic} 
+              alt={reply.advisorId.username} 
               className="avatar-small"
             />
           )}
-          <span className="username">{reply.userId.name}</span>
+          <span className="username">{reply.advisorId.username}</span>
         </div>
         
         <div className="reply-date">

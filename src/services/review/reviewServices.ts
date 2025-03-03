@@ -20,8 +20,9 @@ export const getReviewsForAdvisor = async (advisorId: string) => {
   return response.data;
 };
 
-export const addReplyToReview = async (reviewId: string, text: string) => {
-  const response = await axiosInstance.post(`${BASEURL}/${reviewId}/replies`, { text });
+export const addReplyToReview = async (advisorId:string,reviewId: string, text: string) => {
+  const response = await axiosInstance.post(`${advBASEURL}/addReply/${reviewId}`, {advisorId,text});
+  console.log("submit-reply-response : ",response)
   return response.data;
 };
 

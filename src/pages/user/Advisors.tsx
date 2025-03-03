@@ -22,7 +22,9 @@ interface advisorData {
 
 const Advisors: React.FC = () => {
     const [advisors, setAdvisors] = useState<advisorData[]>([]);
-    const [selectedAdvisor, setSelectedAdvisor] = useState(null);
+    const [selectedAdvisor, setSelectedAdvisor] = useState<advisorData>({
+        _id: '', username: '', profilePic: '', bio: '', specialties:[], experience: 0
+    });
     const [loading, setLoading] = useState(true);
 
     // Fetch advisors from the backend

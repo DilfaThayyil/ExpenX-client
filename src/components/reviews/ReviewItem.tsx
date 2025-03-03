@@ -13,7 +13,7 @@ interface User {
 
 interface Reply {
   _id: string;
-  userId: User;
+  advisorId: User;
   text: string;
   createdAt: string;
 }
@@ -189,7 +189,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
             <ReplyItem 
               key={reply._id} 
               reply={reply}
-              isOwnReply={currentUserId === reply.userId._id}
+              isOwnReply={currentUserId === reply.advisorId._id}
             />
           ))}
         </div>
