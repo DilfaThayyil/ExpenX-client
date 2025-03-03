@@ -11,6 +11,7 @@ import Progresss from '@/components/progressBar'
 import useShowToast from '@/customHook/showToaster';
 import { updateUser, uploadImageToCloudinary } from '@/services/user/userService';
 import { userLogout } from '@/services/user/AuthServices'
+import GoalsList from '@/components/goals/GoalsList';
 
 
 
@@ -226,7 +227,7 @@ const Profile = () => {
           </Card>
 
           {/* Expense Goals Card */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>Financial Goals</CardTitle>
             </CardHeader>
@@ -258,7 +259,8 @@ const Profile = () => {
               </div>
               <Button variant='outline'>Add goal</Button>
             </CardContent>
-          </Card>
+          </Card> */}
+          <GoalsList />
         </div>
         <Button
           variant="destructive"
