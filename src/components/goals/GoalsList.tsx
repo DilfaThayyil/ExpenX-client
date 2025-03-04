@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { getGoals,createGoal,updateGoal,deleteGoal,updateGoalProgress, Goal } from '@/services/goals/goalsService';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Target } from 'lucide-react';
 import GoalForm from './GoalForm';
 import Store from '@/store/store'
+import useShowToast from '@/customHook/showToaster'
 
 const GoalsList: React.FC = () => {
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -14,6 +16,7 @@ const GoalsList: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const user = Store((state)=>state.user)
+  const Toaster = useShowToast()
 
   const fetchGoals = async () => {
     try {
@@ -36,6 +39,7 @@ const GoalsList: React.FC = () => {
   const handleCreateGoal = async (goalData: Omit<Goal, '_id'>) => {
     try {
       await createGoal(user._id,goalData);
+      Toaster('Goal created successfully','success')
       setShowForm(false);
       fetchGoals();
     } catch (err) {
@@ -47,6 +51,8 @@ const GoalsList: React.FC = () => {
   const handleUpdateGoal = async (id: string, goalData: Partial<Goal>) => {
     try {
       await updateGoal(id, goalData);
+      Toaster('Goal updated successfully','success')
+      setShowForm(false)
       setEditingGoal(null);
       fetchGoals();
     } catch (err) {
@@ -56,13 +62,25 @@ const GoalsList: React.FC = () => {
   };
 
   const handleDeleteGoal = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this goal?')) {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to delete this goal?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+    });
+  
+    if (result.isConfirmed) {
       try {
         await deleteGoal(id);
         fetchGoals();
+        Swal.fire('Deleted!', 'The goal has been deleted.', 'success');
       } catch (err) {
         setError('Failed to delete goal');
         console.error(err);
+        Swal.fire('Error!', 'Failed to delete goal.', 'error');
       }
     }
   };
@@ -75,6 +93,7 @@ const GoalsList: React.FC = () => {
   const handleUpdateProgress = async (id: string, amount: number) => {
     try {
       await updateGoalProgress(id, amount);
+      Toaster('Goal updated successfully','success')
       fetchGoals();
     } catch (err) {
       setError('Failed to update progress');

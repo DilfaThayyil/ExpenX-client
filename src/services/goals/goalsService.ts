@@ -25,18 +25,18 @@ export const createGoal = async(userId:string,goalData:Goal)=>{
     console.log("response : ",response)
     return response.data
 }
-export const updateGoal = async()=>{
-    const response = await axiosInstance.patch(`${BASEURL}/updateGoals`)
+export const updateGoal = async(id:string,goalData:Partial<Goal>)=>{
+    const response = await axiosInstance.patch(`${BASEURL}/updateGoal/${id}`,goalData)
     console.log("response : ",response)
     return response.data
 }
-export const deleteGoal = async()=>{
-    const response = await axiosInstance.delete(`${BASEURL}/deleteGoals`)
+export const deleteGoal = async(id:string)=>{
+    const response = await axiosInstance.delete(`${BASEURL}/deleteGoal/${id}`)
     console.log("response : ",response)
     return response.data
 }
-export const updateGoalProgress = async()=>{
-    const response = await axiosInstance.patch(`${BASEURL}/updateGoalProgress`)
+export const updateGoalProgress = async(id:string,amount:number)=>{
+    const response = await axiosInstance.patch(`${BASEURL}/updateGoalProgress/${id}`,{amount})
     console.log("response : ",response)
     return response.data
 }
