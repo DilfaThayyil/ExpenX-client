@@ -123,17 +123,17 @@ const SlotBooking: React.FC = () => {
   }
 
   const handlePaymentSuccess = async () => {
-    await bookSlot(selectedSlot!, userId);
+    await bookSlot(selectedSlot!, userId)
     setSlots(prevSlots =>
       prevSlots.map(slot =>
         slot._id === selectedSlot
           ? { ...slot, status: 'Booked', bookedBy: userId }
           : slot
       )
-    );
+    )
     message.success('Payment successful and slot booked!');
     setPaymentIntent(null);
-  };
+  }
 
 
   return (
@@ -224,25 +224,21 @@ const SlotBooking: React.FC = () => {
     ${slot.status === 'Available'
                                     ? 'bg-green-600 text-white hover:bg-green-700'
                                     : slot.status === 'Booked'
-                                      ? advisorReport?.status === 'pending'
-                                        ? 'bg-yellow-500 text-white'
-                                        : 'bg-red-600 text-white hover:bg-red-700'
+                                      ? 'bg-red-600 text-white hover:bg-red-700'
                                       : 'bg-gray-600 text-white hover:bg-gray-700'}`}
                                 onClick={() =>
                                   slot.status === 'Available'
                                     ? handleBookSlot(slot._id)
                                     : advisorReport?.status === 'pending'
-                                      ? null // Do nothing when pending
+                                      ? null
                                       : setIsReportModalOpen(true)
                                 }
-                                disabled={slot.status === 'Cancelled' || advisorReport?.status === 'pending'}
+                                disabled={slot.status === 'Cancelled'}
                               >
                                 {slot.status === 'Available'
                                   ? 'Book Now'
                                   : slot.status === 'Booked'
-                                    ? advisorReport?.status === 'pending'
-                                      ? 'Report Pending'
-                                      : 'Report'
+                                    ? 'Report'
                                     : 'Cancelled'}
                               </button>
                               {isReportModalOpen && (
@@ -252,6 +248,7 @@ const SlotBooking: React.FC = () => {
                                   advisorId={slot.advisorId._id}
                                   userId={userId}
                                   setReport={setAdvisorReport}
+                                  slotId={slot._id}
                                 />
                               )}
                             </td>

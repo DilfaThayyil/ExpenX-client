@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Empty } from "antd";
+import { EmptyComponent } from '@/components/empty/Empty';
 import Pagination from '@/components/admin/Pagination';
 import Table from '@/components/admin/Table';
 import { manageUser, fetchReports } from '@/services/admin/adminServices';
@@ -27,7 +27,7 @@ const ReportTable = () => {
   const [reports, setReports] = useState<Report[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const limit = 7;
+  const limit = 5;
   const Toast=useShowToast()
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const ReportTable = () => {
         console.log("response : ",response)
         if (response) {
           setReports(response.data.reports.reports);
-          setTotalPages(response.data.reports.totalReports);
+          setTotalPages(Math.ceil(response.data.reports.totalReports/limit));
         }
       } catch (error) {
         console.error('Error fetching reports:', error);
@@ -49,21 +49,25 @@ const ReportTable = () => {
   console.log("Reports after state update:", reports);
   const columns = [
     {
+      header: 'Date',
+      accessor: (item: Report) => new Date(item.createdAt).toLocaleDateString(),
+    },
+    {
       header: 'Advisor Name',
       accessor: (item: Report) => item.advisorId.username,
     },
-    {
-      header: 'Email',
-      accessor: (item: Report) => item.advisorId.email,
-    },
+    // {
+    //   header: 'Email',
+    //   accessor: (item: Report) => item.advisorId.email,
+    // },
     {
       header: 'User Name',
       accessor: (item: Report) => item.userId.username
     },
-    {
-      header: 'Email',
-      accessor: (item: Report) => item.userId.email,
-    },
+    // {
+    //   header: 'Email',
+    //   accessor: (item: Report) => item.userId.email,
+    // },
     {
       header: 'Reason',
       accessor: (item: Report) => item.reason,
@@ -73,10 +77,6 @@ const ReportTable = () => {
       accessor: (item: Report) =>  item.customReason ? item.customReason : 'N/A',
     },
    
-    {
-      header: 'Date',
-      accessor: (item: Report) => new Date(item.createdAt).toLocaleDateString(),
-    },
     {
       header: "Action",
       accessor: (report: Report) =>
@@ -140,7 +140,7 @@ const ReportTable = () => {
         </>
       ) : (
         <div className="flex justify-center mt-7">
-          <Empty />
+          <EmptyComponent />
         </div>
       )}
     </div>

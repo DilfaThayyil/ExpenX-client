@@ -9,6 +9,7 @@ interface IReportModalProps {
     advisorId: string | null;
     userId: string;
     setReport: (report: IReportData) => void;
+    slotId: string
 }
 
 export interface IReportData {
@@ -22,7 +23,7 @@ export interface IReportData {
 
 const REPORT_REASONS = ["Spam", "Inappropriate Content", "Harassment", "Other"];
 
-const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, userId, setReport }) => {
+const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, userId, setReport, slotId }) => {
     const [reason, setReason] = useState<string>("");
     const [customReason, setCustomReason] = useState<string>("");
 
@@ -50,7 +51,7 @@ const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, 
                 customReason: reason === "Other" ? customReason : undefined,
             };
             console.log("reportData : ",reportData)
-            const response = await reportAdvisor(reportData);
+            const response = await reportAdvisor(slotId,reportData);
             console.log("response-modal:", response);
 
             setReport(response.report);

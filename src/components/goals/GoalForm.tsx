@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Goal } from '@/services/goals/goalsService';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import FormInput from '@/components/InputField'
+
 
 interface GoalFormProps {
   onSubmit: (goal: Omit<Goal, '_id'>) => Promise<void>;
@@ -19,12 +20,12 @@ const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel, initialData }) 
     description: initialData?.description || '',
     target: initialData?.target || 0,
     current: initialData?.current || 0,
-    deadline: initialData?.deadline ? 
-      new Date(initialData.deadline).toISOString().split('T')[0] : 
-      new Date().toISOString().split('T')[0],
+    deadline: initialData?.deadline 
+      ? new Date(initialData.deadline).toISOString().split('T')[0] 
+      : new Date().toISOString().split('T')[0],
     category: initialData?.category || 'savings'
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,17 +45,17 @@ const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel, initialData }) 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim()) {
       setError('Title is required');
       return;
     }
-    
+
     if (formData.target <= 0) {
       setError('Target amount must be greater than 0');
       return;
     }
-    
+
     try {
       setLoading(true);
       await onSubmit(formData);
@@ -75,73 +76,69 @@ const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel, initialData }) 
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && <div className="bg-red-100 p-3 rounded text-red-700">{error}</div>}
-          
+
           <div className="space-y-2">
-            <Label htmlFor="title">Goal Title</Label>
-            <Input
+            <FormInput
               id="title"
               name="title"
+              type="text"
+              label="Goal Title"
               value={formData.title}
               onChange={handleChange}
-              placeholder="e.g., New Car, Emergency Fund"
               required
             />
           </div>
-          
+
           <div className="space-y-2">
-            <Label htmlFor="description">Description (Optional)</Label>
-            <Textarea
+            <FormInput
               id="description"
               name="description"
+              type='text'
+              label="Description(Optional)"
               value={formData.description || ''}
               onChange={handleChange}
-              placeholder="Details about your financial goal"
-              rows={3}
+              required
             />
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="target">Target Amount ($)</Label>
-              <Input
+              <FormInput
                 id="target"
                 name="target"
                 type="number"
-                min="0"
-                step="0.01"
-                value={formData.target}
+                label="Target Amount ($)"
+                value={formData.target.toString()}
                 onChange={handleNumberChange}
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="current">Current Amount ($)</Label>
-              <Input
+              <FormInput
                 id="current"
                 name="current"
                 type="number"
-                min="0"
-                step="0.01"
-                value={formData.current}
+                label="Current Amount ($)"
+                value={formData.current.toString()}
                 onChange={handleNumberChange}
               />
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="deadline">Target Date</Label>
-              <Input
+              <FormInput
                 id="deadline"
                 name="deadline"
                 type="date"
+                label="Target Date"
                 value={formData.deadline}
                 onChange={handleChange}
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
               <Select
@@ -165,7 +162,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel, initialData }) 
             </div>
           </div>
         </CardContent>
-        
+
         <CardFooter className="flex justify-between">
           <Button 
             type="button" 

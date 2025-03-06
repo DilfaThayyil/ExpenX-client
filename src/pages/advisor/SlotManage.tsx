@@ -4,9 +4,9 @@ import { createSlot, fetchSlots, updateSlot, deleteSlot } from '@/services/advis
 import React, { useEffect, useState } from 'react';
 import { Calendar, Plus } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
-import {message} from 'antd'
 import Store from '@/store/store';
 import Pagination from "@/components/admin/Pagination"; 
+import useShowToast from '@/customHook/showToaster'
 
 
 
@@ -37,10 +37,11 @@ const SlotManage: React.FC = () => {
   const advisor = Store(state=>state.user)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
+  const Toaster = useShowToast()
 
   const fetchSlot = async () => {
     try {
-      const response = await fetchSlots(currentPage,ITEMS_PER_PAGE)
+      const response = await fetchSlots(advisor._id,currentPage,ITEMS_PER_PAGE)
       console.log("response : ", response.data)
       const {slots,totalPages} = response.data
       setSlots(slots)
@@ -61,7 +62,7 @@ const SlotManage: React.FC = () => {
       console.log("newSlot-frontent: ", newSlot)
       const response = await createSlot(id,newSlot)
       console.log("newSlot : ", response.Slot)
-      message.success("Slot created successfully")
+      Toaster('Slot created successfully','success')
       setSlots([...slots, response.Slot]);    
       setIsCreateModalOpen(false);
     } catch (err) {
@@ -76,11 +77,11 @@ const SlotManage: React.FC = () => {
       const response = await updateSlot(updatedSlot,updatedSlot._id);
       console.log("response-slot : ",response.slot)
       setSlots(slots.map(slot => (slot._id === updatedSlot._id ? response.slot : slot)));
-      message.success(response.message);
+      Toaster(response.message,'success')
       setIsCreateModalOpen(false);
     } catch (err) {
       console.error(err);
-      message.error("Failed to update slot");
+      Toaster('Failed to update slot','error')
     }
   };
 
@@ -91,10 +92,10 @@ const SlotManage: React.FC = () => {
       const response = await deleteSlot(slotId)
       setSlots(slots.filter(slot => slot._id !== slotId));
       console.log("response : ",response)
-      message.success("Slot deleted successfully")
+      Toaster('Slot deleted successfully','success')
     }catch(err){
       console.error(err)
-      message.error('Failed to delete slot')
+      Toaster('Failed to delete slot','error')
     }
   };
 

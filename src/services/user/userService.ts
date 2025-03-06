@@ -140,10 +140,10 @@ export const fetchSlotsByUser = async (userId: string, page: number, limit: numb
   }
 }
 
-export const reportAdvisor = async (reportData: IReportData) => {
+export const reportAdvisor = async (slotId:string,reportData: IReportData) => {
   try {
     console.log("reportData : ",reportData)
-      const response = await axiosInstance.post(`${BASEURL}/reportAdvisor`, reportData);
+      const response = await axiosInstance.post(`${BASEURL}/reportAdvisor/${slotId}`, reportData);
       console.log("response-data:", response.data);
       return response.data;
   } catch (err) {

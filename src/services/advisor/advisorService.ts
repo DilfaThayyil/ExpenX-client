@@ -52,10 +52,10 @@ export const createSlot = async (id:string,slotData:Slot) => {
   }
 }
 
-export const fetchSlots = async(page:number,limit:number)=>{  
+export const fetchSlots = async(advisorId:string,page:number,limit:number)=>{  
   try{
     console.log("page,limit: ",page," ",limit)
-    const response = await axiosInstance.get(`${BASEURL}/fetchSlots`,{
+    const response = await axiosInstance.get(`${BASEURL}/fetchSlots/${advisorId}`,{
       params:{page,limit}
     })
     console.log("response-data : ",response.data)
@@ -96,6 +96,61 @@ export const getBookedSlotsForAdvisor = async(advisorId:string,page:number,limit
       params:{page,limit}
     })
     console.log("response-data :",response.data)
+    return response.data
+  }catch(err){
+    console.error(err)
+    throw err
+  }
+}
+
+export const fetchDashboard = async(advisorId:string)=>{
+  try{
+    const response = await axiosInstance.get(`${BASEURL}/fetchDashboard/${advisorId}`)
+    console.log("response : ",response.data)
+    return response.data
+  }catch(err){
+    console.error(err)
+    throw err
+  }
+}
+
+export const fetchRevenue = async(advisorId:string,timeFrame:'monthly' | 'quarterly' | 'yearly')=>{
+  try{
+    const response = await axiosInstance.get(`${BASEURL}/fetchRevenue/${advisorId}?timeFrame=${timeFrame}`,)
+    console.log("response : ",response.data)
+    return response.data
+  }catch(err){
+    console.error(err)
+    throw err
+  }
+}
+
+export const fetchClientGoals = async(advisorId:string)=>{
+  try{
+    const response = await axiosInstance.get(`${BASEURL}/fetchClientGoals/${advisorId}`)
+    console.log("response : ",response)
+    return response.data
+  }catch(err){
+    console.error(err)
+    throw err
+  }
+}
+
+export const comingAppointments = async(advisorId:string)=>{
+  try{
+    const response = await axiosInstance.get(`${BASEURL}/getUpcomingAppointments/${advisorId}`)
+    console.log("response-serv : ",response.data)
+    return response.data
+  }catch(err){
+    console.error(err)
+    throw err
+  }
+}
+
+export const fetchRecentClients = async(advisorId:string)=>{
+  try{
+    const response = await axiosInstance.get(`${BASEURL}/getRecentClients/${advisorId}`)
+    console.log("resposne-serv-recentCliets : ",response.data)
     return response.data
   }catch(err){
     console.error(err)
