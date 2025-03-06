@@ -111,3 +111,23 @@ export const adminLogout = async()=>{
   const response = await axiosInstance.post(`${BASEURL}/logout`)
   return response.data
 }
+
+export const fetchMonthlyTrends = async()=>{
+  const response = await axiosInstance.get(`${BASEURL}/getMonthlyTrends`)
+  return response.data
+}
+
+export const fetchExpenseCategories = async()=>{
+  const response = await axiosInstance.get(`${BASEURL}/getExpenseCategories`)
+  return response.data
+}
+
+export const fetchDashboardStats = async()=>{
+  const response = await axiosInstance.get(`${BASEURL}/getDashboardStats`)
+  return response.data
+}
+
+export const fetchUserGrowth = async()=>{
+  const response = await axiosInstance.get(`${BASEURL}/getUserGrowth`)
+  return response.data
+}

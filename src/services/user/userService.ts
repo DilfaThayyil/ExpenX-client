@@ -51,6 +51,16 @@ export const getExpenses = async (userId: string) => {
   }
 }
 
+export const getCategories = async()=>{
+  try{
+    const response = await axiosInstance.get(`${BASEURL}/getCategories`)
+    return response.data
+  }catch(err){
+    console.error(err)
+    throw err
+  }
+}
+
 export const createGroup = async (userId:string,name:string,members:string[]) => {
   try {
     console.log(userId,name,members)

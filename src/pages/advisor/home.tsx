@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import Layout from "@/layout/Sidebar";
-import StatsCards from "@/components/dashboard/StatsCard";
-import RevenueChart from "@/components/dashboard/RevenueChart";
-import GoalProgressChart from "@/components/dashboard/GoalProgressChart";
-import AppointmentsList from "@/components/dashboard/AppointmentsList";
-import ClientActivities from "@/components/dashboard/ClientActivities";
+import StatsCards from "@/components/dashboard/advisor/StatsCard";
+import RevenueChart from "@/components/dashboard/advisor/RevenueChart";
+import GoalProgressChart from "@/components/dashboard/advisor/GoalProgressChart";
+import AppointmentsList from "@/components/dashboard/advisor/AppointmentsList";
+import ClientActivities from "@/components/dashboard/advisor/ClientActivities";
 import { moneyColors } from "@/style/theme";
 import { fetchDashboard, fetchRevenue,fetchClientGoals } from '@/services/advisor/advisorService'
 import Store from '@/store/store'

@@ -3,43 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell
-} from 'recharts';
-import {
-  ChevronDown,
-  Bell,
-  Plus,
-  CreditCard,
-  Users,
-  Wallet,
-  TrendingUp,
-  Calendar,
-  Award,
-  Download,
-  LogOut
-} from 'lucide-react';
+import {DropdownMenu,DropdownMenuContent,DropdownMenuItem,DropdownMenuTrigger,} from "@/components/ui/dropdown-menu";
+import {LineChart,Line,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer,PieChart,Pie,Cell} from 'recharts';
+import {ChevronDown,Bell,Plus,CreditCard,Users,Wallet,TrendingUp,Calendar,Award,Download,LogOut} from 'lucide-react';
 import Layout from '@/layout/Sidebar';
 import Store from '@/store/store'
 
 
 
-// Types
 interface ExpenseData {
   category: string;
   amount: number;
@@ -64,10 +35,8 @@ const getGreeting = () => {
 const DashboardPage = () => {
 
   const user = Store(state=>state.user)
-  console.log("user in store : ", user)
   const [budgetProgress, setBudgetProgress] = useState(65);
 
-  // Mock data
   const monthlyExpenses: ExpenseData[] = [
     { category: "Food", amount: 500, color: "#10B981" },
     { category: "Transport", amount: 300, color: "#3B82F6" },

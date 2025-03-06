@@ -1,52 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 import { Input } from "@/components/ui/input";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-
-import {
-    Plus,
-    Search,
-    //   Filter,
-    Calendar as CalendarIcon,
-    Edit,
-    Trash2,
-    Download,
-    //   ArrowUpDown,
-} from 'lucide-react';
+import { Plus, Search, Calendar as CalendarIcon, Edit, Trash2, Download, } from 'lucide-react';
 import { format } from 'date-fns';
 import Layout from '@/layout/Sidebar';
-import { getExpenses, createExpense } from '../../services/user/userService'
+import { getExpenses, createExpense, getCategories } from '../../services/user/userService'
 import useShowToast from '@/customHook/showToaster';
 import Loading from '@/style/loading';
 import Store from '../../store/store'
 
 
-// Types
 interface Expense {
     id?: number;
     date: Date;
@@ -59,17 +29,31 @@ const Expenses = () => {
 
     const Toaster = useShowToast()
     const [expenses, setExpenses] = useState<Expense[]>([])
+    const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
     const [formData, setFormData] = useState<Expense>({
         date: new Date(),
         amount: 0,
         category: '',
         description: ''
     })
-    const [loading,setLoading] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false)
     const [searchQuery, setSearchQuery] = useState('');
-    const [isDialogOpen,setIsDialogOpen] = useState<boolean>(false)
-    const userId = Store((state)=>state.user.id)
-console.log("frontent user Id  : ",userId)
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+    const userId = Store((state) => state.user._id)
+    console.log("frontent user Id  : ", userId)
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await getCategories();
+                console.log("data-categories : ", data)
+                setCategories(data);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     useEffect(() => {
         const fetchExpenses = async () => {
@@ -77,10 +61,10 @@ console.log("frontent user Id  : ",userId)
                 if (!userId) {
                     console.error('User ID is not defined.');
                     return;
-                }                
-                console.log("type of userId : ",typeof userId)
+                }
+                console.log("type of userId : ", typeof userId)
                 const data = await getExpenses(userId)
-                console.log("data : ",data)
+                console.log("data : ", data)
                 setExpenses(data)
             } catch (error) {
                 console.error('Error fetching expenses:', error);
@@ -120,16 +104,16 @@ console.log("frontent user Id  : ",userId)
         }
         setLoading(true)
         try {
-            const newExpense = await createExpense(formData,userId)
-            console.log("newExpense : ",newExpense.data)
-            setExpenses((prev)=>[...prev,newExpense.data])
+            const newExpense = await createExpense(formData, userId)
+            console.log("newExpense : ", newExpense.data)
+            setExpenses((prev) => [...prev, newExpense.data])
             Toaster('Expense added successfully!', 'success');
             setFormData({ date: new Date(), amount: 0, category: '', description: '' });
             setIsDialogOpen(false)
         } catch (error) {
             console.error('Error creating expense:', error)
             Toaster('Failed to add expense', 'error')
-        } finally{
+        } finally {
             setLoading(false)
         }
     };
@@ -157,17 +141,19 @@ console.log("frontent user Id  : ",userId)
                             </SelectContent>
                         </Select>
 
-                        <Select>
+                        <Select onValueChange={(value) => handleChange({ target: { name: 'category', value } } as any)}>
                             <SelectTrigger>
-                                <SelectValue placeholder="Category" />
+                                <SelectValue placeholder="Select category" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="food">Food</SelectItem>
-                                <SelectItem value="transport">Transport</SelectItem>
-                                <SelectItem value="entertainment">Entertainment</SelectItem>
-                                <SelectItem value="utilities">Utilities</SelectItem>
+                                {categories.map((cat) => (
+                                    <SelectItem key={cat.id} value={cat.name}>
+                                        {cat.name}
+                                    </SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
+
 
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -175,7 +161,7 @@ console.log("frontent user Id  : ",userId)
                                 className="pl-10"
                                 placeholder="Search expenses..."
                                 value={searchQuery}
-                                onChange={(e)=>setSearchQuery(e.target.value)}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
                     </div>
@@ -184,7 +170,7 @@ console.log("frontent user Id  : ",userId)
                 {/* Main Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left Column - Expense List */}
-                    <div className="lg:col-span-2 space-y-6">   
+                    <div className="lg:col-span-2 space-y-6">
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between">
                                 <CardTitle>Expenses</CardTitle>
@@ -234,12 +220,14 @@ console.log("frontent user Id  : ",userId)
                                                         <SelectValue placeholder="Select category" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="food">Food</SelectItem>
-                                                        <SelectItem value="transport">Transport</SelectItem>
-                                                        <SelectItem value="entertainment">Entertainment</SelectItem>
-                                                        <SelectItem value="utilities">Utilities</SelectItem>
+                                                        {categories.map((cat) => (
+                                                            <SelectItem key={cat.id} value={cat.name}>
+                                                                {cat.name}
+                                                            </SelectItem>
+                                                        ))}
                                                     </SelectContent>
                                                 </Select>
+
                                             </div>
                                             <div className="grid gap-2">
                                                 <label>Description</label>
@@ -268,9 +256,9 @@ console.log("frontent user Id  : ",userId)
                                             <TableHead className="text-right">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
-                                        {loading ? (
-                                            <Loading/>
-                                        ):(
+                                    {loading ? (
+                                        <Loading />
+                                    ) : (
                                         <TableBody>
                                             {expenses.map((expense) => (
                                                 <TableRow key={expense.id}>
@@ -291,7 +279,7 @@ console.log("frontent user Id  : ",userId)
                                                 </TableRow>
                                             ))}
                                         </TableBody>
-                                        )}
+                                    )}
                                 </Table>
                             </CardContent>
                         </Card>
