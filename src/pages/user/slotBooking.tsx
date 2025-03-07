@@ -292,7 +292,7 @@ const SlotBooking: React.FC = () => {
                   </button>
                 </div>
                 <Elements stripe={stripePromise} options={{ clientSecret: paymentIntent.clientSecret }}>
-                  <PaymentForm
+                  <PaymentForm            
                     clientSecret={paymentIntent.clientSecret}
                     onSuccess={handlePaymentSuccess}
                   />
