@@ -11,12 +11,11 @@ const LandingPage = () => {
               <Wallet className="h-8 w-8 text-emerald-600" />
               <span className="text-2xl font-bold text-gray-900">ExpenX</span>
             </div>
-            <div className="flex gap-4">
-              <a href="/login" className="text-gray-600 hover:text-gray-900 px-3 py-2">Login</a>
-              <a href="/register" className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
-                Signup
-              </a>
-            </div>
+
+            <a href="/advisor" className="inline-flex items-center gap-2 bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 transition-colors text-lg font-medium">
+              Start as a Financial advisor
+              <ChevronRight className="h-5 w-5" />
+            </a>
           </div>
         </nav>
 
@@ -28,10 +27,11 @@ const LandingPage = () => {
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
               Effortlessly manage shared expenses, track group spending, and maintain crystal-clear financial relationships with friends and roommates.
             </p>
-            <a href="/advisor" className="inline-flex items-center gap-2 bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 transition-colors text-lg font-medium">
-              Start as a Financial advisor
-              <ChevronRight className="h-5 w-5" />
-            </a>
+            <div className=" p-4 rounded-lg flex items-center justify-center gap-4">
+              <a href="/login" className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">Login</a>
+              <span className="text-emerald-600">or</span>
+              <a href="/register" className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">Signup</a>
+            </div>
           </div>
         </div>
       </header>
@@ -152,7 +152,7 @@ const LandingPage = () => {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-gray-800 text-center">
-          <p>© 2024 ExpenX. All rights reserved.</p>
+          <p>© 2025 ExpenX. All rights reserved.</p>
         </div>
       </footer>
     </div>
