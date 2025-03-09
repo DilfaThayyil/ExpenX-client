@@ -5,13 +5,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
-import { Progress } from "@/components/ui/progress";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Plus, Search, Calendar as CalendarIcon, Edit, Trash2, Download, } from 'lucide-react';
 import { format } from 'date-fns';
 import Layout from '@/layout/Sidebar';
-import { getExpenses, createExpense, getCategories } from '../../services/user/userService'
+import { getExpenses, createExpense, getCategories, exportExpense } from '../../services/user/userService'
 import useShowToast from '@/customHook/showToaster';
 import Loading from '@/style/loading';
 import Store from '../../store/store'
@@ -118,7 +118,54 @@ const Expenses = () => {
         }
     };
 
-    const totalExpenses = expenses.reduce((acc, expense) => acc + expense.amount, 0);
+    const [isExporting, setIsExporting] = useState(false);
+
+    const handleExportData = async (format: string) => {
+        try {
+          setIsExporting(true);
+          const response = await exportExpense(userId, format);
+          console.log("Response received:", response);
+          if (!response || response.status !== 200) {
+            const errorMessage = response?.data?.message || 'Failed to export data';
+            throw new Error(errorMessage);
+          }
+          const blob = await response.data;
+          if (!blob || blob.size === 0) {
+            throw new Error('Received empty data from server');
+          }
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = `expense-report.${format}`;
+          document.body.appendChild(a);
+          a.click()
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+          Toaster(`Expense report exported as ${format.toUpperCase()} successfully`,'success');
+        } catch (error) {
+          console.error("Error exporting data:", error);
+          Toaster(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`,'error');
+        } finally {
+          setIsExporting(false);
+        }
+      };
+
+
+    const totalAmount = expenses.reduce((acc, expense) => acc + expense.amount, 0);
+    const largestAmount = Math.max(...expenses.map((expense) => expense.amount))
+    const expensesByDate: Record<string, number> = {};
+
+    expenses.forEach(expense => {
+        const date = new Date(expense.date).toISOString().split("T")[0];
+        expensesByDate[date] = (expensesByDate[date] || 0) + expense.amount;
+    });
+
+    const totalDays = Object.keys(expensesByDate).length;
+    const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const averageDailyExpense = totalDays > 0 ? (total / totalDays).toFixed(2) : "0.00";
+
+
 
     return (
         <Layout role='user'>
@@ -296,30 +343,30 @@ const Expenses = () => {
                             <CardContent>
                                 <div className="space-y-4">
                                     <div>
-                                        <p className="text-sm text-gray-600">Total Expenses</p>
-                                        <p className="text-3xl font-bold text-emerald-600">${totalExpenses.toFixed(2)}</p>
+                                        <p className="text-sm text-gray-600">Total Amount</p>
+                                        <p className="text-3xl font-bold text-emerald-600">${totalAmount.toFixed(2)}</p>
                                     </div>
-                                    <div>
+                                    {/* <div>
                                         <p className="text-sm text-gray-600">Monthly Budget</p>
                                         <Progress value={65} className="h-2 mt-2" />
                                         <p className="text-sm text-gray-600 mt-1">
                                             65% of budget used
                                         </p>
-                                    </div>
+                                    </div> */}
                                     <div className="pt-4 border-t">
                                         <p className="text-sm font-medium">Quick Stats</p>
                                         <div className="mt-2 space-y-2">
                                             <div className="flex justify-between">
                                                 <span className="text-gray-600">Average Daily</span>
-                                                <span className="font-medium">$48.50</span>
+                                                <span className="font-medium">${averageDailyExpense}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">Largest Expense</span>
-                                                <span className="font-medium">$85.50</span>
+                                                <span className="text-gray-600">Largest Amount</span>
+                                                <span className="font-medium">${largestAmount}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">Total Transactions</span>
-                                                <span className="font-medium">12</span>
+                                                <span className="text-gray-600">Total Expenses</span>
+                                                <span className="font-medium">{expenses.length}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -328,9 +375,25 @@ const Expenses = () => {
                         </Card>
 
                         {/* Export Data */}
-                        <Button className="w-full" variant="outline">
-                            <Download className="mr-2 h-4 w-4" /> Export Data
-                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button className="w-full" variant="outline" disabled={isExporting}>
+                                    <Download className="mr-2 h-4 w-4" />
+                                    {isExporting ? 'Exporting...' : 'Export Data'}
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem onClick={() => handleExportData('pdf')}>
+                                    Export as PDF
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleExportData('csv')}>
+                                    Export as CSV
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleExportData('excel')}>
+                                    Export as Excel
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
             </div>

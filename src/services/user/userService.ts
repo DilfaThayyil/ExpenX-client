@@ -199,3 +199,19 @@ export const getDashboardData = async(userId:string)=>{
     throw err
   }
 }
+
+export const exportExpense = async(userId: string, format: string) => {
+  try {
+    console.log(`Requesting export for user ${userId} in ${format} format`);
+    const response = await axiosInstance.get(
+      `${BASEURL}/exportExpense/${userId}?format=${format}`,
+      { responseType: 'blob' } 
+    );
+    console.log("Response status:", response.status);
+    console.log("Response headers:", response.headers);
+    return response;
+  } catch(err) {
+    console.error("Export service error:", err);
+    throw err;
+  }
+}
