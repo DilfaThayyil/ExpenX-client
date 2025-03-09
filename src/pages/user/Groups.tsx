@@ -342,25 +342,33 @@ const GroupsPage = () => {
                                     <div className="mb-6">
                                         <h3 className="text-lg font-semibold mb-4">Members</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {selectedGroup.members.map((member) => (
-                                                <div key={member.email} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                                    <div className="flex items-center gap-3">
-                                                        <Avatar>
-                                                            <AvatarImage src={member.avatar} alt={member.name} />
-                                                            <AvatarFallback>{member.name}</AvatarFallback>
-                                                        </Avatar>
-                                                        <div>
-                                                            <p className="font-medium">{member.name}</p>
-                                                            <p className="text-sm text-gray-600">
-                                                                Paid: ${member.paid}
-                                                            </p>
+                                            {selectedGroup.members.map((member) => {
+                                                const totalPaid = selectedGroup.expenses
+                                                    .filter((expense) => expense.paidBy === member.email)
+                                                    .reduce((sum, expense) => sum + expense.totalAmount, 0);
+                                                const totalOwed = selectedGroup.expenses.reduce((sum, expense) => {
+                                                    const split = expense.splits.find((s) => s.user === member.email);
+                                                    return sum + (split ? split.amountOwed : 0);
+                                                }, 0);
+                                                return (
+                                                    <div key={member.email} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                        <div className="flex items-center gap-3">
+                                                            <Avatar>
+                                                                <AvatarImage src={member.avatar} alt={member.name} />
+                                                                <AvatarFallback>{member.name}</AvatarFallback>
+                                                            </Avatar>
+                                                            <div>
+                                                                <p className="font-medium">{member.name}</p>
+                                                                <p className="text-sm text-gray-600">Paid: ${totalPaid}</p>
+                                                                <p className="text-sm text-gray-600">Owed: ${Math.ceil(totalOwed)}</p>
+                                                            </div>
                                                         </div>
+                                                        <Badge variant={totalPaid < totalOwed ? "destructive" : "secondary"}>
+                                                            {totalPaid < totalOwed ? "Owes" : "Owed"} ${Math.ceil(totalPaid - totalOwed)}
+                                                        </Badge>
                                                     </div>
-                                                    <Badge variant={member.paid < member.owed ? "destructive" : "secondary"}>
-                                                        {member.paid < member.owed ? "Owes" : "Owed"} ${Math.abs(member.paid - member.owed)}
-                                                    </Badge>
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                             <input
                                                 type="text"
                                                 placeholder="Enter email address"
