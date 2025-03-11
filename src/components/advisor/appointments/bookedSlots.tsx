@@ -1,13 +1,9 @@
-// import { XCircle, Video } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Store from '@/store/store'
 import ChatWindow from '@/components/chat/chat'
 import { createChat, fetchChats } from "@/services/chat/chatServices";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-
-
-
 
 interface Booking {
     date: string;
@@ -35,7 +31,7 @@ interface BookedAppointmentsTableProps {
 const BookedAppointmentsTable: React.FC<BookedAppointmentsTableProps> = ({ appointments }) => {
     const navigate = useNavigate();
     const sender = Store((state) => state.user)
-    const  senderId = sender._id
+    const senderId = sender._id
     const [selectedChat, setSelectedChat] = useState<any>(null);
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [chatReceiverId, setChatReceiverId] = useState('');
@@ -90,19 +86,18 @@ const BookedAppointmentsTable: React.FC<BookedAppointmentsTableProps> = ({ appoi
         }
     };
 
-
     const normalizedAppointments: Booking[] = Array.isArray(appointments) ? appointments : appointments ? [appointments] : [];
 
     console.log("**receiverId** : ", chatReceiverId)
 
-
     return (
-        <div>
-            <div className="overflow-x-auto bg-white shadow-lg rounded-lg p-4">
-                <table className="w-full border-collapse border border-gray-200">
+        <div className="w-full">
+            <div className="w-full overflow-x-auto bg-white shadow-lg rounded-lg p-4">
+                <table className="min-w-full border-collapse border border-gray-200">
                     <thead className="bg-gray-100 text-gray-700">
                         <tr>
-                            <th className="px-6 py-3 border-b">Client</th>
+                            <th className="px-6 py-3 border-b">Name</th>
+                            <th className="px-6 py-3 border-b">Email</th>
                             <th className="px-6 py-3 border-b">Date</th>
                             <th className="px-6 py-3 border-b">Time</th>
                             <th className="px-6 py-3 border-b">Location</th>
@@ -110,11 +105,11 @@ const BookedAppointmentsTable: React.FC<BookedAppointmentsTableProps> = ({ appoi
                         </tr>
                     </thead>
                     <tbody>
-
                         {normalizedAppointments.length > 0 && Array.isArray(normalizedAppointments) ? (
                             normalizedAppointments.map((appointment, index) => (
                                 <tr key={appointment._id} className={`border-b ${index % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-100 transition`}>
                                     <td className="px-6 py-3">{appointment.bookedBy.username}</td>
+                                    <td className="px-6 py-3">{appointment.bookedBy.email}</td>
                                     <td className="px-6 py-3">{appointment.date}</td>
                                     <td className="px-6 py-3">{appointment.startTime}</td>
                                     <td className="px-6 py-3">{appointment.location}</td>
@@ -153,9 +148,6 @@ const BookedAppointmentsTable: React.FC<BookedAppointmentsTableProps> = ({ appoi
                     </tbody>
                 </table>
             </div>
-            {/* {isChatOpen && (
-                <ChatWindow handleChat={handleAddChat} receiverId={chatReceiverId} />
-            )} */}
         </div>
     );
 };

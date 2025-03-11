@@ -73,6 +73,8 @@ const SlotTable: React.FC<{
                         <th className="p-4 text-left">Time</th>
                         <th className="p-4 text-left">Fee</th>
                         <th className="p-4 text-left">Status</th>
+                        <th className="p-4 text-left">Location</th>
+                        <th className="p-4 text-left">Duration</th>
                         <th className="p-4 text-left">Actions</th>
                     </tr>
                 </thead>
@@ -87,6 +89,8 @@ const SlotTable: React.FC<{
                                     {slot.status}
                                 </Badge>
                             </td>
+                            <td className="p-4">{slot.location}</td>
+                            <td className="p-4">{slot.duration} minutes</td>
                             <td className="p-4 flex space-x-2">
                                 <Button variant="ghost" size="icon" onClick={() => setSelectedSlot(slot)}>
                                     <Eye className="h-4 w-4" />
@@ -95,7 +99,8 @@ const SlotTable: React.FC<{
                                     <Edit className="h-4 w-4" />
                                 </Button>
                                 <Button variant="ghost" size="icon" onClick={() => setSlotToDelete(slot._id)}>
-                                    <Trash2 className="h-4 w-4" />
+                                    <Trash2 className="text-red-500 h-4 w-4" />
+                                    {/* <p className="text-red-500">Delete</p> */}
                                 </Button>
                             </td>
                         </tr>
