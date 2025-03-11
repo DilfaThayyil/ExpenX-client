@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { manageCategory } from "@/services/admin/adminServices";
 import FormInput from "@/components/InputField";
 import useShowToast from "@/customHook/showToaster";
@@ -16,57 +16,89 @@ interface ModalProps {
   onCategoryAdd: (newCategory: Category) => void;
 }
 
-const CategoryModal: React.FC<ModalProps> = ({ isOpen, closeModal, category, onCategoryUpdate, onCategoryAdd }) => {
-  const [name, setName] = useState(category?.name || "")
-  const Toast = useShowToast()
+const CategoryModal: React.FC<ModalProps> = ({ 
+  isOpen, 
+  closeModal, 
+  category, 
+  onCategoryUpdate, 
+  onCategoryAdd 
+}) => {
+  const [name, setName] = useState("");
+  const Toast = useShowToast();
+
+  useEffect(() => {
+    setName(category?.name || "");
+  }, [category]);
 
   const handleSubmit = async () => {
-    if (category?._id) {
-      try {
+    if (!name.trim()) {
+      Toast("Category name cannot be empty", "error", true);
+      return;
+    }
+  
+    try {
+      if (category?._id) {
         const response = await manageCategory("edit", category._id, name);
-        const updatedCategory = response.data.updatedCategory;
-        onCategoryUpdate(updatedCategory);
-        Toast(`Category edited successfully`, "success", true);
-        closeModal();
-      } catch (error) {
-        console.error("Error editing category:", error);
-      }
-    } else {
-      try {
+        console.log("Edit response:", response);
+        if (response && response.data) {
+          onCategoryUpdate(response.data.updatedCategory || { _id: category._id, name });
+          Toast("Category edited successfully", "success", true);
+          closeModal();
+        } else {
+          throw new Error("Invalid response format");
+        }
+      } else {
         const response = await manageCategory("add", "", name);
-        const newCategory = response.data.newCategory;
-        onCategoryAdd(newCategory);
-        Toast(`Category created successfully`, "success", true);
-        closeModal();
-      } catch (error) {
-        console.error("Error creating category:", error);
+        console.log("Add response:", response); 
+        if (response && response.data) {
+          onCategoryAdd(response.data.newCategory || { _id: "temp-id", name });
+          Toast("Category created successfully", "success", true);
+          closeModal();
+        } else {
+          throw new Error("Invalid response format");
+        }
+      }
+    } catch (error: any) {
+      console.error("Error managing category:", error);
+      if (error.response?.data?.error) {
+        Toast(error.response.data.error, "error", true);
+      } else if (error.message) {
+        Toast(error.message, "error", true);
+      } else {
+        Toast("An unexpected error occurred", "error", true);
       }
     }
   };
-  
 
   return isOpen ? (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg">
-        <h2 className="text-xl">{category ? "Edit" : "Add"} Category</h2>
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+      <div className="bg-white p-6 rounded-lg w-96 max-w-full">
+        <h2 className="text-xl font-semibold mb-4">{category ? "Edit" : "Add"} Category</h2>
 
-        {/* Using the reusable FormInput component */}
         <FormInput
           id="categoryName"
           name="categoryName"
           type="text"
-          label="Category"
+          label="Category Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
 
-        <button className="bg-blue-500 text-white px-4 py-2 rounded mt-3" onClick={handleSubmit}>
-          Save
-        </button>
-        <button className="ml-2 text-red-500" onClick={closeModal}>
-          Cancel
-        </button>
+        <div className="flex justify-end mt-6">
+          <button 
+            className="bg-gray-300 text-gray-700 px-4 py-2 rounded mr-2 hover:bg-gray-400" 
+            onClick={closeModal}
+          >
+            Cancel
+          </button>
+          <button 
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" 
+            onClick={handleSubmit}
+          >
+            Save
+          </button>
+        </div>
       </div>
     </div>
   ) : null;

@@ -1,7 +1,7 @@
-import DataTable from "@/components/admin/DataTable";   
+import DataTable from "@/components/admin/DataTable";
 import { fetchCategories, manageCategory } from "@/services/admin/adminServices";
-import { useState } from "react";
-import CategoryModal from "@/components/modals/categoryModal"; 
+import { useState,useEffect } from "react";
+import CategoryModal from "@/components/modals/categoryModal";
 import Layout from "@/layout/Sidebar";
 
 interface Category {
@@ -10,6 +10,7 @@ interface Category {
 }
 
 const CategoryTable = () => {
+  const [categories, setCategories] = useState<Category[]>([]);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
@@ -17,7 +18,22 @@ const CategoryTable = () => {
     { header: "Category Name", accessor: (item: Category) => item.name },
   ];
 
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
+  const fetchCategories = async () => {
+    try {
+      const response = await fetchCategories()
+      setCategories(response.categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const handleCategoryAdd = (newCategory: Category) => {
+    setCategories((prevCategory)=>[...prevCategory,newCategory])
+  };
 
   const actions = (item: Category) => (
     <div className="flex gap-2">
@@ -47,34 +63,36 @@ const CategoryTable = () => {
   return (
     <Layout role='admin'>
 
-        <div>
+      <div>
         <button
-            className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded mb-4"
-            onClick={() => {
+          className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded mb-4"
+          onClick={() => {
             setEditingCategory(null);
             setModalOpen(true);
-            }}
+          }}
         >
-            Add Category
+          Add Category
         </button>
 
         <DataTable<Category>
-            type="category"
-            fetchFunction={fetchCategories}
-            manageFunction={manageCategory}
-            columns={columns}
-            actions={actions}
-            onEdit={handleEdit}
+          type="category"
+          fetchFunction={fetchCategories}
+          manageFunction={manageCategory}
+          columns={columns}
+          actions={actions}
+          onEdit={handleEdit}
         />
 
         {modalOpen && (
-            <CategoryModal
+          <CategoryModal
             isOpen={modalOpen}
             closeModal={() => setModalOpen(false)}
             category={editingCategory}
-            />
+            onCategoryUpdate={handleEdit}
+            onCategoryAdd={handleCategoryAdd}
+          />
         )}
-        </div>
+      </div>
     </Layout>
   );
 };

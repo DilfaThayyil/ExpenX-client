@@ -83,7 +83,7 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
       console.log("action-id : ", action, "--", id);
       const response = await manageFunction(action, id);
       console.log("response :", response);
-      Toast(`${type} ${action}ed successfully`, "success", true);
+      Toast(`${type} ${action}d successfully`, "success", true);
   
       if (action === "delete") {
         setData(data.filter((item: any) => item._id !== id));
