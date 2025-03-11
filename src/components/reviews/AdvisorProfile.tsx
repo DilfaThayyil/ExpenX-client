@@ -1,5 +1,5 @@
-import React from 'react';
 import { FaBriefcase, FaStar, FaCalendarAlt } from 'react-icons/fa';
+import {useNavigate} from 'react-router-dom'
 import ReviewsList from './ReviewsList';
 import './AdvisorProfile.css'
 
@@ -21,6 +21,7 @@ const AdvisorProfile: React.FC<AdvisorProfileProps> = ({
   currentUserId,
   isOwnProfile
 }) => {
+  const navigate = useNavigate()
   return (
     <div className="advisor-profile-container max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       {/* Profile Header with gradient background */}
@@ -30,7 +31,7 @@ const AdvisorProfile: React.FC<AdvisorProfileProps> = ({
           {/* Advisor Photo */}
           <div className="advisor-photo-container mr-6">
             <img 
-              src={advisor.profilePic} 
+              src={advisor.profilePic || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80'} 
               alt={advisor.username} 
               className="advisor-photo w-32 h-32 rounded-full border-4 border-white shadow-md object-cover"
             />
@@ -79,7 +80,7 @@ const AdvisorProfile: React.FC<AdvisorProfileProps> = ({
             <div className="availability-info text-gray-700">
               <p className="mb-2">Monday - Friday</p>
               <p className="font-medium">9:00 AM - 5:00 PM</p>
-              <button className="mt-4 w-full bg-emerald-500 hover:bg-green-700 text-white py-2 px-4 rounded transition duration-200">
+              <button onClick={()=>navigate("/slotBooking")} className="mt-4 w-full bg-emerald-500 hover:bg-green-700 text-white py-2 px-4 rounded transition duration-200">
                 Schedule Meeting
               </button>
             </div>

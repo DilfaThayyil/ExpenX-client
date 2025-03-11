@@ -28,7 +28,7 @@ interface Slot {
   _id: string;
   date: string;
   startTime: string;
-  endTime: string;
+  fee: number;
   duration: number;
   maxBookings: number;
   status: 'Available' | 'Booked' | 'Cancelled';
@@ -65,7 +65,7 @@ const SlotBooking: React.FC = () => {
   const fetchSlot = async () => {
     try {
       const response = await fetchSlotsByUser(userId, currentPage, ITEMS_PER_PAGE);
-      console.log("response : ",response)
+      console.log("response : ", response)
       setSlots(response.data.slots);
       setTotalPages(response.data.totalPages);
     } catch (err) {
@@ -97,7 +97,7 @@ const SlotBooking: React.FC = () => {
           selectedSlot,
           userId,
           advisorId,
-          100
+          50
         )
         console.log("response : ", response)
         setPaymentIntent(response);
@@ -173,74 +173,91 @@ const SlotBooking: React.FC = () => {
               <div className="overflow-x-auto rounded-lg">
                 {slots.length > 0 ? (
                   <div className="min-w-full">
-                    <table className="w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
+                    <table className="w-full border-collapse bg-white shadow-lg rounded-lg overflow-hidden">
+                      <thead className="bg-gray-100 border-b">
                         <tr>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Date</th>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Time</th>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Duration</th>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Location</th>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Status</th>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Action</th>
+                          {["Advisor", "Date", "Time", "Fee", "Duration", "Location", "Status", "Action"].map((header) => (
+                            <th key={header} className="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase">
+                              {header}
+                            </th>
+                          ))}
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody className="divide-y divide-gray-200">
                         {slots.map((slot) => (
-                          <tr key={slot._id} className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{slot.date}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                              {slot.startTime}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{slot.duration} mins</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{slot.location}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center space-x-2">
-                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                                  ${slot.status === 'Available'
-                                    ? 'bg-green-100 text-green-800'
-                                    : slot.status === 'Booked'
-                                      ? 'bg-blue-100 text-blue-800'
-                                      : 'bg-red-100 text-red-800'}`}>
-                                  {slot.status}
-                                </span>
-                                {/* {slot.status === 'Booked' && (
-                                  <button
-                                    className="p-2 bg-green-500 rounded-full hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                                    title='Start Messaging'
-                                    onClick={() => {
-                                      const advisorId = slot.advisorId;
-                                      console.log("**advisorId** : ", advisorId)
-                                      setChatReceiverId(advisorId);
-                                      setIsChatOpen(true);
-                                    }}>
-                                    <MessageCircle className="h-4 w-4 text-white" strokeWidth={2.5} />
-                                  </button>
-                                )} */}
+                          <tr key={slot._id} className="hover:shadow-md transition-shadow bg-white rounded-lg border border-gray-200 my-3">
+                            {/* Advisor */}
+                            <td className="px-6 py-4 text-sm text-gray-700 flex items-center gap-3">
+                              <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                <span className="text-gray-600 font-medium">{slot.advisorId.username.charAt(0)}</span>
                               </div>
+                              {slot.advisorId.username}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+
+                            {/* Date */}
+                            <td className="text-sm text-gray-700">{slot.date}</td>
+
+                            {/* Time */}
+                            <td className="px-6 py-4 text-sm text-gray-700">
+                              <span className="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                                {slot.startTime}
+                              </span>
+                            </td>
+
+                            {/* Fee */}
+                            <td className="px-6 py-4 text-sm text-gray-700 font-semibold">
+                              <span className="px-3 py-1 rounded-md bg-green-100 text-green-800">
+                                ${slot.fee}
+                              </span>
+                            </td>
+
+                            {/* Duration */}
+                            <td className="px-6 py-4 text-sm text-gray-700">
+                              <span className="px-3 py-1 rounded-md bg-purple-100 text-purple-800">
+                                {slot.duration} m
+                              </span>
+                            </td>
+
+                            {/* Location */}
+                            <td className="px-6 py-4 text-sm text-gray-700">{slot.location}</td>
+
+                            {/* Status */}
+                            <td className="px-6 py-4 text-sm">
+                              <span className={`px-3 py-1 rounded-full text-xs font-semibold
+            ${slot.status === "Available" ? "bg-green-100 text-green-800" :
+                                  slot.status === "Booked" ? "bg-blue-100 text-blue-800" :
+                                    "bg-red-100 text-red-800"}
+          `}>
+                                {slot.status}
+                              </span>
+                            </td>
+
+                            {/* Action Button */}
+                            <td className="px-6 py-4">
                               <button
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors
-    ${slot.status === 'Available'
-                                    ? 'bg-green-600 text-white hover:bg-green-700'
-                                    : slot.status === 'Booked'
-                                      ? 'bg-red-600 text-white hover:bg-red-700'
-                                      : 'bg-gray-600 text-white hover:bg-gray-700'}`}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors 
+            ${slot.status === "Available"
+                                    ? "bg-green-600 text-white hover:bg-green-700"
+                                    : slot.status === "Booked"
+                                      ? "bg-red-600 text-white hover:bg-red-700"
+                                      : "bg-gray-600 text-white hover:bg-gray-700"
+                                  }`}
                                 onClick={() =>
-                                  slot.status === 'Available'
+                                  slot.status === "Available"
                                     ? handleBookSlot(slot._id)
-                                    : advisorReport?.status === 'pending'
+                                    : advisorReport?.status === "pending"
                                       ? null
                                       : setIsReportModalOpen(true)
                                 }
-                                disabled={slot.status === 'Cancelled'}
+                                disabled={slot.status === "Cancelled"}
                               >
-                                {slot.status === 'Available'
-                                  ? 'Book Now'
-                                  : slot.status === 'Booked'
-                                    ? 'Report'
-                                    : 'Cancelled'}
+                                {slot.status === "Available"
+                                  ? "Book Now"
+                                  : slot.status === "Booked"
+                                    ? "Report"
+                                    : "Cancelled"}
                               </button>
+
                               {isReportModalOpen && (
                                 <ReportModal
                                   isOpen={isReportModalOpen}
@@ -256,6 +273,7 @@ const SlotBooking: React.FC = () => {
                         ))}
                       </tbody>
                     </table>
+
                   </div>
 
                 ) : (
@@ -292,7 +310,7 @@ const SlotBooking: React.FC = () => {
                   </button>
                 </div>
                 <Elements stripe={stripePromise} options={{ clientSecret: paymentIntent.clientSecret }}>
-                  <PaymentForm            
+                  <PaymentForm
                     clientSecret={paymentIntent.clientSecret}
                     onSuccess={handlePaymentSuccess}
                   />

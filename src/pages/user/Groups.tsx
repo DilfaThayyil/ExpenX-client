@@ -347,7 +347,7 @@ const GroupsPage = () => {
                                                     .filter((expense) => expense.paidBy === member.email)
                                                     .reduce((sum, expense) => sum + expense.totalAmount, 0);
                                                 const totalOwed = selectedGroup.expenses.reduce((sum, expense) => {
-                                                    const split = expense.splits.find((s) => s.user === member.email);
+                                                    const split = expense?.splits?.find((s: { user: string; }) => s.user === member.email);
                                                     return sum + (split ? split.amountOwed : 0);
                                                 }, 0);
                                                 return (

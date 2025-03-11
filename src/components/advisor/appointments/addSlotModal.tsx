@@ -7,7 +7,7 @@ interface Slot {
   _id: string;
   date: string;
   startTime: string;
-  endTime: string;
+  fee: number;
   duration: number;
   maxBookings: number;
   status: "Available" | "Booked" | "Cancelled";
@@ -26,7 +26,7 @@ const SlotCreationModal: React.FC<{
     _id: existingSlot?._id || "",
     date: existingSlot?.date || "",
     startTime: existingSlot?.startTime || "",
-    endTime: existingSlot?.endTime || "",
+    fee: existingSlot?.fee || 50,
     duration: existingSlot?.duration || 30,
     maxBookings: existingSlot?.maxBookings || 1,
     status: existingSlot?.status || "Available",
@@ -46,23 +46,18 @@ const SlotCreationModal: React.FC<{
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
-    setSlotData({ ...slotData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setSlotData((prevData) => ({
+      ...prevData,
+      [name]: name === "maxBookings" ? Math.max(1, Number(value)) : value, 
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic validation
-    if (!slotData.date || !slotData.startTime || !slotData.endTime) {
+    if (!slotData.date || !slotData.startTime || !slotData.maxBookings || !slotData.description || !slotData.location || !slotData.status) {
       message.error("Please fill in all required fields.");
-      return;
-    }
-
-    // Validate time
-    const start = new Date(`1970-01-01T${slotData.startTime}:00`);
-    const end = new Date(`1970-01-01T${slotData.endTime}:00`);
-    if (start >= end) {
-      message.error("Start time must be before end time.");
       return;
     }
 
@@ -108,23 +103,21 @@ const SlotCreationModal: React.FC<{
               required
             />
             <FormInput
-              id="endTime"
-              name="endTime"
-              type="time"
-              label="End Time"
-              value={slotData.endTime}
+              id="fee"
+              name="fee"
+              type="number"
+              label="Advisor Fee"
+              value="50"
               onChange={handleChange}
-              required
             />
-            <select
+            <FormInput
+              id="duration"
               name="duration"
-              value={slotData.duration}
+              type="number"
+              label="duration"
+              value="1"
               onChange={handleChange}
-              className="w-full border p-2"
-            >
-              <option value={30}>30 min</option>
-              <option value={60}>1 hour</option>
-            </select>
+            />
             <FormInput
               id="maxBookings"
               name="maxBookings"

@@ -29,7 +29,7 @@ interface Slot {
     _id: string;
     date: string;
     startTime: string;
-    endTime: string;
+    fee: number;
     duration: number;
     maxBookings: number;
     status: 'Available' | 'Booked' | 'Cancelled';
@@ -70,8 +70,8 @@ const SlotTable: React.FC<{
                 <thead className="bg-gray-100">
                     <tr>
                         <th className="p-4 text-left">Date</th>
-                        <th className="p-4 text-left">Start Time</th>
-                        <th className="p-4 text-left">End Time</th>
+                        <th className="p-4 text-left">Time</th>
+                        <th className="p-4 text-left">Fee</th>
                         <th className="p-4 text-left">Status</th>
                         <th className="p-4 text-left">Actions</th>
                     </tr>
@@ -81,7 +81,7 @@ const SlotTable: React.FC<{
                         <tr key={slot._id} className="border-b">
                             <td className="p-4">{slot.date}</td>
                             <td className="p-4">{slot.startTime}</td>
-                            <td className="p-4">{slot.endTime}</td>
+                            <td className="p-4">{slot.fee}</td>
                             <td className="p-4">
                                 <Badge variant="secondary" className={getStatusColor(slot.status)}>
                                     {slot.status}
@@ -133,8 +133,8 @@ const SlotTable: React.FC<{
                                             <p className="text-sm">{selectedSlot.startTime}</p>
                                         </div>
                                         <div>
-                                            <p className="text-sm font-medium text-gray-500">End Time</p>
-                                            <p className="text-sm">{selectedSlot.endTime}</p>
+                                            <p className="text-sm font-medium text-gray-500">Fee</p>
+                                            <p className="text-sm">{selectedSlot.fee}</p>
                                         </div>
                                     </div>
                                     

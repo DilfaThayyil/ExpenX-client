@@ -6,7 +6,7 @@ interface Slot {
   id?: string;
   date: string;
   startTime: string;
-  endTime: string;
+  fee: number;
   duration: number;
   maxBookings: number;
   status: 'Available' | 'Booked' | 'Cancelled';
