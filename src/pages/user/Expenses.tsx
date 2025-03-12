@@ -40,13 +40,11 @@ const Expenses = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
     const userId = Store((state) => state.user._id)
-    console.log("frontent user Id  : ", userId)
 
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const data = await getCategories();
-                console.log("data-categories : ", data)
                 setCategories(data);
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -62,9 +60,7 @@ const Expenses = () => {
                     console.error('User ID is not defined.');
                     return;
                 }
-                console.log("type of userId : ", typeof userId)
                 const data = await getExpenses(userId)
-                console.log("data : ", data)
                 setExpenses(data)
             } catch (error) {
                 console.error('Error fetching expenses:', error);
@@ -105,7 +101,6 @@ const Expenses = () => {
         setLoading(true)
         try {
             const newExpense = await createExpense(formData, userId)
-            console.log("newExpense : ", newExpense.data)
             setExpenses((prev) => [...prev, newExpense.data])
             Toaster('Expense added successfully!', 'success');
             setFormData({ date: new Date(), amount: 0, category: '', description: '' });
@@ -124,7 +119,6 @@ const Expenses = () => {
         try {
           setIsExporting(true);
           const response = await exportExpense(userId, format);
-          console.log("Response received:", response);
           if (!response || response.status !== 200) {
             const errorMessage = response?.data?.message || 'Failed to export data';
             throw new Error(errorMessage);

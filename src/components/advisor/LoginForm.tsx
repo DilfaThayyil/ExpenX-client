@@ -71,7 +71,6 @@ const AdvisorLogin: React.FC = () => {
       if (response.message) {
         setUser(response.user2)
         toast.success(response.message);
-        console.log("response-user :",response.user2)
         setTimeout(() => navigate("/advisor/home"), 1000);
       } else if (response.error) {
         toast.error(response.error || "Login failed");

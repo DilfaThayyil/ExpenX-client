@@ -1,14 +1,7 @@
 // src/components/dashboard/Header.tsx
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Bell, ChevronDown } from 'lucide-react';
+
 
 interface HeaderProps {
   username: string;
@@ -37,21 +30,10 @@ const Header: React.FC<HeaderProps> = ({ username }) => {
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <Button variant="outline" size="icon">
+        {/* <Button variant="outline" size="icon">
           <Bell className="h-5 w-5" />
-        </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <ChevronDown className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">Logout</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        </Button> */}
+        
       </div>
     </div>
   );

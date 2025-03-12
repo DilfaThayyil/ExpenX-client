@@ -71,7 +71,6 @@ const GroupsPage = () => {
                     return
                 }
                 const response = await getUserGroups(userId)
-                console.log("fetchGroups--response : ", response)
                 if (Array.isArray(response)) {
                     setGroups(response)
                 } else {
@@ -87,9 +86,6 @@ const GroupsPage = () => {
     }, [email, refreshGroups])
 
     const handleAddMember = async () => {
-        console.log("GroupMembers : ", newGroup.members)
-        console.log("addignMember : ", member)
-        console.log("groupId : ", selectedGroup?._id)
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(member)) {
             setMemberError("Please enter a valid email address");
@@ -139,7 +135,6 @@ const GroupsPage = () => {
         setLoading(true)
         try {
             const response = await createGroup(userId, newGroup.name, newGroup.members)
-            console.log("response : ", response)
             Toaster('Group creation successful', 'success')
             setNewGroup({ name: '', members: [] })
             setIsDialogOpen(false)
@@ -153,8 +148,6 @@ const GroupsPage = () => {
     }
 
     const handleAddExpense = async (expense: GroupExpense) => {
-        console.log("selectedGroup : ", selectedGroup)
-        console.log("expense : ", expense)
         if (!selectedGroup) {
             Toaster("Please select a group first.", "error");
             return;
@@ -162,7 +155,6 @@ const GroupsPage = () => {
         setLoading(true);
         try {
             const response = await addExpenseInGroup(selectedGroup._id, { ...expense });
-            console.log("response : ", response)
             if (response.success) {
                 Toaster(response.message, "success");
                 setRefreshGroups((prev) => !prev);

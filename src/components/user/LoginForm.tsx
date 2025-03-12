@@ -67,8 +67,6 @@ const LoginPage = () => {
     try {
       const response = await userLogin(formData.email, formData.password);
       if (response.message) {
-        console.log("response-msg in loginForm : ",response.message)
-        console.log("response-user2 : ",response.user2)
         setUser(response.user2)
         toastr.success(response.message);
         setTimeout(() => navigate("/home"), 1000);

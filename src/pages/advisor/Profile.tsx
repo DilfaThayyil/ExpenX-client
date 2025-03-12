@@ -11,7 +11,6 @@ import FormInput from '@/components/InputField';
 import useShowToast from '@/customHook/showToaster';
 import { updateUser, uploadImageToCloudinary } from '@/services/advisor/advisorService';
 import { getReviewsForAdvisor,addReplyToReview } from '@/services/review/reviewServices'
-import { advisorLogout } from '@/services/advisor/AuthServices'
 import Loading from '@/style/loading';
 import ReplyItem from '@/components/reviews/ReplyItem';
 import ReplyForm from '@/components/reviews/ReplyForm';
@@ -65,7 +64,6 @@ const ProfileAd = () => {
   const fetchReviews = async () => {
     try {
       const response = await getReviewsForAdvisor(user._id)
-      console.log('response : ', response)
       setFeedbacks(response.data);
     } catch (error) {
       console.error("Error fetching advisors:", error);
@@ -110,7 +108,6 @@ const ProfileAd = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("form data : ", formData)
     setFormSubmitted(true)
     const errors = validateForm()
     if (errors.length > 0) {
@@ -126,9 +123,7 @@ const ProfileAd = () => {
       if (profilePic) {
         const formData = new FormData();
         formData.append('profilePic', profilePic);
-        console.log("profilePic : ", profilePic)
         const response = await uploadImageToCloudinary(formData);
-        console.log("response : ", response)
         imageUrl = response.url;
         setLoading(false)
       }
@@ -141,11 +136,9 @@ const ProfileAd = () => {
         country: formData.country,
         language: formData.language,
       });
-      console.log("updatedUser : ", updatedUser)
       Toaster('Profile updated successfully!', 'success', true);
       // Store.setState({ user: updatedUser });
       Store.getState().setUser(updatedUser);
-      console.log("Updated User in Store:", Store.getState().user);
       setFormData({
         username: '',
         phone: '',
@@ -164,7 +157,6 @@ const ProfileAd = () => {
   const handleReplySubmit = async (reviewId: string, text: string) => {
     try {
       const response = await addReplyToReview(user._id,reviewId, text);
-      console.log("response : ",response)
       setShowReplyForm(null);
       fetchReviews();
     } catch (error) {
@@ -189,12 +181,7 @@ const ProfileAd = () => {
     return Math.floor((completedFields.length / fields.length) * 100);
   };
 
-  const handleLogout = async () => {
-    await advisorLogout()
-    Store.getState().clearUser();  // Clears user from Zustand store
-    localStorage.removeItem('user'); // Removes user from local storage
-    window.location.href = '/advisor/login'; // Redirect to login page
-  };
+ 
 
 
   return (
@@ -337,13 +324,6 @@ const ProfileAd = () => {
 
         </div>
 
-        <Button
-          variant="destructive"
-          className="fixed bottom-5 right-5 p-4 rounded-full shadow-lg"
-          onClick={handleLogout}
-        >
-          <LogOut className="h-5 w-5" />
-        </Button>
 
         {/* Edit Profile Drawer */}
         {isDrawerOpen && (

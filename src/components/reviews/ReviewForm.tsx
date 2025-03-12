@@ -28,9 +28,7 @@ const  ReviewForm: React.FC<ReviewFormProps> = ({ advisorId, onReviewAdded }) =>
     setIsSubmitting(true);
     setError(null);
     try {
-      console.log("handleSubmit-data : ",advisorId," ==> ",user._id," ==> ",rating," ==> ",reviewText)
       const res = await createReview(advisorId,user._id,rating,reviewText);
-      console.log("response : ",res)
       setRating(0);
       setReviewText('');
       onReviewAdded();

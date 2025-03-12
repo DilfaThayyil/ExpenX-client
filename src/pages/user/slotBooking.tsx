@@ -65,7 +65,6 @@ const SlotBooking: React.FC = () => {
   const fetchSlot = async () => {
     try {
       const response = await fetchSlotsByUser(userId, currentPage, ITEMS_PER_PAGE);
-      console.log("response : ", response)
       setSlots(response.data.slots);
       setTotalPages(response.data.totalPages);
     } catch (err) {
@@ -90,16 +89,13 @@ const SlotBooking: React.FC = () => {
     try {
       if (selectedSlot) {
         const advisorId = slots.find(slot => slot._id === selectedSlot)?.advisorId._id;
-        console.log("1 paymentInitiate - parameters : ", selectedSlot, userId, advisorId, 100)
         if (!advisorId) throw new Error("Advisor ID not found");
-        console.log("2 paymentInitiate - parameters : ", selectedSlot, userId, advisorId, 100)
         const response = await paymentInitiate(
           selectedSlot,
           userId,
           advisorId,
           50
         )
-        console.log("response : ", response)
         setPaymentIntent(response);
         setIsPayModal(false)
       }
@@ -117,7 +113,6 @@ const SlotBooking: React.FC = () => {
       }
     })
     const advisorArray = Array.from(uniqueAdvisors.values())
-    console.log("Unique Advisors : ", advisorArray)
     setAdvisorList(advisorArray)
     setShowChat(true)
   }

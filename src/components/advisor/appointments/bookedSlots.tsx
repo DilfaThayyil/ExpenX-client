@@ -38,16 +38,12 @@ const BookedAppointmentsTable: React.FC<BookedAppointmentsTableProps> = ({ appoi
 
     const handleAddChat = async (chatReceiverId: string) => {
         try {
-            console.log("senderId : ", sender._id)
-            console.log("chatReceiverId : ", chatReceiverId)
             const allChats = await fetchChats(chatReceiverId);
-            console.log("fetchChatss : ", allChats)
             const existingChat = allChats.find(
                 (chat: { user1: string; user2: string; _id: string }) =>
                     (chat.user1 === sender._id && chat.user2 === chatReceiverId) ||
                     (chat.user1 === chatReceiverId && chat.user2 === sender._id)
             );
-            console.log("existingChat : ", existingChat)
             if (existingChat) {
                 handleSelectChat(existingChat);
             } else {
@@ -58,7 +54,6 @@ const BookedAppointmentsTable: React.FC<BookedAppointmentsTableProps> = ({ appoi
                 };
 
                 const res = await createChat(chatDetails);
-                console.log("res-createChat : ", res)
                 if (res?.data?.result) {
                     setSelectedChat(res.data.result);
                 }
@@ -88,7 +83,6 @@ const BookedAppointmentsTable: React.FC<BookedAppointmentsTableProps> = ({ appoi
 
     const normalizedAppointments: Booking[] = Array.isArray(appointments) ? appointments : appointments ? [appointments] : [];
 
-    console.log("**receiverId** : ", chatReceiverId)
 
     return (
         <div className="w-full">

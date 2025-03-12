@@ -10,6 +10,7 @@ import Clients from '@/pages/advisor/Clients';
 import { NotFound } from '@/pages/404/404';
 import AdvisorProtectedRoute from './advisorProtectedRoutes'
 // import PublicRoute from './publicRoute'
+import WithNavbar from '@/layout/withNav'
 
 const AdvisorRoutes = () => {
     return (
@@ -17,17 +18,19 @@ const AdvisorRoutes = () => {
             <Route path="*" element={<NotFound />} />
             <Route path="" element={<AdvisorLanding />} />
             {/* <Route element={<PublicRoute/>}> */}
-                <Route path="register" element={<AdvisorRegister />} />
-                <Route path="login" element={<AdvisorLogin />} />
+            <Route path="register" element={<AdvisorRegister />} />
+            <Route path="login" element={<AdvisorLogin />} />
             {/* </Route> */}
             <Route path="resetPassword" element={<ResetPassword />} />
             <Route element={<AdvisorProtectedRoute />}>
-                <Route path="home" element={<DashboardAd />} />
-                <Route path="profile" element={<ProfileAd />} />
-                <Route path="slotManage" element={<SlotManage />} />
-                <Route path="clients" element={<Clients />} />
+                <Route element={<WithNavbar />}>
+                    <Route path="home" element={<DashboardAd />} />
+                    <Route path="profile" element={<ProfileAd />} />
+                    <Route path="slotManage" element={<SlotManage />} />
+                    <Route path="clients" element={<Clients />} />
+                </Route>
             </Route>
-        </Routes>
+        </Routes >
     );
 };
 

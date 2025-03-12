@@ -36,7 +36,6 @@ export default function DashboardPage() {
     const fetchStats = async () => {
       try {
         const response = await fetchDashboard(advisor._id)
-        console.log("response-stats : ", response)
         setStats({
           totalRevenue: response.totalRevenue,
           activeClients: response.activeClients,
@@ -53,9 +52,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchRevenueData = async () => {
       try {
-        console.log("revenueData : ", advisor._id, ",", timeframe)
         const response = await fetchRevenue(advisor._id, timeframe);
-        console.log(`response-(${timeframe}):`, response);
         setRevenueData({
           [timeframe]: Array.isArray(response) ? response : [{ name: timeframe, revenue: response.revenue }]
         });
@@ -70,7 +67,6 @@ export default function DashboardPage() {
     const fetchClientGoalProgress = async()=>{
       try{
         const response = await fetchClientGoals(advisor._id)
-        console.log("response-clientProgress : ",response)
         setGoalProgress(response.clientGoalProgress)
       }catch(err){
         console.error('Error fetching clientGoalsProgress : ',err)

@@ -50,12 +50,8 @@ const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, 
                 status: "pending",
                 customReason: reason === "Other" ? customReason : undefined,
             };
-            console.log("reportData : ",reportData)
             const response = await reportAdvisor(slotId,reportData);
-            console.log("response-modal:", response);
-
             setReport(response.report);
-
             message.success(response.message);
             setReason("");
             setCustomReason("");
@@ -122,110 +118,3 @@ const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, 
 };
 
 export default ReportModal;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import { useState } from "react";
-// import { X } from "lucide-react";
-// import { message } from "antd";
-// import { reportAdvisor } from "@/services/admin/adminServices";
-
-// interface IReportModalProps {
-//     isOpen: boolean;
-//     onClose: () => void;
-//     advisorId: string | null;
-//     userId: string
-//     setReport: (report:IReport)=>void
-// }
-
-// export interface IReport {
-//     _id: string;
-//     userId: string;
-//     advisorId: string;
-//     reason: string;
-//     status: string;
-//     createdAt: string;
-// }
-
-// const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, userId, setReport }) => {
-//     const [reportReason, setReportReason] = useState<string>("");
-
-//     const handleSubmitReport = async () => {
-//         if (!advisorId || !reportReason.trim()) {
-//             message.error("Please enter a valid reason before submitting.");
-//             return;
-//         }
-//         try {
-//             const response = await reportAdvisor(userId, advisorId, reportReason);
-//             const report = response.report
-//             setReport({
-//                 _id: report._id,
-//                 userId: report.userId,
-//                 advisorId: report.advisorId,
-//                 reason: report.reason,
-//                 status: report.status,
-//                 createdAt: report.createdAt
-//             })
-//             message.success(response.message);
-//             setReportReason("");
-//             onClose();
-//         } catch (err) {
-//             console.error(err);
-//             message.error("Error submitting report");
-//         }
-//     };
-
-//     if (!isOpen) return null;
-
-//     return (
-//         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md z-50 p-4">
-//             <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-2xl w-full max-w-md transition-transform transform scale-100 hover:scale-105 duration-300">
-//                 <div className="flex justify-between items-center mb-4">
-//                     <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">Report Advisor</h2>
-//                     <button onClick={onClose} className="text-gray-500 dark:text-gray-400 hover:text-red-500 transition">
-//                         <X size={22} />
-//                     </button>
-//                 </div>
-
-//                 <textarea
-//                     className="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-3 text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-red-400 focus:border-transparent transition duration-200"
-//                     placeholder="Enter your reason for reporting..."
-//                     value={reportReason}
-//                     onChange={(e) => setReportReason(e.target.value)}
-//                     rows={4}
-//                 />
-
-//                 <div className="mt-5 flex justify-end">
-//                     <button
-//                         onClick={handleSubmitReport}
-//                         className="bg-red-500 text-white px-5 py-2 rounded-lg shadow-md hover:bg-red-600 transition-all duration-300"
-//                     >
-//                         Submit Report
-//                     </button>
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default ReportModal;

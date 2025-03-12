@@ -14,7 +14,6 @@ export default function ClientActivities({ advisorId }: { advisorId: string }) {
     const fetchRecentAppointments = async () => {
       try {
         const response = await fetchRecentClients(advisorId);
-        console.log("response-recentClients:", response);
         const formattedActivities = response.map((slot: any) => ({
           id: slot._id,
           client: slot.bookedBy?.username || "Unknown",

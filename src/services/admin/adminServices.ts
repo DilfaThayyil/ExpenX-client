@@ -11,7 +11,6 @@ export const adminLogin = async (email: string, password: string) => {
        email,
        password 
       })
-    console.log("response in service : ",response.data)
     return response.data;
   } catch (err) {
     const error = err as AxiosError;
@@ -26,7 +25,6 @@ export const fetchUsers = async (page: number, limit: number) => {
   const response = await axiosInstance.get(`${BASEURL}/users`, {
     params: { page, limit },
   });
-  console.log("fetchUsers-response : ",response.data)
   return response.data;
 }
 
@@ -34,15 +32,12 @@ export const fetchAdvisors = async (page: number, limit: number) => {
   const response = await axiosInstance.get(`${BASEURL}/advisors`, {
     params: { page, limit },
   });
-  console.log("fetchAdvisors-reponse : ",response)
   return response.data;
 }
 
 export const updateAdmin = async (name:string,email:string,password:string)=>{
   try{
-    console.log("name : ",name)
-    console.log("email : ",email)
-    console.log("password : ",password)
+
     const response = await axiosInstance.post(`${BASEURL}/updateAdmin`,{
       name,
       email,
@@ -70,7 +65,6 @@ export const fetchCategories = async(page:number,limit:number)=>{
     const response = await axiosInstance.get(`${BASEURL}/categories`,{
       params:{page,limit}
     })
-    console.log("response-data : ",response.data)
     return response.data
   }catch(err){
     console.log(err)
@@ -103,7 +97,6 @@ export const fetchReports = async(page:number,limit:number)=>{
   const reponse = await axiosInstance.get(`${BASEURL}/reports`,{
     params:{page,limit}
   })
-  console.log("res - service : ",reponse.data)
   return reponse.data
 }
 

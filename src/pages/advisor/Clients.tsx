@@ -56,7 +56,6 @@ const Clients: React.FC = () => {
     const fetchBookedSlots = async () => {
       try {
         const response = await getBookedSlotsForAdvisor(advisorId, currentPage, ITEMS_PER_PAGE);
-        console.log("Fetched Booked Slots:", response.data);
 
         const { bookedSlots, totalPages } = response.data;
         setBookedAppointments(Array.isArray(bookedSlots) ? bookedSlots : bookedSlots ? [bookedSlots] : []);
@@ -109,7 +108,6 @@ const Clients: React.FC = () => {
     });
 
     const clientsArray = Array.from(uniqueClients.values());
-    console.log("Unique Clients:", clientsArray);
 
     setClientsList(clientsArray);
     setShowChat(true)

@@ -44,7 +44,6 @@ const AdminDashboard = () => {
           fetchDashboardStats(),
           fetchUserGrowth()
         ]);
-        console.log("response : ", monthlyResponse, " ,, ", categoryResponse, " ,, ", statsResponse, " ,, ", userGrowthResponse)
         setMonthlyData(monthlyResponse);
         setCategoryData(categoryResponse);
         setStats(statsResponse);

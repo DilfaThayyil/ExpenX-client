@@ -39,7 +39,6 @@ const CategoryModal: React.FC<ModalProps> = ({
     try {
       if (category?._id) {
         const response = await manageCategory("edit", category._id, name);
-        console.log("Edit response:", response);
         if (response && response.data) {
           onCategoryUpdate(response.data.updatedCategory || { _id: category._id, name });
           Toast("Category edited successfully", "success", true);
@@ -49,7 +48,6 @@ const CategoryModal: React.FC<ModalProps> = ({
         }
       } else {
         const response = await manageCategory("add", "", name);
-        console.log("Add response:", response); 
         if (response && response.data) {
           onCategoryAdd(response.data.newCategory || { _id: "temp-id", name });
           Toast("Category created successfully", "success", true);

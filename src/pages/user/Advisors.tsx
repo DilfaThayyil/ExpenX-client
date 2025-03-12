@@ -32,7 +32,6 @@ const Advisors: React.FC = () => {
         const fetchAdvisors = async () => {
             try {
                 const response = await getAdvisors()
-                console.log('response : ', response)
                 setAdvisors(response.Advisors);
                 setSelectedAdvisor(response.Advisors[0]);
             } catch (error) {

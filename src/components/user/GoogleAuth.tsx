@@ -19,7 +19,6 @@ const GoogleAuth:React.FC<GoogleAuthProps> = ({role}) => {
       try {
         if (userCredential.credential) {
           const user = jwtDecode<any>(userCredential.credential); 
-          console.log("Decoded user:", user);
   
           let userData;
           if (role === 'user') {
@@ -27,9 +26,6 @@ const GoogleAuth:React.FC<GoogleAuthProps> = ({role}) => {
           } else if (role === 'advisor') {
             userData = await advisorGoogleAuth(user); 
           }
-  
-          console.log("User data:", userData);
-          console.log("User: ",userData.user)
   
           if (userData?.message) {
             setUser(userData.user)
@@ -43,23 +39,7 @@ const GoogleAuth:React.FC<GoogleAuthProps> = ({role}) => {
         console.error("Error during Google Auth:", error);
         Toast('Something went wrong, please try again later', 'error', true);
       }
-    };
-      //   if(userCredential.credential){
-      //       const user = jwtDecode(userCredential.credential)
-      //       console.log("user : ",user)
-      //       const userData= await googleAuth(user)
-      //       console.log("userData : ",userData)
-      //    if(userData?.message){
-      //     if(role==='advisor'){
-      //       Toast(userData.message,'success',true)
-      //       setTimeout(()=>navigate("/advisor"),1000)
-      //     }else{
-      //       Toast(userData.message,'success',true)
-      //       setTimeout(() => navigate("/"), 1000);
-      //     }
-      //    }
-      //   }
-      // };
+    }
     return (
         <GoogleLogin
         onSuccess={handleGoogle}

@@ -85,7 +85,6 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log('form submitted with data: ',formData)
 
     if (
       formData.email === lastSubmittedValues.email &&
@@ -111,13 +110,11 @@ const RegisterPage = () => {
 
     try {
       setLoading(true);
-      console.log('calling createuser...')
       const response = await createUser({
         username: formData.username,
         email: formData.email,
         password: formData.password,
       });
-      console.log('createuser response : ',response)
 
       if (response === 'Email is already in use') {
         toastr.error(response);
@@ -129,10 +126,8 @@ const RegisterPage = () => {
         ...formData
       });
 
-      console.log('calling otpGenerate...')
 
       const res = await otpGenerate(formData.email);
-      console.log('otpgenerate response : ',res)
       setLoading(false);
 
       if (res.message === 'OTP sent successfully') {

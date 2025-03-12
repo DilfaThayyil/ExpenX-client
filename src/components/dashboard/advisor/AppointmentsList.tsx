@@ -21,7 +21,6 @@ export default function AppointmentsList({advisorId}:{advisorId:string}) {
     const fetchAppointments = async()=>{
       try{
         const response = await comingAppointments(advisorId)
-        console.log("res-appointments : ",response)
         setAppointments(response.upComingAppointments)
       }catch(err){
         console.error(err)

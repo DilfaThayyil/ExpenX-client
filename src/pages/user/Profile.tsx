@@ -73,7 +73,6 @@ const Profile = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("form data : ", formData)
     setFormSubmitted(true)
     const errors = validateForm()
     if (errors.length > 0) {
@@ -89,9 +88,7 @@ const Profile = () => {
       if (profilePic) {
         const formData = new FormData();
         formData.append('profilePic', profilePic);
-        console.log("profilePic : ", profilePic)
         const response = await uploadImageToCloudinary(formData);
-        console.log("response : ", response)
         imageUrl = response.url;
         setLoading(false)
       }
@@ -104,11 +101,9 @@ const Profile = () => {
         country: formData.country,
         language: formData.language,
       });
-      console.log("updatedUser : ", updatedUser)
       Toaster('Profile updated successfully!', 'success', true);
       // Store.setState({ user: updatedUser });
       Store.getState().setUser(updatedUser);
-      console.log("Updated User in Store:", Store.getState().user);
       setFormData({
         username: '',
         phone: '',
@@ -124,33 +119,13 @@ const Profile = () => {
     }
   }
 
-  const [goals] = useState<ExpenseGoal[]>([
-    {
-      title: "Emergency Fund",
-      current: 5000,
-      target: 10000,
-      deadline: "2024-12-31"
-    },
-    {
-      title: "Vacation Savings",
-      current: 2000,
-      target: 5000,
-      deadline: "2024-08-31"
-    }
-  ]);
-
   const calculateProfileCompletion = () => {
     const fields = Object.values(user);
     const completedFields = fields.filter(field => field && field.length > 0);
     return Math.floor((completedFields.length / fields.length) * 100);
   };
 
-  const handleLogout = async() => {
-    await userLogout()
-    Store.getState().clearUser();  
-    localStorage.removeItem('user'); 
-    window.location.href = '/login'; 
-  };
+
   
 
   return (
@@ -262,13 +237,7 @@ const Profile = () => {
           </Card> */}
           <GoalsList />
         </div>
-        <Button
-          variant="destructive"
-          className="fixed bottom-5 right-5 p-4 rounded-full shadow-lg"
-          onClick={handleLogout}
-        >
-          <LogOut className="h-5 w-5" />
-        </Button>
+        
 
         {/* Edit Profile Drawer */}
         {isDrawerOpen && (

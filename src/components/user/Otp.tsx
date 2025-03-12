@@ -52,9 +52,7 @@ const OTPVerification:React.FC<otpProps> = ({email,purpose,role}) => {
   const handleResend = async () => {
     setIsResending(true);
     try {
-      console.log("calling resendOtp...")
       const res = await resendOtp(email)
-      console.log("response from resendOtp : ",res)
       toastr.success(res.message);
       setTimeLeft(60);
       setTimeout(() => setIsResending(false), 1000); 
@@ -74,16 +72,9 @@ const OTPVerification:React.FC<otpProps> = ({email,purpose,role}) => {
   
     try {
       const enteredOtp = otp.join('');
-      console.log('forgotPassword email : ', email);
-      console.log('forgotPassword purpose : ', purpose);
-      console.log('email & otp : ', email, enteredOtp);
-  
       const res = purpose === 'forgotPassword'
         ? await handleforgetpasswordOtp(email, enteredOtp)
-        : await verifyOtp(email, enteredOtp);
-  
-      console.log('response : ', res);
-  
+        : await verifyOtp(email, enteredOtp);  
       if (res) {
         if (purpose === 'forgotPassword' && res?.message === 'OTP verified successfully') {
           toastr.success('OTP verified successfully');

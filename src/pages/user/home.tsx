@@ -10,11 +10,11 @@ import RecentActivity from '@/components/dashboard/user/RecentActivity'
 import CategoryBreakdown from '@/components/dashboard/user/CategoryBreakdown'
 import AchievementCard from '@/components/dashboard/user/AchievementCard'
 import {getDashboardData} from '@/services/user/userService'
-
+import {useNavigate} from 'react-router-dom'
 
 const DashboardPage: React.FC = () => {
   const user = Store(state => state.user);
-  
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState({
     monthlyExpenses: [],
@@ -57,7 +57,7 @@ const DashboardPage: React.FC = () => {
   // };
 
   const handleAddExpense = () => {
-    // Add expense logic - could open a modal or navigate to expense form
+    navigate('/expenses')
   };
 
   return (
