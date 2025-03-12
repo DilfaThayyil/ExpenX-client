@@ -1,6 +1,6 @@
 import { io, Socket } from "socket.io-client";
 
-const BACKEND_ENDPOINT = "http://localhost:3000"; // Remove '/socket' to match server config
+const BACKEND_ENDPOINT = "http://localhost:3000"; 
 
 export let socket: Socket;
 
@@ -11,7 +11,7 @@ export const initializeSocket = () => {
     socket = io(BACKEND_ENDPOINT, {
       transports: ["websocket", "polling"],
       withCredentials: true,
-      path: "/socket.io", // Match path with server
+      path: "/socket.io", 
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
@@ -38,7 +38,6 @@ export const initializeSocket = () => {
   return socket;
 };
 
-// Helper function to identify a user to the socket
 export const identifyUser = (userId: string) => {
   if (socket && socket.connected) {
     console.log("Identifying user to socket:", userId);

@@ -14,6 +14,20 @@ export interface Message{
   // timestamp?:string
 }
 
+export interface Notification {
+  _id: string;
+  userId: string;
+  senderId: {
+    _id: string;
+    username: string;
+    profilePic: string;
+  };
+  message: string;
+  type: 'message' | 'system';
+  read: boolean;
+  createdAt: string;
+}
+
 
 export const sendMessage = async(message:Message)=>{
   try{
@@ -23,7 +37,7 @@ export const sendMessage = async(message:Message)=>{
     return response.data
   }catch(err){
     console.error(err)
-    throw err
+    throw err 
   }
 }
 
@@ -107,6 +121,47 @@ export const uploadChatFile =  async (formData:FormData)=>{
   }
 }
 
+
+
+export const getNotification = async (userId: string) => {
+  try {
+    const response = await axiosInstance.get(`${BASEURL}/getNotification/${userId}`)
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    throw error;
+  }
+};
+
+// export const markRead = async (notificationId: string)=> {
+//   try {
+//     const response = await axiosInstance.patch(`${BASEURL}/markRead/${notificationId}`)
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error marking notification as read:', error);
+//     throw error;
+//   }
+// };
+
+export const markAllNotificationsAsRead = async (userId:string): Promise<boolean> => {
+  try {
+    const response = await axiosInstance.patch(`${BASEURL}/markAllRead/${userId}`)
+    return response.data.success;
+  } catch (error) {
+    console.error('Error marking all notifications as read:', error);
+    throw error;
+  }
+};
+
+export const deleteNotification = async (notificationId: string): Promise<boolean> => {
+  try {
+    const response = await axiosInstance.delete(`${BASEURL}/deleteNotification/${notificationId}`)
+    return response.data.success;
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    throw error;
+  }
+};
 
 
 // export const findMyFriends= async(id:string)=>{

@@ -1,98 +1,90 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { FiHome, FiBook, FiDollarSign, FiLogIn, FiBell, FiUser } from 'react-icons/fi';
-import { FaRegMessage } from "react-icons/fa6";
-import image from '../assets/Letter E.png';
+import { useState } from 'react';
+import { User, LogOut, Menu, X } from 'lucide-react';
+import NotificationBell from '@/components/chat/notificationBell'
+import { Button } from "@/components/ui/button";
+import { advisorLogout } from '@/services/advisor/AuthServices'
+import { userLogout } from '@/services/user/AuthServices'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useNavigate } from 'react-router-dom'
+import Store from '@/store/store'
 
-const Navbar: React.FC = () => {
+const Navbar = () => {
+  const navigate = useNavigate()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleProfileClick = () => {
+    role === 'user' ? navigate('/profile') : navigate('/advisor/profile')
+  }
+  const role = Store((state) => state.user.role)
+
+  const handleLogout = async () => {
+    if (role === 'advisor') {
+      await advisorLogout()
+      Store.getState().clearUser();
+      localStorage.removeItem('user');
+      window.location.href = '/advisor/login';
+    } else {
+      await userLogout()
+      Store.getState().clearUser();
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+  };
   return (
-    <nav className="bg-white shadow-sm sticky top-0 w-full z-10">
-      <div className="px-4 py-2 flex items-center justify-between w-full">
-        {/* Logo Section */}
-        <div className="flex items-center">
-          <Link to="" className="text-xl font-bold">
-            <img className='h-9' src={image} alt="Logo" />
-          </Link>
-        </div>
+    <nav className="bg-white dark:bg-gray-800 shadow-sm h-10 px-4 flex items-center justify-between">
+      {/* Logo and site name */}
+      <div className="flex items-center space-x-2">
+      </div>
+      {/* Mobile menu button */}
+      <button
+        className="md:hidden text-gray-600 dark:text-gray-200 focus:outline-none"
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+      >
+        {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
 
-        {/* Navigation Links */}
-        <div className="hidden md:flex space-x-4">
-          <Link
-            to=""
-            className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200"
-          >
-            <FiHome className="me-2 icon" />
-            Home
-          </Link>
-          <Link
-            to=""
-            className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200"
-          >
-            <FiBook className="me-2 icon" />
-            Expenses
-          </Link>
-          <Link
-            to=""
-            className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200"
-          >
-            <FaRegMessage className="me-2 icon" />
-            Groups
-          </Link>
-          <Link
-            to=""
-            className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200"
-          >
-            <FiDollarSign size={19} className="me-2 icon" />
-            Payments
-          </Link>
-        </div>
+      {/* Desktop menu */}
+      <div className="hidden md:flex items-center space-x-6">
+        <div className="flex items-center space-x-4">
+          {/* Notifications */}
+          <NotificationBell />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='outline' size="icon">
+                <User className="h-5 w-5 " />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleProfileClick}>
+                Profile</DropdownMenuItem>
+              {/* <DropdownMenuItem>Settings</DropdownMenuItem> */}
+              <DropdownMenuItem className="text-red-600">Logout</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        {/* Profile Section */}
-        <div className="flex items-center">
-          <button className="px-3 py-2 mr-3 rounded-md text-gray-700 flex items-center hover:bg-gray-200">
-            <FiBell size={19} className='mr-3' />
-          </button>
-          <Link
-            to='/profile'
-            className="px-3 py-2 border border-gray-300 rounded-md text-gray-700 flex items-center hover:bg-gray-200"
+          <Button
+            variant='outline'
+            onClick={handleLogout}
           >
-            <FiUser className="mr-2" />
-            Profile
-          </Link>
+            <LogOut className="h-5 w-5" />
+          </Button>
+
+          {/* Profile */}
+
         </div>
       </div>
 
-      {/* Mobile Navigation */}
-      <div className="md:hidden">
-        <Link
-          to=""
-          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200"
-        >
-          <FiHome className="me-2 icon" />
-          Home
-        </Link>
-        <Link
-          to=""
-          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200"
-        >
-          <FiBook className="me-2 icon" />
-          Expenses
-        </Link>
-        <Link
-          to=""
-          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200"
-        >
-          <FaRegMessage className="me-2 icon" />
-          Groups
-        </Link>
-        <Link
-          to=""
-          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200"
-        >
-          <FiDollarSign size={19} className="me-2 icon" />
-          Payments
-        </Link>
-      </div>
+      {/* Mobile menu, only shown when menu is open */}
+      {mobileMenuOpen && (
+
+        <NotificationBell />
+
+      )}
     </nav>
   );
 };

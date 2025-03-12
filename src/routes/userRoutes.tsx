@@ -12,6 +12,7 @@ import { NotFound } from '@/pages/404/404';
 import UserProtectedRoute from './UserProtectedRoutes'
 import Advisors from '@/pages/user/Advisors'
 // import PublicRoute from './publicRoute'
+import WithNavbar from '@/layout/withNav'
 
 const UserRoutes = () => {
     return (
@@ -19,17 +20,19 @@ const UserRoutes = () => {
             <Route path="*" element={<NotFound />} />
             <Route path="" element={<LandingPage />} />
             {/* <Route element={<PublicRoute />}>  */}
-                <Route path="login" element={<LoginPage />} />
-                <Route path="register" element={<RegisterPage />} />
+            <Route path="login" element={<LoginPage />} />
+            <Route path="register" element={<RegisterPage />} />
             {/* </Route> */}
             <Route path="resetPassword" element={<ResetPassword />} />
-            <Route element={<UserProtectedRoute/>}>
-                <Route path="home" element={<DashboardPage />} />
-                <Route path="expenses" element={<Expenses />} />
-                <Route path="groups" element={<Groups />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="slotBooking" element={<SlotBooking />} />
-                <Route path='Advisors' element={<Advisors/>}/>
+            <Route element={<UserProtectedRoute />}>
+                <Route element={<WithNavbar />}>
+                    <Route path="home" element={<DashboardPage />} />
+                    <Route path="expenses" element={<Expenses />} />
+                    <Route path="groups" element={<Groups />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="slotBooking" element={<SlotBooking />} />
+                    <Route path='Advisors' element={<Advisors />} />
+                </Route>
             </Route>
         </Routes>
     );

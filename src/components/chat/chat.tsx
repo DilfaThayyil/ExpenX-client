@@ -51,13 +51,11 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     contact.username.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  // Initialize socket once
   useEffect(() => {
     if (!socketInitialized && sender?._id) {
       const newSocket = initializeSocket();
       
       if (newSocket) {
-        // Register the user with their ID to the socket
         identifyUser(sender._id);
         setSocketInitialized(true);
       }
@@ -70,16 +68,13 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     };
   }, [sender, socketInitialized]);
 
-  // Handle room joining when active contact changes
   useEffect(() => {
     if (!socket || !sender || !activeContact || !socketInitialized) return;
     
-    // Leave previous room if exists
     if (currentRoomId) {
       socket.emit("leaveRoom", currentRoomId);
     }
     
-    // Join new room
     const roomId = [sender._id, activeContact._id].sort().join('_');
     setCurrentRoomId(roomId);
     socket.emit("joinRoom", roomId);
@@ -93,17 +88,14 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     };
   }, [activeContact, sender, socketInitialized]);
 
-  // Handle message receiving
   useEffect(() => {
     if (!socket || !socketInitialized) return;
 
     const messageListener = (message: Message) => {
       console.log("Received message:", message);
       
-      // Check if this message belongs to current room or should update badge counter
       if (message.roomId === currentRoomId) {
         setMessages(prev => {
-          // Check if message already exists to prevent duplicates
           if (!prev.some(m => m.id === message.id)) {
             return [...prev, message];
           }
@@ -111,15 +103,12 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
         });
       }
       
-      // Handle notifications and unread counts
       if (message.senderId !== sender?._id) {
-        // Play sound if document not focused or message is from non-active contact
         if (!document.hasFocus() || activeContact._id !== message.senderId) {
           notificationSound.current?.play()
             .catch(err => console.log("Error playing notification:", err));
         }
         
-        // Update unread counter
         setUnreadMessages(prev => {
           const newUnreadMessages = new Map(prev);
           if (activeContact._id !== message.senderId) {
@@ -140,7 +129,6 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     };
   }, [currentRoomId, activeContact, sender, socketInitialized]);
 
-  // Handle typing indicators
   useEffect(() => {
     if (!socket || !socketInitialized) return;
     
@@ -158,21 +146,18 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     };
   }, [socketInitialized]);
 
-  // Fetch messages when active contact changes
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         if (!sender?._id || !activeContact?._id) return;
         
         const response = await fetchMessage(sender._id, activeContact._id);
-        // Sort by createdAt date to ensure proper ordering
         const sortedMessages = response.sort((a: Message, b: Message) => 
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
         
         setMessages(sortedMessages);
         
-        // Clear unread count for this contact
         setUnreadMessages(prev => {
           const newUnreadMessages = new Map(prev);
           newUnreadMessages.set(activeContact._id, 0);
@@ -188,12 +173,10 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     }
   }, [activeContact, sender]);
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Initialize notification sound
   useEffect(() => {
     notificationSound.current = new Audio(notification);
     if (notificationSound.current) {
@@ -208,7 +191,6 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     };
   }, []);
 
-  // Handle sending messages
   const handleSendMessage = useCallback((message: string, url?: string, fileInfo?: { type: string, name: string }) => {
     if ((!message.trim() && !url) || !socket || !socketInitialized) return;
     
@@ -227,15 +209,12 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     
     console.log("Sending message:", newMessageObj);
     
-    // Optimistically add message to the UI
     setMessages(prev => [...prev, newMessageObj]);
     
-    // Send message through socket
     socket.emit("send_message", newMessageObj);
     setNewMessage('');
   }, [sender, activeContact, socketInitialized]);
 
-  // Handle typing indicators
   const handleTyping = useCallback(() => {
     if (!socket || !socketInitialized) return;
     
@@ -352,7 +331,6 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   const handleContactChange = (contact: any) => {
     setActiveContact(contact);
     
-    // Clear unread messages for this contact
     setUnreadMessages(prev => {
       const newUnreadMessages = new Map(prev);
       newUnreadMessages.set(contact._id, 0);
