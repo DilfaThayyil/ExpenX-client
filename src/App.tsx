@@ -4,7 +4,7 @@ import UserRoutes from "./routes/userRoutes";
 import AdvisorRoutes from "./routes/advisorRoutes";
 import AdminRoutes from "./routes/adminRoutes";
 import { NotFound } from "@/pages/404/404";
-import {NotificationProvider} from '@/context/notificationContext'
+import {NotificationProvider} from '@/context/NotificationContext'
 
 const GOOGLECLIENTID = import.meta.env.VITE_GOOGLECLIENTID;
 

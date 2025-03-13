@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNotifications } from "@/context/notificationContext";
+import { useNotifications } from "@/context/NotificationContext";
 
 const NotificationBell = () => {
   const { notifications, markNotificationsAsRead } = useNotifications();
