@@ -1,0 +1,40 @@
+{
+    "nav": {
+      "features": "Funktionen",
+      "WhyExpenX": "Warum ExpenX?",
+      "about": "Über uns",
+      "startAdvisor": "Als Finanzberater starten",
+      "login": "Anmelden",
+      "signup": "Registrieren"
+    },
+    "hero": {
+      "title": "Teile Ausgaben, vereinfache Freundschaften",
+      "subtitle": "Verwalte mühelos gemeinsame Ausgaben, verfolge Gruppenausgaben und pflege transparente finanzielle Beziehungen mit Freunden und Mitbewohnern."
+    },
+    "features": {
+      "title": "Funktionen",
+      "groupExpenses": "Gruppenausgaben",
+      "groupExpensesDesc": "Teile Rechnungen einfach mit Freunden und verfolge, wer wem was schuldet",
+      "smartCalc": "Intelligente Berechnungen",
+      "smartCalcDesc": "Automatische Aufteilung von Ausgaben und Schuldenvereinfachung",
+      "billScan": "Beleg-Scan",
+      "billScanDesc": "Scanne Rechnungen, um Ausgaben automatisch hinzuzufügen",
+      "groupChat": "Gruppenchat",
+      "groupChatDesc": "Besprich Ausgaben und begleiche Rechnungen direkt in der App"
+    },
+    "chat": {
+      "title": "Echtzeit-Chat",
+      "advisor": "Hey John! Ich habe einen persönlichen Anlageplan für dich erstellt.",
+      "user": "Das ist großartig, Kumpel!"
+    },
+    "benefits": {
+      "title": "Warum ExpenX wählen?",
+      "secure": "Sicher & privat",
+      "secureDes": "Banken-Sicherheitsstandards und Datenverschlüsselung",
+      "save": "Zeit sparen",
+      "saveDes":"Automatisiere die Verfolgung von Ausgaben und Berechnungen",
+      "overview": "Klare Übersicht",
+      "overviewDes": "Visuelle Berichte und Ausgabenanalysen"
+    }
+  }
+  

@@ -1,0 +1,39 @@
+{
+  "nav": {
+    "features": "Features",
+    "WhyExpenX": "Why ExpenX",
+    "about": "About",
+    "startAdvisor": "Start as a Financial Advisor",
+    "login": "Login",
+    "signup": "Signup"
+  },
+  "hero": {
+    "title": "Split Expenses, Simplify Friendships",
+    "subtitle": "Effortlessly manage shared expenses, track group spending, and maintain crystal-clear financial relationships with friends and roommates."
+  },
+  "features": {
+    "title": "Features",
+    "groupExpenses": "Group Expenses",
+    "groupExpensesDesc": "Easily split bills among friends and track who owes what",
+    "smartCalc": "Smart Calculations",
+    "smartCalcDesc": "Automatic expense splitting and debt simplification",
+    "billScan": "Bill Scanning",
+    "billScanDesc": "Scan receipts to automatically add expenses",
+    "groupChat": "Group Chat",
+    "groupChatDesc": "Discuss expenses and settle up within the app"
+  },
+  "chat": {
+    "title": "Real Time Chat",
+    "advisor": "Hey John! I made a personal investment plan for you.",
+    "user": "That's awesome, dude!"
+  },
+  "benefits": {
+    "title": "Why Choose ExpenX?",
+    "secure": "Secure & Private",
+    "secureDes": "Bank-level security and data encryption",
+    "save": "Save Time",
+    "saveDes":"Automate expense tracking and calculations",
+    "overview": "Clear Overview",
+    "overviewDes": "Visual reports and spending insights"
+  }
+}

@@ -1,0 +1,40 @@
+{
+    "nav": {
+      "features": "Fonctionnalités",
+      "WhyExpenX": "Pourquoi ExpenX?",
+      "about": "À propos",
+      "startAdvisor": "Commencer en tant que conseiller financier",
+      "login": "Connexion",
+      "signup": "S'inscrire"
+    },
+    "hero": {
+      "title": "Partagez les dépenses, simplifiez les amitiés",
+      "subtitle": "Gérez facilement les dépenses partagées, suivez les dépenses de groupe et entretenez des relations financières claires avec vos amis et colocataires."
+    },
+    "features": {
+      "title": "Fonctionnalités",
+      "groupExpenses": "Dépenses de groupe",
+      "groupExpensesDesc": "Répartissez facilement les factures entre amis et suivez qui doit quoi",
+      "smartCalc": "Calculs intelligents",
+      "smartCalcDesc": "Répartition automatique des dépenses et simplification des dettes",
+      "billScan": "Numérisation de factures",
+      "billScanDesc": "Scannez les reçus pour ajouter automatiquement des dépenses",
+      "groupChat": "Chat de groupe",
+      "groupChatDesc": "Discutez des dépenses et régularisez vos comptes dans l'application"
+    },
+    "chat": {
+      "title": "Chat en temps réel",
+      "advisor": "Salut John ! J'ai préparé un plan d'investissement personnel pour toi.",
+      "user": "C'est génial, mec !"
+    },
+    "benefits": {
+      "title": "Pourquoi choisir ExpenX ?",
+      "secure": "Sécurisé et privé",
+      "secureDes": "Sécurité bancaire et cryptage des données",
+      "save": "Gagnez du temps",
+      "saveDes":"Automatisez le suivi des dépenses et les calculs",
+      "overview": "Vue d'ensemble claire",
+      "overviewDes": "Rapports visuels et analyses des dépenses"
+    }
+  }
+  
