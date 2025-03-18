@@ -7,7 +7,7 @@ import Layout from '@/layout/Sidebar';
 import Store from '@/store/store';
 import Pagination from "@/components/admin/Pagination"; 
 import useShowToast from '@/customHook/showToaster';
-
+  
 interface Slot {
   _id: string;
   advisorId?:{
@@ -53,7 +53,7 @@ const SlotManage: React.FC = () => {
       setTotalPages(totalPages);
     } catch (err) {
       console.error(err);
-      Toaster('Failed to fetch slots', 'error');
+      // Toaster('Failed to fetch slots', 'error');
     }
   };
 
@@ -141,7 +141,7 @@ const SlotManage: React.FC = () => {
 
   const handleDeleteSlot = async(slotId: string) => {
     try {
-      const response = await deleteSlot(slotId);
+      await deleteSlot(slotId);
       const updatedSlots = slots.filter(slot => slot._id !== slotId);
       setSlots(updatedSlots);
       setFilteredSlots(updatedSlots);

@@ -53,7 +53,7 @@ const GroupsPage = () => {
     const [loading, setLoading] = useState<boolean>(false)
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [isExpenseDialogOpen, setIsExpenseDialogOpen] = useState(false);
-    const [newExpense, setNewExpense] = useState<GroupExpense>({ id: '', date: new Date().toISOString(), title: '', totalAmount: 0, paidBy: '', splitMethod: 'equal' })
+    // const [newExpense, setNewExpense] = useState<GroupExpense>({ id: '', date: new Date().toISOString(), title: '', totalAmount: 0, paidBy: '', splitMethod: 'equal' })
     const [newGroup, setNewGroup] = useState<Group1>({ name: '', members: [] })
     const [groups, setGroups] = useState<Group[]>([])
     const [memberError, setMemberError] = useState('')
@@ -135,7 +135,7 @@ const GroupsPage = () => {
         }
         setLoading(true)
         try {
-            const response = await createGroup(userId, newGroup.name, newGroup.members)
+            await createGroup(userId, newGroup.name, newGroup.members)
             Toaster('Group creation successful', 'success')
             setNewGroup({ name: '', members: [] })
             setIsDialogOpen(false)
@@ -173,13 +173,13 @@ const GroupsPage = () => {
 
 
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target
-        setNewExpense({
-            ...newExpense,
-            [name]: name === 'amount' ? parseFloat(value) : value
-        })
-    }
+    // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    //     const { name, value } = e.target
+    //     setNewExpense({
+    //         ...newExpense,
+    //         [name]: name === 'amount' ? parseFloat(value) : value
+    //     })
+    // }
 
 
     return (

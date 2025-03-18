@@ -1,4 +1,4 @@
-import { IndianRupee , Users, Target, Clock, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { IndianRupee , Users, Target, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { moneyColors } from "@/style/theme";
 
@@ -63,9 +63,9 @@ export default function StatsCards({ stats }:{stats:Stats}) {
 }
 
 
-function StatCard({ title, value, change, icon, iconBg, bgGradient }:StatCardProps) {
-  const changeValue = change ?? "0"; 
-  const isPositive = parseFloat(changeValue.toString()) > 0;
+function StatCard({ title, value, icon, iconBg, bgGradient }:StatCardProps) {
+  // const changeValue = change ?? "0"; 
+  // const isPositive = parseFloat(changeValue.toString()) > 0;
 
   return (
     <Card className="overflow-hidden border-none shadow-md">
@@ -84,7 +84,7 @@ function StatCard({ title, value, change, icon, iconBg, bgGradient }:StatCardPro
         <div className="flex items-baseline justify-between mt-4">
           <h3 className="text-2xl font-bold">{value}</h3>
           <div className="flex items-center text-xs font-medium">
-            {isPositive ? (
+            {/* {isPositive ? (
               <span style={{ color: moneyColors.money.success }} className="flex items-center">
                 <ArrowUpRight className="h-3 w-3 mr-1" />
                 {typeof changeValue === "string" ? changeValue.replace('-', '') : changeValue}
@@ -94,7 +94,7 @@ function StatCard({ title, value, change, icon, iconBg, bgGradient }:StatCardPro
                 <ArrowDownRight className="h-3 w-3 mr-1" />
                 {typeof changeValue === "string" ? changeValue.replace('-', '') : changeValue}
               </span>
-            )}
+            )} */}
           </div>
         </div>
       </CardContent>

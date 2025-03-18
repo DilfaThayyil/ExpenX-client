@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Mail, Phone, Globe, Languages, Target, Edit2, X, UploadCloud ,LogOut} from 'lucide-react';
+import { User, Mail, Phone, Globe, Languages, Edit2, X, UploadCloud} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -7,20 +7,20 @@ import { Progress } from "@/components/ui/progress";
 import Layout from '@/layout/Sidebar';
 import Store from '@/store/store';
 import FormInput from '@/components/InputField';
-import Progresss from '@/components/progressBar'
+// import Progresss from '@/components/progressBar'
 import useShowToast from '@/customHook/showToaster';
 import { updateUser, uploadImageToCloudinary } from '@/services/user/userService';
-import { userLogout } from '@/services/user/AuthServices'
+// import { userLogout } from '@/services/user/AuthServices'
 import GoalsList from '@/components/goals/GoalsList';
 
 
 
-interface ExpenseGoal {
-  title: string;
-  current: number;
-  target: number;
-  deadline: string;
-}
+// interface ExpenseGoal {
+//   title: string;
+//   current: number;
+//   target: number;
+//   deadline: string;
+// }
 
 const Profile = () => {
 
@@ -102,7 +102,7 @@ const Profile = () => {
         language: formData.language,
       });
       Toaster('Profile updated successfully!', 'success', true);
-      // Store.setState({ user: updatedUser });
+      // Store.setState({ user: updatedUser })
       Store.getState().setUser(updatedUser);
       setFormData({
         username: '',
@@ -201,40 +201,6 @@ const Profile = () => {
             </CardContent>
           </Card>
 
-          {/* Expense Goals Card */}
-          {/* <Card>
-            <CardHeader>
-              <CardTitle>Financial Goals</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {goals.map((goal, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Target className="h-4 w-4 text-emerald-500" />
-                        <span className="font-medium">{goal.title}</span>
-                      </div>
-                      <span className="text-sm text-gray-500">
-                        Due: {new Date(goal.deadline).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <div className="space-y-1">
-                      <Progresss
-                        value={(goal.current / goal.target) * 100}
-                        className="h-2"
-                      />
-                      <div className="flex justify-between text-sm">
-                        <span>${goal.current.toLocaleString()}</span>
-                        <span>${goal.target.toLocaleString()}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Button variant='outline'>Add goal</Button>
-            </CardContent>
-          </Card> */}
           <GoalsList />
         </div>
         
@@ -266,17 +232,6 @@ const Profile = () => {
                     required
                   />
                 </div>
-                {/* <div>
-              <FormInput
-                id="email"
-                name="email"
-                type="text"
-                label="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                />
-              </div> */}
                 <div>
                   <FormInput
                     id="phone"

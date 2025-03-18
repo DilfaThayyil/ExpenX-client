@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, Globe, Languages, LogOut, Edit2, X, UploadCloud, MessageCircle, Star } from 'lucide-react';
+import { User, Mail, Phone, Globe, Languages, Edit2, X, UploadCloud, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -156,7 +156,7 @@ const ProfileAd = () => {
 
   const handleReplySubmit = async (reviewId: string, text: string) => {
     try {
-      const response = await addReplyToReview(user._id,reviewId, text);
+      await addReplyToReview(user._id,reviewId, text);
       setShowReplyForm(null);
       fetchReviews();
     } catch (error) {
@@ -318,10 +318,6 @@ const ProfileAd = () => {
               </div>
             </CardContent>
           </Card>
-
-
-
-
         </div>
 
 
