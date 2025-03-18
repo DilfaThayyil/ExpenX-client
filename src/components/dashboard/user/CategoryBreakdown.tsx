@@ -25,7 +25,7 @@ const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({ categories, loadi
       <CardHeader>
         <CardTitle>Expense Categories</CardTitle>
       </CardHeader>
-      <CardContent className="h-[300px]">
+      <CardContent className="h-[350px]">
         {loading ? (
           <div className="h-full flex items-center justify-center">
             <p>Loading categories...</p>
@@ -51,7 +51,7 @@ const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({ categories, loadi
               </PieChart>
             </ResponsiveContainer>
             {/* ✅ Scrollable list for categories */}
-            <div className="mt-4 space-y-2 max-h-32 overflow-y-auto">
+            <div className="mt-4 space-y-2 max-h-32 overflow-y-auto border-t-2">
               {categories.map((category) => (
                 <div key={category.category} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">

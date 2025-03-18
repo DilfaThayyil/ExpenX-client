@@ -73,6 +73,7 @@ const GroupsPage = () => {
                 const response = await getUserGroups(userId)
                 if (Array.isArray(response)) {
                     setGroups(response)
+                    setSelectedGroup(response[0])
                 } else {
                     console.error('Invalid response format:', response)
                     Toaster('Error fetching groups: Invalid format', 'error')

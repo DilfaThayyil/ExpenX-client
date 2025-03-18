@@ -9,8 +9,8 @@ import SpendingTrend from '@/components/dashboard/user/SpendingTrends'
 import RecentActivity from '@/components/dashboard/user/RecentActivity'
 import CategoryBreakdown from '@/components/dashboard/user/CategoryBreakdown'
 import AchievementCard from '@/components/dashboard/user/AchievementCard'
-import {getDashboardData} from '@/services/user/userService'
-import {useNavigate} from 'react-router-dom'
+import { getDashboardData } from '@/services/user/userService'
+import { useNavigate } from 'react-router-dom'
 
 const DashboardPage: React.FC = () => {
   const user = Store(state => state.user);
@@ -32,6 +32,7 @@ const DashboardPage: React.FC = () => {
       try {
         setLoading(true);
         const data = await getDashboardData(user._id);
+        console.log("data  :", data)
         setDashboardData(data);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -66,7 +67,7 @@ const DashboardPage: React.FC = () => {
         {/* Header */}
         <Header username={user.username} />
 
-        <Button 
+        <Button
           className="fixed bottom-6 right-6 rounded-full shadow-lg bg-emerald-600 hover:bg-emerald-700 z-10"
           onClick={handleAddExpense}
         >
@@ -81,15 +82,11 @@ const DashboardPage: React.FC = () => {
               // progress={dashboardData.budgetInfo.progress}
               loading={loading}
             />
-
             <SpendingTrend
               data={dashboardData.trendData}
               loading={loading}
             />
-            <RecentActivity
-              activities={dashboardData.recentActivity}
-              loading={loading}
-            />
+
           </div>
 
           <div className="space-y-6">
@@ -103,6 +100,14 @@ const DashboardPage: React.FC = () => {
               loading={loading}
             />
           </div>
+
+
+        </div>
+        <div className='mt-3'>
+          <RecentActivity
+            activities={dashboardData.recentActivity}
+            loading={loading}
+          />
         </div>
       </div>
     </Layout>
