@@ -23,18 +23,15 @@ const NotificationContext = createContext<NotificationContextProps>({
 });
 
 export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
-    console.log("NotificationProvider initialized...");
 
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const loggedInUserId = Store((state) => state.user?._id)
-    console.log("loggeduser-context : ",loggedInUserId)
     useEffect(() => {
         if (!loggedInUserId) return;
         initializeSocket()
         const fetchNotifications = async () => {
             try {
                 const res = await getNotification(loggedInUserId);
-                console.log("Fetched notifications:", res);
                 setNotifications(res);
             } catch (error) {
                 console.error("Error fetching notifications:", error);
@@ -51,7 +48,6 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
         }
 
         const notificationListener = (notification: Notification) => {
-            console.log("Received notification:", notification);
             setNotifications((prev) => {
                 if (!prev.some((n) => n._id === notification._id)) {
                     return [...prev, notification];

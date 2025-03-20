@@ -1,6 +1,6 @@
 import axiosInstance from '../axios/axios';
 const BASEURL = 'http://localhost:3000/user';
-import {IReportData} from '@/components/modals/reportModal'
+import { IReportData } from '@/components/modals/reportModal'
 
 export interface DashboardData {
   monthlyExpenses: {
@@ -57,7 +57,6 @@ export const updateUser = async (formData: { profilePic: string; username: strin
 
 export const createExpense = async (formData: FormData, userId: string) => {
   try {
-    console.log("sdfksdjfk")
     const response = await axiosInstance.post(`${BASEURL}/createExpense/${userId}`, formData);
     return response;
   } catch (error) {
@@ -69,7 +68,6 @@ export const createExpense = async (formData: FormData, userId: string) => {
 
 export const getExpenses = async (userId: string) => {
   try {
-    console.log("userid : ", userId)
     const response = await axiosInstance.get(`${BASEURL}/getExpenses/${userId}`);
     return response.data;
   } catch (error) {
@@ -78,21 +76,19 @@ export const getExpenses = async (userId: string) => {
   }
 }
 
-export const getCategories = async()=>{
-  try{
+export const getCategories = async () => {
+  try {
     const response = await axiosInstance.get(`${BASEURL}/getCategories`)
     return response.data
-  }catch(err){
+  } catch (err) {
     console.error(err)
     throw err
   }
 }
 
-export const createGroup = async (userId:string,name:string,members:string[]) => {
+export const createGroup = async (userId: string, name: string, members: string[]) => {
   try {
-    console.log(userId,name,members)
-    const response = await axiosInstance.post(`${BASEURL}/createGroup`, {userId,name,members});
-    console.log('Response in service:', response);
+    const response = await axiosInstance.post(`${BASEURL}/createGroup`, { userId, name, members });
     return response.data;
   } catch (error) {
     console.error('Error creating group:', error);
@@ -104,7 +100,6 @@ export const createGroup = async (userId:string,name:string,members:string[]) =>
 export const getUserGroups = async (userId: string) => {
   try {
     const response = await axiosInstance.get(`${BASEURL}/getUserGroups/${userId}`);
-    console.log("response : ",response)
     return response.data.groups
   } catch (error) {
     console.error('Error fetching groups:', error);
@@ -118,7 +113,6 @@ export const addMember = async (groupId: string, memberEmail: string) => {
     const response = await axiosInstance.post(`${BASEURL}/addMember/${groupId}`, {
       memberEmail
     })
-    console.log("response : ",response)
     return response.data
   } catch (error) {
     console.error(error)
@@ -131,10 +125,7 @@ export const addExpenseInGroup = async (groupId: string,
   expenseData: { title: string; totalAmount: number; paidBy: string; date: string; splitMethod: string }
 ) => {
   try {
-    console.log("groupId : ", groupId)
-    console.log("expenseData: ", expenseData)
     const response = await axiosInstance.post(`${BASEURL}/addExpenseInGroup/${groupId}`, expenseData)
-    console.log("response- serv : ",response.data)
     return response.data
   } catch (error) {
     console.error(error);
@@ -145,7 +136,6 @@ export const addExpenseInGroup = async (groupId: string,
 export const bookSlot = async (slotId: string, userId: string) => {
   try {
     const response = await axiosInstance.patch(`${BASEURL}/bookslot`, { slotId, userId })
-    console.log("response-data :", response.data)
     return response.data
   } catch (err) {
     console.error(err)
@@ -158,7 +148,6 @@ export const paymentInitiate = async (slotId: string, userId: string, advisorId:
     const response = await axiosInstance.post(`${BASEURL}/paymentInitiate`, {
       slotId, userId, advisorId, amount
     })
-    console.log("response : ", response.data)
     return response.data
   } catch (err) {
     console.error(err)
@@ -169,7 +158,6 @@ export const paymentInitiate = async (slotId: string, userId: string, advisorId:
 export const fetchSlotsByUser = async (userId: string, page: number, limit: number) => {
   try {
     const response = await axiosInstance.get(`${BASEURL}/fetchSlotsByUser/${userId}?page=${page}&limit=${limit}`)
-    console.log("response : ", response.data)
     return response.data
   } catch (err) {
     console.error(err)
@@ -177,40 +165,34 @@ export const fetchSlotsByUser = async (userId: string, page: number, limit: numb
   }
 }
 
-export const reportAdvisor = async (slotId:string,reportData: IReportData) => {
+export const reportAdvisor = async (slotId: string, reportData: IReportData) => {
   try {
-    console.log("reportData : ",reportData)
-      const response = await axiosInstance.post(`${BASEURL}/reportAdvisor/${slotId}`, reportData);
-      console.log("response-data:", response.data);
-      return response.data;
+    const response = await axiosInstance.post(`${BASEURL}/reportAdvisor/${slotId}`, reportData);
+    return response.data;
   } catch (err) {
-      console.error(err);
-      throw err;
+    console.error(err);
+    throw err;
   }
 }
 
-export const getDashboardData = async(userId:string)=>{
-  try{
+export const getDashboardData = async (userId: string) => {
+  try {
     const response = await axiosInstance.get(`${BASEURL}/getDashboardData/${userId}`)
-    console.log("getUserDashboard- : ",response.data)
     return response.data
-  }catch(err){
+  } catch (err) {
     console.error(err)
     throw err
   }
 }
 
-export const exportExpense = async(userId: string, format: string) => {
+export const exportExpense = async (userId: string, format: string) => {
   try {
-    console.log(`Requesting export for user ${userId} in ${format} format`);
     const response = await axiosInstance.get(
       `${BASEURL}/exportExpense/${userId}?format=${format}`,
-      { responseType: 'blob' } 
+      { responseType: 'blob' }
     );
-    console.log("Response status:", response.status);
-    console.log("Response headers:", response.headers);
     return response;
-  } catch(err) {
+  } catch (err) {
     console.error("Export service error:", err);
     throw err;
   }

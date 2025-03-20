@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {adminLogout} from '@/services/admin/adminServices'
+import { adminLogout } from '@/services/admin/adminServices'
 
 
 const AdminProfile = () => {
@@ -14,9 +14,8 @@ const AdminProfile = () => {
   const adminEmail = useAdminStore((state) => state.adminEmail);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  const handleConfirmLogout = async() => {
-    const response = await adminLogout()
-    console.log("response : ",response)
+  const handleConfirmLogout = async () => {
+    await adminLogout()
     useAdminStore.getState().clearAdminEmail();
     toast.success("Logged out successfully!");
     setTimeout(() => {
@@ -51,7 +50,7 @@ const AdminProfile = () => {
             </DialogTrigger>
 
             <DialogContent>
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.2 }}

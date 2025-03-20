@@ -32,11 +32,9 @@ const DashboardPage: React.FC = () => {
       try {
         setLoading(true);
         const data = await getDashboardData(user._id);
-        console.log("data  :", data)
         setDashboardData(data);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
-        // Handle error (you could set an error state and display a message)
       } finally {
         setLoading(false);
       }
@@ -44,18 +42,6 @@ const DashboardPage: React.FC = () => {
 
     fetchDashboardData();
   }, []);
-
-  // const refreshDashboard = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const data = await refreshData();
-  //     setDashboardData(data);
-  //   } catch (error) {
-  //     console.error("Error refreshing dashboard data:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleAddExpense = () => {
     navigate('/expenses')

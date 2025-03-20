@@ -54,7 +54,7 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   useEffect(() => {
     if (!socketInitialized && sender?._id) {
       const newSocket = initializeSocket();
-      
+
       if (newSocket) {
         identifyUser(sender._id);
         setSocketInitialized(true);
@@ -70,17 +70,16 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
 
   useEffect(() => {
     if (!socket || !sender || !activeContact || !socketInitialized) return;
-    
+
     if (currentRoomId) {
       socket.emit("leaveRoom", currentRoomId);
     }
-    
+
     const roomId = [sender._id, activeContact._id].sort().join('_');
     setCurrentRoomId(roomId);
     socket.emit("joinRoom", roomId);
-    
-    console.log(`Joined room: ${roomId}`);
-    
+
+
     return () => {
       if (roomId) {
         socket.emit("leaveRoom", roomId);
@@ -92,8 +91,7 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     if (!socket || !socketInitialized) return;
 
     const messageListener = (message: Message) => {
-      console.log("Received message:", message);
-      
+
       if (message.roomId === currentRoomId) {
         setMessages(prev => {
           if (!prev.some(m => m.id === message.id)) {
@@ -102,18 +100,18 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
           return prev;
         });
       }
-      
+
       if (message.senderId !== sender?._id) {
         if (!document.hasFocus() || activeContact._id !== message.senderId) {
           notificationSound.current?.play()
             .catch(err => console.log("Error playing notification:", err));
         }
-        
+
         setUnreadMessages(prev => {
           const newUnreadMessages = new Map(prev);
           if (activeContact._id !== message.senderId) {
             newUnreadMessages.set(
-              message.senderId, 
+              message.senderId,
               (newUnreadMessages.get(message.senderId) || 0) + 1
             );
           }
@@ -123,7 +121,7 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     };
 
     socket.on("receive_message", messageListener);
-    
+
     return () => {
       socket.off("receive_message", messageListener);
     };
@@ -131,15 +129,15 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
 
   useEffect(() => {
     if (!socket || !socketInitialized) return;
-    
+
     socket.on('display_typing', ({ senderId }) => {
       setTypingUser(senderId);
     });
-    
+
     socket.on('hide_typing', () => {
       setTypingUser(null);
     });
-    
+
     return () => {
       socket.off('display_typing');
       socket.off('hide_typing');
@@ -150,14 +148,14 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     const fetchMessages = async () => {
       try {
         if (!sender?._id || !activeContact?._id) return;
-        
+
         const response = await fetchMessage(sender._id, activeContact._id);
-        const sortedMessages = response.sort((a: Message, b: Message) => 
+        const sortedMessages = response.sort((a: Message, b: Message) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
-        
+
         setMessages(sortedMessages);
-        
+
         setUnreadMessages(prev => {
           const newUnreadMessages = new Map(prev);
           newUnreadMessages.set(activeContact._id, 0);
@@ -167,7 +165,7 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
         console.error("Error fetching messages:", error);
       }
     };
-    
+
     if (activeContact?._id && sender?._id) {
       fetchMessages();
     }
@@ -182,7 +180,7 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     if (notificationSound.current) {
       notificationSound.current.volume = 0.4;
     }
-    
+
     return () => {
       if (notificationSound.current) {
         notificationSound.current.pause();
@@ -193,7 +191,7 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
 
   const handleSendMessage = useCallback((message: string, url?: string, fileInfo?: { type: string, name: string }) => {
     if ((!message.trim() && !url) || !socket || !socketInitialized) return;
-    
+
     const roomId = [sender._id, activeContact._id].sort().join('_');
     const newMessageObj = {
       id: `temp_${Date.now().toString()}`,
@@ -206,18 +204,17 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
       fileName: fileInfo?.name,
       createdAt: new Date().toISOString(),
     };
-    
-    console.log("Sending message:", newMessageObj);
-    
+
+
     setMessages(prev => [...prev, newMessageObj]);
-    
+
     socket.emit("send_message", newMessageObj);
     setNewMessage('');
   }, [sender, activeContact, socketInitialized]);
 
   const handleTyping = useCallback(() => {
     if (!socket || !socketInitialized) return;
-    
+
     const roomId = [sender._id, activeContact._id].sort().join('_');
     if (!isTyping) {
       setIsTyping(true);
@@ -229,7 +226,7 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   const debounceStopTyping = useCallback(
     debounce(() => {
       if (!socket || !socketInitialized) return;
-      
+
       const roomId = [sender._id, activeContact._id].sort().join('_');
       setIsTyping(false);
       socket.emit("stop_typing", { senderId: sender._id, roomId });
@@ -270,7 +267,7 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
 
   const uploadFile = async (file: File) => {
     if (!socketInitialized) return;
-    
+
     setUploading(true);
     try {
       const maxSize = file.type.startsWith('video/') ? MAX_VIDEO_SIZE : MAX_OTHER_SIZE;
@@ -279,12 +276,12 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
         setUploading(false);
         return;
       }
-      
+
       const formData = new FormData();
       formData.append('file', file);
-      
+
       const response = await uploadChatFile(formData);
-      
+
       if (response.url) {
         handleSendMessage('', response.url, {
           type: getFileType(file),
@@ -330,7 +327,7 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
 
   const handleContactChange = (contact: any) => {
     setActiveContact(contact);
-    
+
     setUnreadMessages(prev => {
       const newUnreadMessages = new Map(prev);
       newUnreadMessages.set(contact._id, 0);
@@ -397,9 +394,9 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
             <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
               {messages.length > 0 ? (
                 messages.map((message, index) => (
-                  <MessageBubble 
-                    key={message.id || index} 
-                    message={message} 
+                  <MessageBubble
+                    key={message.id || index}
+                    message={message}
                   />
                 ))
               ) : (

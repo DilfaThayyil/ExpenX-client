@@ -34,7 +34,6 @@ const ReportTable = () => {
     const fetchData = async () => {
       try {
         const response = await fetchReports(currentPage, limit);
-        console.log("response : ",response)
         if (response) {
           setReports(response.data.reports.reports);
           setTotalPages(Math.ceil(response.data.reports.totalReports/limit));
@@ -46,7 +45,6 @@ const ReportTable = () => {
 
     fetchData();
   }, [currentPage]);
-  console.log("Reports after state update:", reports);
   const columns = [
     {
       header: 'Date',
@@ -56,18 +54,10 @@ const ReportTable = () => {
       header: 'Advisor Name',
       accessor: (item: Report) => item.advisorId.username,
     },
-    // {
-    //   header: 'Email',
-    //   accessor: (item: Report) => item.advisorId.email,
-    // },
     {
       header: 'User Name',
       accessor: (item: Report) => item.userId.username
     },
-    // {
-    //   header: 'Email',
-    //   accessor: (item: Report) => item.userId.email,
-    // },
     {
       header: 'Reason',
       accessor: (item: Report) => item.reason,

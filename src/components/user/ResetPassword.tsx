@@ -49,8 +49,6 @@ const ResetPassword = () => {
 
     try {
       setLoading(true);
-      console.log("email : ", email);
-      console.log("password : ",password)
       if(role==='user'){
         const response = await resetPassword(email, password);
         if (response?.success) {

@@ -15,15 +15,13 @@ interface ErrorResponse {
 }
 
 export const createUser = async (userData: IcreateUser) => {
-  console.log("userData in AuthService : ",userData);
 
   try {
     const response = await axiosInstance.post(`${BASEURL}/register`, userData)
-    console.log("response in createUser: ",response.data)
     return response.data;
   } catch (err) {
     const axiosError = err as AxiosError;
-  
+
     if (axiosError.response) {
       const errorData = axiosError.response.data as ErrorResponse;
 
@@ -43,7 +41,6 @@ export const otpGenerate = async (email: string) => {
     const response = await axiosInstance.post(`${BASEURL}/generateOtp`, {
       email,
     });
-    console.log("otpGenerate response :",response.data.message)
     return response.data;
   } catch (err) {
     console.log(err);
@@ -51,22 +48,19 @@ export const otpGenerate = async (email: string) => {
 };
 
 export const verifyOtp = async (email: string, otp: string) => {
-    console.log("email $ otp : ",email,otp)
-    const response = await axiosInstance.post(`${BASEURL}/verifyOtp`,
-      { email, otp }
-    )
-    return { success: true, message: response.data.message }
+  const response = await axiosInstance.post(`${BASEURL}/verifyOtp`,
+    { email, otp }
+  )
+  return { success: true, message: response.data.message }
 };
 
 ////////some updation should be here in verifyOtp///////////////
 
 export const resendOtp = async (email: string) => {
   try {
-    console.log("email for resendOtp : ",email);
     const response = await axiosInstance.post(`${BASEURL}/resendOtp`, {
       email,
     });
-    console.log("resendotp response : ",response.data.message)
     return response.data;
   } catch (err) {
     return err;
@@ -79,8 +73,6 @@ export const userLogin = async (email: string, password: string) => {
       email,
       password,
     });
-    console.log(response.data)
-    console.log(response.data.message)
     return response.data;
   } catch (err) {
     console.log(err);
@@ -106,11 +98,10 @@ export const handleforgetpassword = async (email: string) => {
 };
 
 export const handleforgetpasswordOtp = async (email: string, otp: string) => {
-    console.log("email $ otp : ",email,otp)
-    const response = await axiosInstance.post(`${BASEURL}/forgetPassOtp`,
-      { email, otp }
-    )
-    return { success: true, message: response.data.message }
+  const response = await axiosInstance.post(`${BASEURL}/forgetPassOtp`,
+    { email, otp }
+  )
+  return { success: true, message: response.data.message }
 };
 
 /////////////some updation need here in handleForgetPasswordOtp////////////
@@ -121,19 +112,18 @@ export const resetPassword = async (email: string, password: string) => {
       email,
       password,
     });
-    return {success:true,message : response.data.message}
+    return { success: true, message: response.data.message }
   } catch (err) {
     console.log(err);
   }
 };
 
-export const userGoogleAuth = async (userCredential:JwtPayload) => {
+export const userGoogleAuth = async (userCredential: JwtPayload) => {
   try {
-    console.log(userCredential,"123456")    
-    const response = await axiosInstance.post(`${BASEURL}/googleAuth`,{
-      userCredential:userCredential
-    },{
-      withCredentials:true
+    const response = await axiosInstance.post(`${BASEURL}/googleAuth`, {
+      userCredential: userCredential
+    }, {
+      withCredentials: true
     })
     return response.data
   } catch (err) {
@@ -141,11 +131,11 @@ export const userGoogleAuth = async (userCredential:JwtPayload) => {
   }
 }
 
-export const userLogout = async()=>{
-  try{
+export const userLogout = async () => {
+  try {
     const response = await axiosInstance.post(`${BASEURL}/logout`)
     return response.data
-  }catch(err){
+  } catch (err) {
     console.error(err)
     throw err
   }

@@ -11,7 +11,7 @@ import CategoryModal from "../modals/categoryModal";
 
 interface DataTableProps<T> {
   type: "user" | "advisor" | "category";
-  onEdit?: (item:any)=>void
+  onEdit?: (item: any) => void
 }
 
 const DataTable = <T,>({ type }: DataTableProps<T>) => {
@@ -26,7 +26,7 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
   const limit = 4;
   const Toast = useShowToast();
 
-  
+
   const fetchFunction = async (page: number, limit: number) => {
     switch (type) {
       case "user":
@@ -54,7 +54,6 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
       setLoading(true);
       try {
         const response = await fetchFunction(currentPage, limit);
-        console.log("response : ", response)
         if (type === 'category') {
           setData(Array.isArray(response.data.categories) ? response.data.categories : [])
         } else {
@@ -78,13 +77,11 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
       setModalOpen(true);
       return;
     }
-  
+
     try {
-      console.log("action-id : ", action, "--", id);
-      const response = await manageFunction(action, id);
-      console.log("response :", response);
+      await manageFunction(action, id);
       Toast(`${type} ${action}d successfully`, "success", true);
-  
+
       if (action === "delete") {
         setData(data.filter((item: any) => item._id !== id));
       }
@@ -94,23 +91,22 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
     }
   };
 
-  const handleBlock = async (action: string,type:'user'|'advisor', email: string)=>{
-    try{
-      const response = await manageUser(action,type,email)
-      console.log("response :",response)
+  const handleBlock = async (action: string, type: 'user' | 'advisor', email: string) => {
+    try {
+      await manageUser(action, type, email)
       setData((prevData) =>
         prevData.map((item: any) =>
           item.email === email ? { ...item, isBlocked: action === "block" } : item
         )
-      );      
-      Toast(`${type} ${action}ed successfully`,'success',true)
-    }catch(err){
+      );
+      Toast(`${type} ${action}ed successfully`, 'success', true)
+    } catch (err) {
       console.error(err)
-      Toast(`Failed to ${action} the ${type}`,'error',true)
+      Toast(`Failed to ${action} the ${type}`, 'error', true)
     }
   }
 
-  const handleCategoryUpdate = (updatedCategory:any)=>{
+  const handleCategoryUpdate = (updatedCategory: any) => {
     setData((prevData) =>
       prevData.map((item: any) =>
         item._id === updatedCategory._id ? updatedCategory : item
@@ -118,8 +114,8 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
     );
   }
 
-  const handleCategoryAdd = (newCategory:any)=>{
-    setData((prev)=>[...prev,newCategory])
+  const handleCategoryAdd = (newCategory: any) => {
+    setData((prev) => [...prev, newCategory])
   }
 
   if (loading)
@@ -175,7 +171,7 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
                 header: "Action", accessor: (item: any) => (
                   <button
                     className={`px-4 py-2 rounded ${item.isBlocked ? "bg-blue-500" : "bg-red-500"} text-white`}
-                    onClick={() => handleBlock(item.isBlocked ? "unblock" : "block",type, item.email)}
+                    onClick={() => handleBlock(item.isBlocked ? "unblock" : "block", type, item.email)}
                   >
                     {item.isBlocked ? "Unblock" : "Block"}
                   </button>
@@ -188,16 +184,16 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
         <Pagination currentPage={currentPage} onPageChange={setCurrentPage} totalPages={totalPages} />
       </div>
       {modalOpen && (
-            <CategoryModal
-            isOpen={modalOpen}
-            closeModal={() => setModalOpen(false)}
-            category={selectedCategory}
-            onCategoryUpdate={handleCategoryUpdate}
-            onCategoryAdd={handleCategoryAdd}
-            />
-        )}
+        <CategoryModal
+          isOpen={modalOpen}
+          closeModal={() => setModalOpen(false)}
+          category={selectedCategory}
+          onCategoryUpdate={handleCategoryUpdate}
+          onCategoryAdd={handleCategoryAdd}
+        />
+      )}
     </div>
-    
+
   );
 };
 
