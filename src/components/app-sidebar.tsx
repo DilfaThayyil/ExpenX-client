@@ -8,12 +8,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { User2, Sun, Moon } from "lucide-react";
+import { User2 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Store from "@/store/store";
 import useAdminStore from '@/store/adminStore'
-import { useState } from "react";
+// import { useState } from "react";
 
 interface MenuItem {
   title: string;
@@ -31,12 +31,12 @@ export function AppSidebar({ menuItems, role }: AppSidebarProps) {
   const currentPath = router.pathname;
   const user = Store((state) => state.user);
   const adminEmail = useAdminStore((state)=>state.adminEmail)
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // const [isDarkMode, setIsDarkMode] = useState(false);
 
-  const toggleTheme = () => {
-    setIsDarkMode((prev) => !prev);
-    document.documentElement.classList.toggle("dark", !isDarkMode); // Example toggle for Tailwind dark mode
-  };
+  // const toggleTheme = () => {
+  //   setIsDarkMode((prev) => !prev);
+  //   document.documentElement.classList.toggle("dark", !isDarkMode); 
+  // };
 
   return (
     <Sidebar>
@@ -97,7 +97,7 @@ export function AppSidebar({ menuItems, role }: AppSidebarProps) {
             <span>{role ==='admin' ? adminEmail : user.username}</span>
           </SidebarMenuButton>
 
-          {/* Dark/Light Mode Toggle */}
+          {/* Dark/Light Mode Toggle
           <button
             onClick={toggleTheme}
             className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
@@ -108,7 +108,7 @@ export function AppSidebar({ menuItems, role }: AppSidebarProps) {
             ) : (
               <Moon className="w-5 h-5" />
             )}
-          </button>
+          </button> */}
         </div>
       </SidebarFooter>
     </Sidebar>

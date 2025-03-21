@@ -85,7 +85,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full mx-auto space-y-8 bg-white p-8 rounded-xl shadow-lg border border-emerald-100">
         {/* Header */}
         <div className="text-center">

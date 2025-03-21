@@ -55,22 +55,22 @@ const AdvisorProfile: React.FC<AdvisorProfileProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Left Column - Bio and Specialties */}
         <div className="md:col-span-1">
-          <div className="bg-gray-50 rounded-lg p-6 shadow-sm mb-6">
+          {/* <div className="bg-gray-50 rounded-lg p-6 shadow-sm mb-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
               <FaStar className="mr-2 text-green-600" />
               Specialties
             </h3>
             <div className="specialties-list flex flex-wrap gap-2">
-              {/* {advisor.specialties.map((specialty, index) => (
+              {advisor.specialties.map((specialty, index) => (
                 <span 
                   key={index} 
                   className="specialty-tag px-3 py-1 bg-blue-100 text-green-800 rounded-full text-sm font-medium"
                 >
                   {specialty}
                 </span>
-              ))} */}
+              ))}
             </div>
-          </div>
+          </div> */}
           
           <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
             <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
@@ -89,12 +89,12 @@ const AdvisorProfile: React.FC<AdvisorProfileProps> = ({
         
         {/* Right Column - Bio and Reviews */}
         <div className="md:col-span-2">
-          <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
+          {/* <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">About</h3>
             <p className="text-gray-700 leading-relaxed whitespace-pre-line">
               {advisor.bio}
             </p>
-          </div>
+          </div> */}
           
           {/* Reviews Section with subtle card styling */}
           <div className="advisor-reviews-section bg-white rounded-lg p-6 shadow-sm">

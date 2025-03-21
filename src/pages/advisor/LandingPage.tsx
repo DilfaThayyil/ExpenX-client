@@ -33,7 +33,7 @@ const LandingPage = () => {
               </p>
               <div className="flex gap-4">
                 <Link 
-                  to="/advisor/register" 
+                  to="/advisor/login" 
                   className="inline-flex items-center px-6 py-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
                 >
                   Get Started

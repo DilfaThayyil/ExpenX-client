@@ -4,22 +4,13 @@ import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
 import GoogleAuth from './GoogleAuth';
 import FormInput from '../InputField';
-import {
-  createUser, 
-  otpGenerate
-} from '../../services/user/AuthServices'; 
-import {
-  isValidateEmail,
-  isValidatePassword,
-} from '../../utility/validator';
+import {createUser, otpGenerate} from '../../services/user/AuthServices'; 
+import {isValidateEmail,isValidatePassword,} from '../../utility/validator';
 import useShowToast from '../../customHook/showToaster';
-// import { useNavigate } from 'react-router-dom';
 import OTPVerification from './Otp';
 
 
-
 const RegisterPage = () => {
-  // const navigate = useNavigate();
   const [formData, setFormData] = useState<{
     username:string
     email:string

@@ -85,12 +85,9 @@ const LandingPage = () => {
             </p>
             <div className="flex items-center justify-center gap-4">
               <a href="/login" className={`px-6 py-3 rounded-lg transition-colors ${darkMode ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-emerald-600 hover:bg-emerald-700'} text-white text-lg font-medium`}>
-                {t('nav.login')}
+              Get Started as User
               </a>
-              <span className="text-emerald-600">or</span>
-              <a href="/register" className={`px-6 py-3 rounded-lg transition-colors ${darkMode ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-emerald-600 hover:bg-emerald-700'} text-white text-lg font-medium`}>
-                {t('nav.signup')}
-              </a>
+              
             </div>
           </div>
         </div>
