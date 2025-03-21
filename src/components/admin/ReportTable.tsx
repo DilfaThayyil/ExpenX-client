@@ -115,7 +115,7 @@ const ReportTable = () => {
   
 
   return (
-    <div className="container mx-auto px-20 mt-7">
+    <div className="p-8 container mx-auto px-20 mt-7">
       <h1 className="text-2xl font-semibold mb-4">Reports</h1>
       {reports.length > 0 ? (
         <>

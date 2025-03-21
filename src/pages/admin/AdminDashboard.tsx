@@ -3,6 +3,7 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, R
 import { Users, CreditCard, TrendingUp, DollarSign } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
 import { fetchMonthlyTrends, fetchExpenseCategories, fetchDashboardStats, fetchUserGrowth } from '@/services/admin/adminServices'
+import {AdminNavbar} from '@/layout/AdminNav'
 
 interface MonthlyData {
   month: string;
@@ -101,9 +102,10 @@ const AdminDashboard = () => {
 
   return (
     <Layout role='admin'>
-      <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+      <AdminNavbar/>
+      <div className="p-16 space-y-6 bg-gray-50 min-h-screen">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-800"> Dashboard</h1>
           <div className="text-sm text-gray-500">
             Last updated: {new Date().toLocaleString()}
           </div>

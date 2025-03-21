@@ -1,8 +1,9 @@
 import DataTable from "@/components/admin/DataTable";
 import { fetchCategories, manageCategory } from "@/services/admin/adminServices";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import CategoryModal from "@/components/modals/categoryModal";
 import Layout from "@/layout/Sidebar";
+import { AdminNavbar } from '@/layout/AdminNav'
 
 interface Category {
   _id: string;
@@ -32,7 +33,7 @@ const CategoryTable = () => {
   };
 
   const handleCategoryAdd = (newCategory: Category) => {
-    setCategories((prevCategory)=>[...prevCategory,newCategory])
+    setCategories((prevCategory) => [...prevCategory, newCategory])
   };
 
   const actions = (item: Category) => (
@@ -62,17 +63,9 @@ const CategoryTable = () => {
 
   return (
     <Layout role='admin'>
+      <AdminNavbar />
 
       <div>
-        <button
-          className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded mb-4"
-          onClick={() => {
-            setEditingCategory(null);
-            setModalOpen(true);
-          }}
-        >
-          Add Category
-        </button>
 
         <DataTable<Category>
           type="category"
@@ -83,6 +76,7 @@ const CategoryTable = () => {
           onEdit={handleEdit}
         />
 
+
         {modalOpen && (
           <CategoryModal
             isOpen={modalOpen}
@@ -92,6 +86,16 @@ const CategoryTable = () => {
             onCategoryAdd={handleCategoryAdd}
           />
         )}
+
+        <button
+          className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded mb-4"
+          onClick={() => {
+            setEditingCategory(null);
+            setModalOpen(true);
+          }}
+        >
+          Add Category
+        </button>
       </div>
     </Layout>
   );

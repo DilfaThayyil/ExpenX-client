@@ -132,7 +132,7 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
     );
 
   return (
-    <div className="container mx-auto px-20 mt-7">
+    <div className="p-8 container mx-auto px-20 mt-7">
       <input
         type="text"
         className="p-2 border border-gray-300 rounded-lg w-full mb-2"

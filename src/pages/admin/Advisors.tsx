@@ -2,6 +2,7 @@ import Layout from "@/layout/Sidebar";
 import DataTable from "@/components/admin/DataTable";
 import { fetchAdvisors, manageUser } from "@/services/admin/adminServices";
 import useShowToast from "@/customHook/showToaster";
+import {AdminNavbar} from '@/layout/AdminNav'
 
 const Advisors = () => {
   const Toast = useShowToast();
@@ -54,6 +55,7 @@ const Advisors = () => {
 
   return (
     <Layout role="admin">
+      <AdminNavbar />
       <DataTable
         type="advisor"
         fetchFunction={fetchAdvisors}
