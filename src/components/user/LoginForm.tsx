@@ -14,7 +14,7 @@ import Store from '@/store/store';
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const {setUser} = Store()
+  // const {setUser} = Store()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -67,7 +67,8 @@ const LoginPage = () => {
     try {
       const response = await userLogin(formData.email, formData.password);
       if (response.message) {
-        setUser(response.user2)
+        // setUser(response.user2)
+        Store.getState().setUser(response.user2);
         toastr.success(response.message);
         setTimeout(() => navigate("/home"), 1000);
       } else if (response.error) {

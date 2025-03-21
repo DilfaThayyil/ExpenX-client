@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import {LogoutDialog} from '@/components/modals/logoutDialogue'
 import { User, LogOut, Menu, X } from 'lucide-react';
+import toastr from 'toastr'
 import NotificationBell from '@/components/chat/notificationBell'
 import { Button } from "@/components/ui/button";
 import { advisorLogout } from '@/services/advisor/AuthServices'
@@ -15,6 +17,7 @@ import Store from '@/store/store'
 
 const Navbar = () => {
   const navigate = useNavigate()
+  const [open, setOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleProfileClick = () => {
@@ -22,17 +25,23 @@ const Navbar = () => {
   }
   const role = Store((state) => state.user.role)
 
-  const handleLogout = async () => {
-    if (role === 'advisor') {
-      await advisorLogout()
+  const handleConfirmLogout = async () => {
+    try {
+      if (role === "advisor") {
+        await advisorLogout();
+      } else {
+        await userLogout();
+      }
       Store.getState().clearUser();
-      localStorage.removeItem('user');
-      window.location.href = '/advisor/login';
-    } else {
-      await userLogout()
-      Store.getState().clearUser();
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      localStorage.removeItem("userProfile");
+      toastr.success("Logged out successfully!");
+      setTimeout(() => {
+        window.location.href = role === "advisor" ? "/advisor/login" : "/login";
+      }, 1500); 
+    } catch (err) {
+      toastr.error("Logout failed. Please try again.");
+    } finally {
+      setOpen(false);
     }
   };
   return (
@@ -69,10 +78,11 @@ const Navbar = () => {
 
           <Button
             variant='outline'
-            onClick={handleLogout}
+            onClick={()=>setOpen(true)}
           >
             <LogOut className="h-5 w-5" />
           </Button>
+          <LogoutDialog open={open} onClose={() => setOpen(false)} onConfirm={handleConfirmLogout} />
 
           {/* Profile */}
 
