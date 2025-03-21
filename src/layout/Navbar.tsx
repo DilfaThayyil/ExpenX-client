@@ -72,7 +72,7 @@ const Navbar = () => {
               <DropdownMenuItem onClick={handleProfileClick}>
                 Profile</DropdownMenuItem>
               {/* <DropdownMenuItem>Settings</DropdownMenuItem> */}
-              <DropdownMenuItem className="text-red-600">Logout</DropdownMenuItem>
+              {/* <DropdownMenuItem className="text-red-600">Logout</DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -80,7 +80,7 @@ const Navbar = () => {
             variant='outline'
             onClick={()=>setOpen(true)}
           >
-            <LogOut className="h-5 w-5" />
+            <LogOut className="h-5 w-5 text-red-600" />
           </Button>
           <LogoutDialog open={open} onClose={() => setOpen(false)} onConfirm={handleConfirmLogout} />
 
