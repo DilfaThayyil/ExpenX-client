@@ -3,10 +3,6 @@ import Swal from "sweetalert2";
 import { BACKENDENDPOINT } from "../../utility/env";
 import Store from "@/store/store";
 
-const clearCookie = (cookieName: string) => {
-  document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
-}
-
 const axiosInstance = axios.create({
   baseURL: BACKENDENDPOINT,
   withCredentials: true,
@@ -15,35 +11,41 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
+    console.log("error - TTTTTTTTTTTTTTTTTTT : ", error)
     const originalRequest = error.config;
 
     if (error.response) {
-      if (error.response.status === 401 && !originalRequest._retry) {
-        originalRequest._retry = true;
-
+      if (error.response.status === 401 &&  !originalRequest._retry) {
+          originalRequest._retry = true;
         try {
           console.log("🔄 Refreshing access token...");
-          const { data } = await axiosInstance.post(`${BACKENDENDPOINT}/user/auth/refresh-token`);
-          console.log("data : ",data)
-          document.cookie = `accessToken=${data.accessToken}; path=/;`;
-
+          const { data } = await axiosInstance.post(`/user/auth/refresh-token`);
+          console.log("data : ", data)
           console.log("✅ Token refreshed successfully.");
-          return axiosInstance(originalRequest);
-        } catch (err) {
-          console.log("❌ Token refresh failed. Logging out...");
-
-          await axiosInstance.post(`${BACKENDENDPOINT}/user/auth/logout`);
+          return axiosInstance(originalRequest)
+        } catch (err) { 
+          console.log("❌ refresh token failed. Logging out...");
           Store.getState().clearUser()
-        
-          window.location.href = "/";
-          clearCookie('accessToken');
-          clearCookie('refreshToken');
+          console.log("store cleared due to 401 . logging out...")
+          Swal.fire({
+            icon: "error",
+            title: "Access Denied",
+            text: "You have been logged out. Please contact support.",
+            timer: 6000,
+            timerProgressBar: true,
+            willClose: () => {
+              window.location.href = "/";
+            },
+          });
+          await axiosInstance.post(`/user/auth/logout`);
           return Promise.reject(err);
         }
-      } 
-      
-      if (error.response.status === 403) {
+
+      } else if (error.response.status === 403) {
         console.log('❌ User is blocked by admin!');
+        Store.getState().clearUser()
+        console.log("store cleared due to 403 . Logginh out...")
+        await axiosInstance.post(`/user/auth/logout`);
         Swal.fire({
           icon: "error",
           title: "Access Denied",
