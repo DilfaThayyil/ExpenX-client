@@ -3,7 +3,7 @@ const BASEURL = 'http://localhost:3000/user'
 const advBASEURL = 'http://localhost:3000/advisor'
 
 export const getAdvisors = async()=>{
-  const response = await axiosInstance.get(`${BASEURL}/getAdvisors`)
+  const response = await axiosInstance.get(`${advBASEURL}/getAdvisors`)
   return response.data
 }
 
