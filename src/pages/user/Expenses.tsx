@@ -11,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Plus, Search, Calendar as CalendarIcon, Edit, Trash2, Download, } from 'lucide-react';
 import { format } from 'date-fns';
 import Layout from '@/layout/Sidebar';
-import { getExpenses, createExpense, getCategories, exportExpense } from '../../services/user/userService'
+import { getExpenses, createExpense, getCategories, exportExpense, deleteExpense } from '../../services/user/userService'
 import useShowToast from '@/customHook/showToaster';
 import Loading from '@/style/loading';
 import Store from '../../store/store'
@@ -40,6 +40,12 @@ const Expenses = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
     const userId = Store((state) => state.user._id)
+    const [isExporting, setIsExporting] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<string>('');
+    const [selectedDateRange, setSelectedDateRange] = useState<string>('');
+    const [exportFilter, setExportFilter] = useState('daily');
+    const [customStartDate, setCustomStartDate] = useState<Date | null>(null);
+    const [customEndDate, setCustomEndDate] = useState<Date | null>(null);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -68,6 +74,23 @@ const Expenses = () => {
         };
         fetchExpenses();
     }, []);
+
+    const handleDeleteExpense = async (id: number | undefined) => {
+        console.log("deleteExpensId :; ", id)
+        if (!id) return;
+        try {
+            setLoading(true);
+            await deleteExpense(id);
+            setExpenses((prev) => prev.filter(exp => exp.id !== id));
+            Toaster('Expense deleted successfully!', 'success');
+        } catch (error) {
+            console.error('Error deleting expense:', error);
+            Toaster('Failed to delete expense', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -113,38 +136,101 @@ const Expenses = () => {
         }
     };
 
-    const [isExporting, setIsExporting] = useState(false);
-
     const handleExportData = async (format: string) => {
         try {
-          setIsExporting(true);
-          const response = await exportExpense(userId, format);
-          if (!response || response.status !== 200) {
-            const errorMessage = response?.data?.message || 'Failed to export data';
-            throw new Error(errorMessage);
-          }
-          const blob = await response.data;
-          if (!blob || blob.size === 0) {
-            throw new Error('Received empty data from server');
-          }
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.style.display = 'none';
-          a.href = url;
-          a.download = `expense-report.${format}`;
-          document.body.appendChild(a);
-          a.click()
-          window.URL.revokeObjectURL(url);
-          document.body.removeChild(a);
-          Toaster(`Expense report exported as ${format.toUpperCase()} successfully`,'success');
-        } catch (error) {
-          console.error("Error exporting data:", error);
-          Toaster(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`,'error');
-        } finally {
-          setIsExporting(false);
-        }
-      };
+            setIsExporting(true);
+            let startDate: Date | null = null;
+            let endDate: Date | null = new Date();
 
+            switch (exportFilter) {
+                case 'daily':
+                    startDate = new Date();
+                    startDate.setHours(0, 0, 0, 0);
+                    break;
+                case 'weekly':
+                    startDate = new Date();
+                    startDate.setDate(startDate.getDate() - 7);
+                    break;
+                case 'monthly':
+                    startDate = new Date();
+                    startDate.setDate(1);
+                    break;
+                case 'custom':
+                    if (!customStartDate || !customEndDate) {
+                        Toaster('Please select a valid custom date range.', 'error');
+                        setIsExporting(false);
+                        return;
+                    }
+                    startDate = customStartDate;
+                    endDate = customEndDate;
+                    break;
+                default:
+                    break;
+            }
+
+            if (!startDate || !endDate) {
+                Toaster('Invalid date range selected.', 'error');
+                setIsExporting(false);
+                return;
+            }
+            const filteredExpenses = expenses.filter(expense => {
+                const expenseDate = new Date(expense.date);
+                return expenseDate >= startDate! && expenseDate <= endDate!;
+            });
+    
+            if (filteredExpenses.length === 0) {
+                Toaster('No expenses found for the selected date range.', 'info');
+                setIsExporting(false);
+                return;
+            }
+            console.log("Exporting:", userId, format, startDate, endDate);
+            const response = await exportExpense(userId, format, startDate, endDate);
+            if(response.status===404){
+                throw new Error('No expense found for this date range')
+            }
+            if (!response || response.status !== 200) {
+                throw new Error(response?.data?.message || 'Failed to export data');
+            }
+            const blob = await response.data;
+            if (!blob || blob.size === 0) {
+                throw new Error('Received empty data from server');
+            }
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `expense-report.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            Toaster(`successfully exported Expense report as ${format.toUpperCase()} `, 'success');
+        } catch (error) {
+            console.error("Error exporting data:", error);
+            Toaster(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
+    const isWithinRange = (date: Date) => {
+        const now = new Date();
+        const expenseDate = new Date(date);
+        switch (selectedDateRange) {
+            case 'today':
+                return expenseDate.toDateString() === now.toDateString();
+            case 'week':
+                const weekAgo = new Date();
+                weekAgo.setDate(now.getDate() - 7);
+                return expenseDate >= weekAgo && expenseDate <= now;
+            case 'month':
+                return expenseDate.getMonth() === now.getMonth() &&
+                    expenseDate.getFullYear() === now.getFullYear();
+            default:
+                return true;
+        }
+    };
 
     const totalAmount = expenses.reduce((acc, expense) => acc + expense.amount, 0);
     const largestAmount = Math.max(...expenses.map((expense) => expense.amount))
@@ -159,6 +245,11 @@ const Expenses = () => {
     const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
     const averageDailyExpense = totalDays > 0 ? (total / totalDays).toFixed(2) : "0.00";
 
+    const filteredExpenses = expenses.filter(expense =>
+        expense.description.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (selectedCategory ? expense.category === selectedCategory : true) &&
+        isWithinRange(expense.date)
+    );
 
 
     return (
@@ -170,7 +261,7 @@ const Expenses = () => {
 
                     {/* Filters */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <Select>
+                        <Select onValueChange={(value) => setSelectedDateRange(value)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Date Range" />
                             </SelectTrigger>
@@ -178,11 +269,10 @@ const Expenses = () => {
                                 <SelectItem value="today">Today</SelectItem>
                                 <SelectItem value="week">Last 7 Days</SelectItem>
                                 <SelectItem value="month">This Month</SelectItem>
-                                <SelectItem value="custom">Custom Range</SelectItem>
                             </SelectContent>
                         </Select>
 
-                        <Select onValueChange={(value) => handleChange({ target: { name: 'category', value } } as any)}>
+                        <Select onValueChange={(value) => setSelectedCategory(value)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select category" />
                             </SelectTrigger>
@@ -301,7 +391,7 @@ const Expenses = () => {
                                         <Loading />
                                     ) : (
                                         <TableBody>
-                                            {expenses.map((expense) => (
+                                            {filteredExpenses.map((expense) => (
                                                 <TableRow key={expense.id}>
                                                     <TableCell>{format(new Date(expense.date), 'PPP')}</TableCell>
                                                     <TableCell>{expense.description}</TableCell>
@@ -313,7 +403,7 @@ const Expenses = () => {
                                                         <Button variant="ghost" size="icon">
                                                             <Edit className="h-4 w-4" />
                                                         </Button>
-                                                        <Button variant="ghost" size="icon" className="text-red-600">
+                                                        <Button onClick={() => handleDeleteExpense(expense.id)} variant="ghost" size="icon" className="text-red-600">
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
                                                     </TableCell>
@@ -369,7 +459,7 @@ const Expenses = () => {
                         </Card>
 
                         {/* Export Data */}
-                        <DropdownMenu>
+                        {/* <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button className="w-full" variant="outline" disabled={isExporting}>
                                     <Download className="mr-2 h-4 w-4" />
@@ -387,7 +477,70 @@ const Expenses = () => {
                                     Export as Excel
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
+                        </DropdownMenu> */}
+                        <Select value={exportFilter} onValueChange={setExportFilter}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select Export Range" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="daily">Today</SelectItem>
+                                <SelectItem value="weekly">Last 7 Days</SelectItem>
+                                <SelectItem value="monthly">This Month</SelectItem>
+                                <SelectItem value="custom">Custom Range</SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        {exportFilter === 'custom' && (
+                            <div className="flex gap-4 mt-2">
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button variant="outline">
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {customStartDate ? format(customStartDate, 'PPP') : 'Start Date'}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent>
+                                        <Calendar
+                                            mode="single"
+                                            selected={customStartDate || undefined}
+                                            onSelect={setCustomStartDate}
+                                            max={customEndDate || new Date()}
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button variant="outline">
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {customEndDate ? format(customEndDate, 'PPP') : 'End Date'}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent>
+                                        <Calendar
+                                            mode="single"
+                                            selected={customEndDate || undefined}
+                                            onSelect={setCustomEndDate}
+                                            min={customStartDate || undefined}
+                                            max={new Date()}
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                        )}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button disabled={isExporting || (exportFilter === 'custom' && (!customStartDate || !customEndDate))} className="bg-blue-600 hover:bg-blue-700">
+                                    <Download className="mr-2 h-4 w-4" />
+                                    {isExporting ? 'Exporting...' : 'Export'}
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem onClick={() => handleExportData('pdf')}>Export PDF</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleExportData('csv')}>Export CSV</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleExportData('excel')}>Export Excel</DropdownMenuItem>
+                            </DropdownMenuContent>
                         </DropdownMenu>
+
                     </div>
                 </div>
             </div>

@@ -185,15 +185,45 @@ export const getDashboardData = async (userId: string) => {
   }
 }
 
-export const exportExpense = async (userId: string, format: string) => {
-  try {
-    const response = await axiosInstance.get(
-      `${BASEURL}/exportExpense/${userId}?format=${format}`,
-      { responseType: 'blob' }
-    );
-    return response;
-  } catch (err) {
-    console.error("Export service error:", err);
-    throw err;
+// export const exportExpense = async (userId: string, format: string) => {
+//   try {
+//     const response = await axiosInstance.get(
+//       `${BASEURL}/exportExpense/${userId}?format=${format}`,
+//       { responseType: 'blob' }
+//     );
+//     return response;
+//   } catch (err) {
+//     console.error("Export service error:", err);
+//     throw err;
+//   }
+// }
+
+
+export const exportExpense = async (userId: string, format: string, startDate?: Date | null, endDate?: Date | null) => {
+  try{
+    console.log("export-service : userId : ",userId," , format : ",format," , startDate : ",startDate," ,endDate : ",endDate)
+    const params: any = { format, userId };
+    if (startDate) params.startDate = startDate.toISOString();
+    if (endDate) params.endDate = endDate.toISOString();
+    const response =  axiosInstance.get(`${BASEURL}/exportExpense`, {
+      params,
+      responseType: 'blob',
+    });
+    console.log("response - service : ",response)
+    return response
+  }catch(err){
+    console.error("Export service error : ",err)
+    throw err
+  }
+};
+
+
+export const deleteExpense = async(id:number|undefined)=>{
+  try{
+    const response = await axiosInstance.delete(`${BASEURL}/deleteExpense/${id}`)
+    return response
+  }catch(err){
+    console.error("deleteExpense error : ",err)
+    throw err
   }
 }
