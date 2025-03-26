@@ -15,6 +15,8 @@ import { getExpenses, createExpense, getCategories, exportExpense, deleteExpense
 import useShowToast from '@/customHook/showToaster';
 import Loading from '@/style/loading';
 import Store from '../../store/store'
+import Pagination from "@/components/admin/Pagination";
+
 
 
 interface Expense {
@@ -46,6 +48,10 @@ const Expenses = () => {
     const [exportFilter, setExportFilter] = useState('daily');
     const [customStartDate, setCustomStartDate] = useState<Date | null>(null);
     const [customEndDate, setCustomEndDate] = useState<Date | null>(null);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(3);
+    const limit = 4;
+
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -66,14 +72,19 @@ const Expenses = () => {
                     console.error('User ID is not defined.');
                     return;
                 }
-                const data = await getExpenses(userId)
-                setExpenses(data)
+                console.log("limit :", limit)
+                console.log("currentPage : ", currentPage)
+                const response = await getExpenses(userId, currentPage, limit)
+                console.log(response)
+                setExpenses(response.data.expenses)
+                console.log("totalpages : ", response.data.totalPages)
+                setTotalPages(response.data.totalPages)
             } catch (error) {
                 console.error('Error fetching expenses:', error);
             }
         };
         fetchExpenses();
-    }, []);
+    }, [userId, currentPage]);
 
     const handleDeleteExpense = async (id: number | undefined) => {
         console.log("deleteExpensId :; ", id)
@@ -177,7 +188,7 @@ const Expenses = () => {
                 const expenseDate = new Date(expense.date);
                 return expenseDate >= startDate! && expenseDate <= endDate!;
             });
-    
+
             if (filteredExpenses.length === 0) {
                 Toaster('No expenses found for the selected date range.', 'info');
                 setIsExporting(false);
@@ -185,7 +196,7 @@ const Expenses = () => {
             }
             console.log("Exporting:", userId, format, startDate, endDate);
             const response = await exportExpense(userId, format, startDate, endDate);
-            if(response.status===404){
+            if (response.status === 404) {
                 throw new Error('No expense found for this date range')
             }
             if (!response || response.status !== 200) {
@@ -231,7 +242,6 @@ const Expenses = () => {
                 return true;
         }
     };
-
     const totalAmount = expenses.reduce((acc, expense) => acc + expense.amount, 0);
     const largestAmount = Math.max(...expenses.map((expense) => expense.amount))
     const expensesByDate: Record<string, number> = {};
@@ -414,7 +424,12 @@ const Expenses = () => {
                                 </Table>
                             </CardContent>
                         </Card>
-
+                        <div className="flex justify-end mt-4">
+                            <Pagination currentPage={currentPage} onPageChange={(page) => {
+                                console.log("Changing page to: ", page);
+                                setCurrentPage(page);
+                            }} totalPages={totalPages} />
+                        </div>
                     </div>
 
                     {/* Right Column - Summary and Charts */}
