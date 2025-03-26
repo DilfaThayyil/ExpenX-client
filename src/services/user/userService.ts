@@ -66,9 +66,11 @@ export const createExpense = async (formData: FormData, userId: string) => {
 };
 
 
-export const getExpenses = async (userId: string) => {
+export const getExpenses = async (userId: string,currentPage:number,limit:number) => {
   try {
-    const response = await axiosInstance.get(`${BASEURL}/getExpenses/${userId}`);
+    const response = await axiosInstance.get(`${BASEURL}/getExpenses/${userId}`,{
+      params: { currentPage, limit }
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching expenses:', error);
