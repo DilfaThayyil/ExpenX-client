@@ -7,7 +7,7 @@ import Store from "@/store/store";
 import Pagination from "@/components/admin/Pagination";
 import ChatWindow from "@/components/chat/chat";
 
-interface Booking {
+export interface Booking {
   date: string;
   endTime: string;
   startTime: string;

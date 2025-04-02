@@ -144,3 +144,14 @@ export const fetchRecentClients = async(advisorId:string)=>{
     throw err
   }
 }
+
+export const getClientMeetings = async(clientId:string|undefined)=>{
+  try{
+    const response = await axiosInstance.get(`${BASEURL}/getClientMeetings/${clientId}`)
+    return response.data
+  }catch(err){
+    console.error(err)
+    throw err
+  }
+}
+

@@ -11,6 +11,7 @@ import { NotFound } from '@/pages/404/404';
 import AdvisorProtectedRoute from './advisorProtectedRoutes'
 // import PublicRoute from './publicRoute'
 import WithNavbar from '@/layout/withNav'
+import ClientProfile from '@/components/advisor/clientProfile/ClientProfile'
 
 const AdvisorRoutes = () => {
     return (
@@ -28,6 +29,7 @@ const AdvisorRoutes = () => {
                     <Route path="profile" element={<ProfileAd />} />
                     <Route path="slotManage" element={<SlotManage />} />
                     <Route path="clients" element={<Clients />} />
+                    <Route path="clientProfile/:clientId" element={<ClientProfile/>}/>
                 </Route>
             </Route>
         </Routes >
