@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import Store from '@/store/store'
-import ChatWindow from '@/components/chat/chat'
-import { createChat, fetchChats } from "@/services/chat/chatServices";
-import { useState } from "react";
+// import Store from '@/store/store'
+// import ChatWindow from '@/components/chat/chat'
+// import { createChat, fetchChats } from "@/services/chat/chatServices";
+// import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 
 interface Booking {
@@ -30,43 +30,43 @@ interface BookedAppointmentsTableProps {
 
 const BookedAppointmentsTable: React.FC<BookedAppointmentsTableProps> = ({ appointments }) => {
     const navigate = useNavigate();
-    const sender = Store((state) => state.user)
-    const senderId = sender._id
-    const [selectedChat, setSelectedChat] = useState<any>(null);
-    const [isChatOpen, setIsChatOpen] = useState(false);
-    const [chatReceiverId, setChatReceiverId] = useState('');
+    // const sender = Store((state) => state.user)
+    // const senderId = sender._id
+    // const [selectedChat, setSelectedChat] = useState<any>(null);
+    // const [isChatOpen, setIsChatOpen] = useState(false);
+    // const [chatReceiverId, setChatReceiverId] = useState('');
 
-    const handleAddChat = async (chatReceiverId: string) => {
-        try {
-            const allChats = await fetchChats(chatReceiverId);
-            const existingChat = allChats.find(
-                (chat: { user1: string; user2: string; _id: string }) =>
-                    (chat.user1 === sender._id && chat.user2 === chatReceiverId) ||
-                    (chat.user1 === chatReceiverId && chat.user2 === sender._id)
-            );
-            if (existingChat) {
-                handleSelectChat(existingChat);
-            } else {
-                const chatDetails = {
-                    user1: sender._id,
-                    user2: chatReceiverId,
-                    lastMessage: '',
-                };
+    // const handleAddChat = async (chatReceiverId: string) => {
+    //     try {
+    //         const allChats = await fetchChats(chatReceiverId);
+    //         const existingChat = allChats.find(
+    //             (chat: { user1: string; user2: string; _id: string }) =>
+    //                 (chat.user1 === sender._id && chat.user2 === chatReceiverId) ||
+    //                 (chat.user1 === chatReceiverId && chat.user2 === sender._id)
+    //         );
+    //         if (existingChat) {
+    //             handleSelectChat(existingChat);
+    //         } else {
+    //             const chatDetails = {
+    //                 user1: sender._id,
+    //                 user2: chatReceiverId,
+    //                 lastMessage: '',
+    //             };
 
-                const res = await createChat(chatDetails);
-                if (res?.data?.result) {
-                    setSelectedChat(res.data.result);
-                }
+    //             const res = await createChat(chatDetails);
+    //             if (res?.data?.result) {
+    //                 setSelectedChat(res.data.result);
+    //             }
 
-            }
-        } catch (error) {
-            console.error("Error handling chat creation:", error);
-        }
-    };
+    //         }
+    //     } catch (error) {
+    //         console.error("Error handling chat creation:", error);
+    //     }
+    // };
 
-    const handleSelectChat = (chat: any) => {
-        setSelectedChat(chat);
-    };
+    // const handleSelectChat = (chat: any) => {
+    //     setSelectedChat(chat);
+    // };
 
     const getStatusColor = (status: Booking['status']) => {
         switch (status) {
@@ -101,7 +101,10 @@ const BookedAppointmentsTable: React.FC<BookedAppointmentsTableProps> = ({ appoi
                     <tbody>
                         {normalizedAppointments.length > 0 && Array.isArray(normalizedAppointments) ? (
                             normalizedAppointments.map((appointment, index) => (
-                                <tr key={appointment._id} className={`border-b ${index % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-100 transition`}>
+                                <tr key={appointment._id} 
+                                className={`border-b ${index % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-100 transition cursor-pointer`}
+                                onClick={()=>navigate(`/advisor/clientProfile/${appointment.bookedBy._id}`)}
+                                >
                                     <td className="px-6 py-3">{appointment.bookedBy.username}</td>
                                     <td className="px-6 py-3">{appointment.bookedBy.email}</td>
                                     <td className="px-6 py-3">{appointment.date}</td>
