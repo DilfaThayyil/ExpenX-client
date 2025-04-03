@@ -8,7 +8,7 @@ import { ExpensesTab } from './ExpenseTab';
 import { InvestmentsTab } from './InvestmentsTab';
 import { DocumentsTab } from './DocumentsTab';
 import { useParams } from 'react-router-dom';
-import { getClientMeetings } from '@/services/advisor/advisorService';
+import { getClientMeetings,getClient } from '@/services/advisor/advisorService';
 
 
 const investmentData = [
@@ -42,6 +42,7 @@ const documentsData = [
 
 const ClientProfilePage = () => {
     const [meetings, setMeetings] = useState([]);
+    const [client,setClient] = useState(null)
     const [expenseTimeframe, setExpenseTimeframe] = useState('30days');
     const [activeTab, setActiveTab] = useState('overview');
     const { clientId } = useParams()
@@ -56,11 +57,44 @@ const ClientProfilePage = () => {
         fetchMeetings()
     }, [clientId])
 
+    useEffect(() => {
+        const fetchClient = async () => {
+            const response = await getClient(clientId)
+            console.log("response-clientProfile-client ==>>  ", response.client)
+            setClient(response.client)
+        }
+        fetchClient()
+    }, [clientId])
+
+    const getMeetingDetails = (meetings) => {
+        const today = new Date();
+        
+        const sortedMeetings = meetings.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+        let lastMeeting = null;
+        let nextMeeting = null;
+    
+        for (const meeting of sortedMeetings) {
+            const meetingDate = new Date(meeting.date);
+    
+            if (meetingDate < today) {
+                lastMeeting = meeting;
+            } else if (!nextMeeting && meetingDate >= today) {
+                nextMeeting = meeting;
+            }
+        }
+        console.log("lastMeeting ==> ",lastMeeting)
+        console.log("nextMeeting ==> ",nextMeeting)
+        return { lastMeeting, nextMeeting };
+    };
+
+    const { lastMeeting, nextMeeting } = getMeetingDetails(meetings);
+    console.log(lastMeeting," , ",nextMeeting)
 
     return (
         <Layout role='advisor'>
             <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6">
-                <ClientHeader />
+                <ClientHeader client={client} lastMeeting={lastMeeting} nextMeeting={nextMeeting}/>
 
                 {/* Main Content with Tabs */}
                 <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>

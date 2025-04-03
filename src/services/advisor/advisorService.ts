@@ -155,3 +155,14 @@ export const getClientMeetings = async(clientId:string|undefined)=>{
   }
 }
 
+export const getClient = async(clientId:string|undefined)=>{
+  try{
+    console.log("starting....service : ",clientId)
+    const response = await axiosInstance.get(`${BASEURL}/getClient/${clientId}`)
+    console.log("service-getClient : ",response.data)
+    return response.data
+  }catch(err){
+    console.error(err)
+    throw err
+  }
+}
