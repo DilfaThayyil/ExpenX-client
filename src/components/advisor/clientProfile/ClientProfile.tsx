@@ -8,7 +8,7 @@ import { ExpensesTab } from './ExpenseTab';
 import { InvestmentsTab } from './InvestmentsTab';
 import { DocumentsTab } from './DocumentsTab';
 import { useParams } from 'react-router-dom';
-import { getClientMeetings,getClient } from '@/services/advisor/advisorService';
+import { getClientMeetings, getClient, getExpenseByCategory } from '@/services/advisor/advisorService';
 
 
 const investmentData = [
@@ -26,13 +26,7 @@ const investmentPortfolio = [
     { name: 'Real Estate Trust', type: 'REIT', amount: '$2,000', growth: '+8%', risk: 'Medium' },
     { name: 'Bitcoin', type: 'Crypto', amount: '$1,000', growth: '+45%', risk: 'Very High' }
 ];
-const expenseData = [
-    { name: 'Housing', value: 40, color: '#3b82f6' },
-    { name: 'Food', value: 20, color: '#22c55e' },
-    { name: 'Shopping', value: 15, color: '#f59e0b' },
-    { name: 'Travel', value: 15, color: '#8b5cf6' },
-    { name: 'Other', value: 10, color: '#64748b' }
-];
+
 const documentsData = [
     { id: 1, name: 'Q1 Tax Documents', type: 'PDF', date: 'Mar 15, 2025' },
     { id: 2, name: 'Annual Budget', type: 'Excel', date: 'Jan 05, 2025' },
@@ -41,8 +35,11 @@ const documentsData = [
 ];
 
 const ClientProfilePage = () => {
+    const [customStartDate, setCustomStartDate] = useState<Date|null>(null);
+    const [customEndDate, setCustomEndDate] = useState<Date|null>(null);
     const [meetings, setMeetings] = useState([]);
-    const [client,setClient] = useState(null)
+    const [client, setClient] = useState(null)
+    const [expense, setExpense] = useState([])
     const [expenseTimeframe, setExpenseTimeframe] = useState('30days');
     const [activeTab, setActiveTab] = useState('overview');
     const { clientId } = useParams()
@@ -51,7 +48,6 @@ const ClientProfilePage = () => {
     useEffect(() => {
         const fetchMeetings = async () => {
             const response = await getClientMeetings(clientId)
-            console.log("response-clientProfile-meetings ==>>  ", response.clientMeetings)
             setMeetings(response.clientMeetings)
         }
         fetchMeetings()
@@ -60,41 +56,74 @@ const ClientProfilePage = () => {
     useEffect(() => {
         const fetchClient = async () => {
             const response = await getClient(clientId)
-            console.log("response-clientProfile-client ==>>  ", response.client)
             setClient(response.client)
         }
         fetchClient()
     }, [clientId])
 
+    useEffect(() => {
+        const fetchExpenseData = async () => {
+            try {
+                const response = await getExpenseByCategory(clientId, expenseTimeframe,customStartDate,customEndDate);
+                const formattedData = response.expenses.map(exp => ({
+                    name: exp.category,
+                    value: exp.totalAmount,
+                    color: getCategoryColor(exp.category)
+                }));
+                console.log("formatedDta-fetchExpense ^^^^^^ ", formattedData)
+                setExpense(formattedData);
+            } catch (error) {
+                console.error("Error fetching expense data:", error);
+            }
+        };
+        fetchExpenseData();
+    }, [clientId, expenseTimeframe,customStartDate, customEndDate]);
+    
+    const setCustomDates = (start, end) => {
+        setCustomStartDate(start);
+        setCustomEndDate(end);
+    };  
+
+    const getCategoryColor = (category: string) => {
+        const colors: Record<string, string> = {
+            Utility: '#3b82f6',
+            Entertainment: '#502966',
+            Education: '#e62e77',
+            Movie: '#e8502e',
+            Food: '#22c55e',
+            Shopping: '#f59e0b',
+            Travel: '#8b5cf6',
+            Other: '#64748b'
+        };
+        return colors[category] || '#000000';
+    };
+
     const getMeetingDetails = (meetings) => {
         const today = new Date();
-        
+
         const sortedMeetings = meetings.sort((a, b) => new Date(a.date) - new Date(b.date));
-    
+
         let lastMeeting = null;
         let nextMeeting = null;
-    
+
         for (const meeting of sortedMeetings) {
             const meetingDate = new Date(meeting.date);
-    
+
             if (meetingDate < today) {
                 lastMeeting = meeting;
             } else if (!nextMeeting && meetingDate >= today) {
                 nextMeeting = meeting;
             }
         }
-        console.log("lastMeeting ==> ",lastMeeting)
-        console.log("nextMeeting ==> ",nextMeeting)
         return { lastMeeting, nextMeeting };
     };
 
     const { lastMeeting, nextMeeting } = getMeetingDetails(meetings);
-    console.log(lastMeeting," , ",nextMeeting)
 
     return (
         <Layout role='advisor'>
             <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6">
-                <ClientHeader client={client} lastMeeting={lastMeeting} nextMeeting={nextMeeting}/>
+                <ClientHeader client={client} lastMeeting={lastMeeting} nextMeeting={nextMeeting} />
 
                 {/* Main Content with Tabs */}
                 <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
@@ -128,12 +157,12 @@ const ClientProfilePage = () => {
                         <MeetingsTab meetings={meetings} />
                     </TabsContent>
 
-                    {/* Other tabs would be added here */}
                     <TabsContent value="expenses" className="mt-0">
                         <ExpensesTab
                             expenseTimeframe={expenseTimeframe}
                             setExpenseTimeframe={setExpenseTimeframe}
-                            expenseData={expenseData}
+                            expenseData={expense}
+                            setCustomDates={setCustomDates}
                         />
                     </TabsContent>
 

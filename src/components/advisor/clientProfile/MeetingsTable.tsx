@@ -9,10 +9,10 @@ const MeetingsTable = ({meetings}) => {
             <CardHeader className="pb-2">
                 <div className="flex justify-between items-center">
                     <CardTitle className="text-lg">Scheduled Meetings</CardTitle>
-                    <Button variant="outline" size="sm" className="text-sm">
+                    {/* <Button variant="outline" size="sm" className="text-sm">
                         <Plus size={16} className="mr-1" />
                         New Meeting
-                    </Button>
+                    </Button> */}
                 </div>
             </CardHeader>
             <CardContent>
@@ -54,9 +54,9 @@ const MeetingsTable = ({meetings}) => {
                         </tbody>
                     </table>
                 </div>
-                <div className="mt-4">
+                {/* <div className="mt-4">
                     <Button variant="outline" size="sm" className="text-sm">View All Meetings</Button>
-                </div>
+                </div> */}
             </CardContent>
         </Card>
     );
