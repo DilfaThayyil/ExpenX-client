@@ -1,53 +1,41 @@
-import { useEffect, useState } from 'react';
-import Layout from "@/layout/Sidebar";
+import { getClientMeetings, getClient, getExpenseByCategory } from '@/services/advisor/advisorService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ClientHeader from './ClientHeader';
-import ClientOverview from './ClientOverview';
-import MeetingsTab from './MeetingsTab';
-import { ExpensesTab } from './ExpenseTab';
-import { InvestmentsTab } from './InvestmentsTab';
+import MeetingCalendar from './MeetingCalender';
+import RecentTransactions from './RecentTransactions'
 import { DocumentsTab } from './DocumentsTab';
 import { useParams } from 'react-router-dom';
-import { getClientMeetings, getClient, getExpenseByCategory } from '@/services/advisor/advisorService';
+import { useEffect, useState } from 'react';
+import { ExpensesTab } from './ExpenseTab';
+import ClientHeader from './ClientHeader';
+import MeetingsTab from './MeetingsTab';
+import Layout from "@/layout/Sidebar";
+import Store from '@/store/store'
 
 
-const investmentData = [
-    { name: 'Jan', value: 10000 },
-    { name: 'Feb', value: 11500 },
-    { name: 'Mar', value: 13000 },
-    { name: 'Apr', value: 12500 },
-    { name: 'May', value: 14000 },
-    { name: 'Jun', value: 16000 }
-];
-const investmentPortfolio = [
-    { name: 'S&P 500 ETF', type: 'ETF', amount: '$5,000', growth: '+12%', risk: 'Medium' },
-    { name: 'Tech Fund', type: 'Mutual Fund', amount: '$3,000', growth: '+18%', risk: 'High' },
-    { name: 'Bond Fund', type: 'Bond', amount: '$4,000', growth: '+5%', risk: 'Low' },
-    { name: 'Real Estate Trust', type: 'REIT', amount: '$2,000', growth: '+8%', risk: 'Medium' },
-    { name: 'Bitcoin', type: 'Crypto', amount: '$1,000', growth: '+45%', risk: 'Very High' }
+const transactionData = [
+    { id: 1, type: 'Income', description: 'Salary', amount: 5000, date: '2025-03-15', category: 'Income' },
+    { id: 2, type: 'Expense', description: 'Rent', amount: 1500, date: '2025-03-10', category: 'Housing' },
+    { id: 3, type: 'Expense', description: 'Groceries', amount: 300, date: '2025-03-20', category: 'Food' },
+    { id: 4, type: 'Expense', description: 'Flight Tickets', amount: 800, date: '2025-03-05', category: 'Travel' },
 ];
 
-const documentsData = [
-    { id: 1, name: 'Q1 Tax Documents', type: 'PDF', date: 'Mar 15, 2025' },
-    { id: 2, name: 'Annual Budget', type: 'Excel', date: 'Jan 05, 2025' },
-    { id: 3, name: 'Investment Statement', type: 'PDF', date: 'Feb 10, 2025' },
-    { id: 4, name: 'Expense Tracker', type: 'Excel', date: 'Mar 01, 2025' }
-];
 
 const ClientProfilePage = () => {
-    const [customStartDate, setCustomStartDate] = useState<Date|null>(null);
-    const [customEndDate, setCustomEndDate] = useState<Date|null>(null);
+    const [customStartDate, setCustomStartDate] = useState<Date | null>(null);
+    const [customEndDate, setCustomEndDate] = useState<Date | null>(null);
     const [meetings, setMeetings] = useState([]);
     const [client, setClient] = useState(null)
     const [expense, setExpense] = useState([])
     const [expenseTimeframe, setExpenseTimeframe] = useState('30days');
-    const [activeTab, setActiveTab] = useState('overview');
+    const [activeTab, setActiveTab] = useState('transactions');
     const { clientId } = useParams()
+    const advisorId = Store((state) => state.user._id)
     console.log("clientId-clientProfilePage : ", clientId)
 
     useEffect(() => {
         const fetchMeetings = async () => {
-            const response = await getClientMeetings(clientId)
+            const response = await getClientMeetings(clientId, advisorId)
+            console.log("meetings ; ", response.clientMeetings)
             setMeetings(response.clientMeetings)
         }
         fetchMeetings()
@@ -64,7 +52,7 @@ const ClientProfilePage = () => {
     useEffect(() => {
         const fetchExpenseData = async () => {
             try {
-                const response = await getExpenseByCategory(clientId, expenseTimeframe,customStartDate,customEndDate);
+                const response = await getExpenseByCategory(clientId, expenseTimeframe, customStartDate, customEndDate);
                 const formattedData = response.expenses.map(exp => ({
                     name: exp.category,
                     value: exp.totalAmount,
@@ -77,12 +65,12 @@ const ClientProfilePage = () => {
             }
         };
         fetchExpenseData();
-    }, [clientId, expenseTimeframe,customStartDate, customEndDate]);
-    
+    }, [clientId, expenseTimeframe, customStartDate, customEndDate]);
+
     const setCustomDates = (start, end) => {
         setCustomStartDate(start);
         setCustomEndDate(end);
-    };  
+    };
 
     const getCategoryColor = (category: string) => {
         const colors: Record<string, string> = {
@@ -100,15 +88,11 @@ const ClientProfilePage = () => {
 
     const getMeetingDetails = (meetings) => {
         const today = new Date();
-
         const sortedMeetings = meetings.sort((a, b) => new Date(a.date) - new Date(b.date));
-
         let lastMeeting = null;
         let nextMeeting = null;
-
         for (const meeting of sortedMeetings) {
             const meetingDate = new Date(meeting.date);
-
             if (meetingDate < today) {
                 lastMeeting = meeting;
             } else if (!nextMeeting && meetingDate >= today) {
@@ -117,7 +101,6 @@ const ClientProfilePage = () => {
         }
         return { lastMeeting, nextMeeting };
     };
-
     const { lastMeeting, nextMeeting } = getMeetingDetails(meetings);
 
     return (
@@ -126,20 +109,23 @@ const ClientProfilePage = () => {
                 <ClientHeader client={client} lastMeeting={lastMeeting} nextMeeting={nextMeeting} />
 
                 {/* Main Content with Tabs */}
-                <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
+                <Tabs defaultValue="transactions" className="w-full" onValueChange={setActiveTab}>
                     <div className="mb-6 overflow-x-auto">
                         <TabsList className="bg-white dark:bg-slate-800 p-1 rounded-lg shadow-sm">
-                            <TabsTrigger value="overview" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-slate-700">
-                                Overview
+                            <TabsTrigger value="transactions" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-slate-700">
+                                Transactions
                             </TabsTrigger>
                             <TabsTrigger value="expenses" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-slate-700">
                                 Expenses
                             </TabsTrigger>
-                            <TabsTrigger value="investments" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-slate-700">
+                            {/* <TabsTrigger value="investments" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-slate-700">
                                 Investments
-                            </TabsTrigger>
+                            </TabsTrigger> */}
                             <TabsTrigger value="meetings" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-slate-700">
                                 Meetings
+                            </TabsTrigger>
+                            <TabsTrigger value="calender" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-slate-700">
+                                Calender
                             </TabsTrigger>
                             <TabsTrigger value="documents" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-slate-700">
                                 Documents
@@ -148,13 +134,8 @@ const ClientProfilePage = () => {
                     </div>
 
                     {/* Overview Tab */}
-                    <TabsContent value="overview" className="mt-0">
-                        <ClientOverview />
-                    </TabsContent>
-
-                    {/* Meetings Tab */}
-                    <TabsContent value="meetings" className="mt-0">
-                        <MeetingsTab meetings={meetings} />
+                    <TabsContent value="transactions" className="mt-0">
+                        <RecentTransactions clientId={clientId}/>
                     </TabsContent>
 
                     <TabsContent value="expenses" className="mt-0">
@@ -166,15 +147,16 @@ const ClientProfilePage = () => {
                         />
                     </TabsContent>
 
-                    <TabsContent value="investments" className="mt-0">
-                        <InvestmentsTab
-                            investmentData={investmentData}
-                            investmentPortfolio={investmentPortfolio}
-                        />
+                    <TabsContent value="meetings" className="mt-0">
+                        <MeetingsTab meetings={meetings} />
+                    </TabsContent>
+
+                    <TabsContent value="calender" className="mt-0">
+                        <MeetingCalendar meetings={meetings} />
                     </TabsContent>
 
                     <TabsContent value="documents" className="mt-0">
-                        <DocumentsTab documentsData={documentsData} />
+                        <DocumentsTab clientId={clientId} />
                     </TabsContent>
                 </Tabs>
             </div>
