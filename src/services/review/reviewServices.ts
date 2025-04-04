@@ -12,8 +12,10 @@ export const createReview = async (advisorId: string,userId:string,rating: numbe
   return response.data;
 };
 
-export const getReviewsForAdvisor = async (advisorId: string) => {
-  const response = await axiosInstance.get(`${advBASEURL}/getReviews/${advisorId}`);
+export const getReviewsForAdvisor = async (advisorId: string,page:number,limit:number) => {
+  const response = await axiosInstance.get(`${advBASEURL}/getReviews/${advisorId}`,{
+    params:{page,limit}
+  });
   return response.data;
 };
 

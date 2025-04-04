@@ -210,9 +210,9 @@ export const uploadDocument = async(formData:FormData)=>{
   }
 } 
 
-export const getTransactions = async(clientId:string|undefined)=>{
+export const getTransactions = async(userId:string|undefined)=>{
   try{
-    const response = await axiosInstance.get(`${BASEURL}/getTransactions/${clientId}`)
+    const response = await axiosInstance.get(`${BASEURL}/getTransactions/${userId}`)
     return response.data
   }catch(err){
     console.error(err)
