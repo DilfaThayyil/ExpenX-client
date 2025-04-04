@@ -12,6 +12,7 @@ import AdvisorProtectedRoute from './advisorProtectedRoutes'
 // import PublicRoute from './publicRoute'
 import WithNavbar from '@/layout/withNav'
 import ClientProfile from '@/components/advisor/clientProfile/ClientProfile'
+import AdvisorWallet from '@/pages/advisor/Wallet';
 
 const AdvisorRoutes = () => {
     return (
@@ -27,6 +28,7 @@ const AdvisorRoutes = () => {
                 <Route element={<WithNavbar />}>
                     <Route path="home" element={<DashboardAd />} />
                     <Route path="profile" element={<ProfileAd />} />
+                    <Route path="wallet" element={<AdvisorWallet/>}/>
                     <Route path="slotManage" element={<SlotManage />} />
                     <Route path="clients" element={<Clients />} />
                     <Route path="clientProfile/:clientId" element={<ClientProfile/>}/>

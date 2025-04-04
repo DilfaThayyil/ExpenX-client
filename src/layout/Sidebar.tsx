@@ -1,6 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { Calendar, Home, Inbox, Search, Settings, Users, UsersRound, FileWarning, UserCircle } from "lucide-react";
+import { Calendar, Home, Inbox, Search, Settings, Users, UsersRound, FileWarning, UserCircle,Wallet  } from "lucide-react";
 
 const userMenuItems = [
   { title: "Dashboard", url: "/home", icon: Home },
@@ -14,9 +14,9 @@ const userMenuItems = [
 const advisorMenuItems = [
   { title: "Dashboard", url: "/advisor/home", icon: Home },
   { title: "Appointments", url: "/advisor/slotManage", icon: Calendar },
-  { title: "Clients", url: "/advisor/clients", icon: Inbox },
+  { title: "Clients", url: "/advisor/clients", icon: Search },
   { title: "Profile", url: "/advisor/profile", icon: Settings },
-  // { title: "Profile", url: "/advisor/profile", icon: Search },   
+  { title: "Wallet", url: "/advisor/wallet", icon: Wallet  },
 ];
 
 const adminMenuItems = [
@@ -24,7 +24,6 @@ const adminMenuItems = [
   { title: "Users", url: "/admin/users", icon: Users },
   { title: "Advisors", url: "/admin/advisors", icon: UsersRound },
   { title: "Categories", url: "/admin/categories", icon: Inbox },
-  // { title: "Profile", url: "/admin/profile", icon: Settings },
   { title: "User Reports", url: "/admin/reports", icon: FileWarning }
 ];
 

@@ -10,10 +10,11 @@ import FormInput from '@/components/InputField';
 // import Progresss from '@/components/progressBar'
 import useShowToast from '@/customHook/showToaster';
 import { updateUser, uploadImageToCloudinary } from '@/services/advisor/advisorService';
-import { getReviewsForAdvisor,addReplyToReview } from '@/services/review/reviewServices'
+import { getReviewsForAdvisor, addReplyToReview } from '@/services/review/reviewServices'
 import Loading from '@/style/loading';
 import ReplyItem from '@/components/reviews/ReplyItem';
 import ReplyForm from '@/components/reviews/ReplyForm';
+import Pagination from "@/components/admin/Pagination";
 
 
 interface Feedback {
@@ -43,6 +44,9 @@ const ProfileAd = () => {
 
   const Toaster = useShowToast()
   const user = Store(state => state.user)
+  const limit = 1;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(2);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
   const [profilePic, setProfilePic] = useState<File | null>(null)
   const [previewPic, setPreviewPic] = useState(user.profilePic)
@@ -61,10 +65,14 @@ const ProfileAd = () => {
     language: ''
   })
   const [showReplyForm, setShowReplyForm] = useState<string | null>(null);
+
   const fetchReviews = async () => {
     try {
-      const response = await getReviewsForAdvisor(user._id)
-      setFeedbacks(response.data);
+      const response = await getReviewsForAdvisor(user._id,currentPage,limit)
+      console.log("res-getFeedbacks ******* : ", response.data)
+      const {reviews,totalPages} = response.data
+      setFeedbacks(reviews);
+      setTotalPages(totalPages)
     } catch (error) {
       console.error("Error fetching advisors:", error);
     } finally {
@@ -74,7 +82,7 @@ const ProfileAd = () => {
 
   useEffect(() => {
     fetchReviews();
-  }, []);
+  }, [user._id,currentPage]);
   if (loading) return <Loading />
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,7 +164,7 @@ const ProfileAd = () => {
 
   const handleReplySubmit = async (reviewId: string, text: string) => {
     try {
-      await addReplyToReview(user._id,reviewId, text);
+      await addReplyToReview(user._id, reviewId, text);
       setShowReplyForm(null);
       fetchReviews();
     } catch (error) {
@@ -181,12 +189,12 @@ const ProfileAd = () => {
     return Math.floor((completedFields.length / fields.length) * 100);
   };
 
- 
+
 
 
   return (
     <Layout role='advisor'>
-      <div className="container mx-auto p-4 max-w-6xl">
+      <div className="container mx-auto p-2 max-w-full lg-px-8">
         {/* Profile Completion Alert */}
         <Alert className="mb-6">
           <AlertDescription className="flex items-center justify-between">
@@ -195,7 +203,9 @@ const ProfileAd = () => {
           </AlertDescription>
         </Alert>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2  gap-6">
+
+
           {/* User Information Card */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -257,7 +267,6 @@ const ProfileAd = () => {
             </CardContent>
           </Card>
 
-          {/* Client feedbacks Card */}
           <Card>
             <CardHeader>
               <CardTitle>Client Feedbacks</CardTitle>
@@ -269,7 +278,7 @@ const ProfileAd = () => {
                     <div key={index} className="space-y-2 border-b pb-4 last:border-b-0">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <img src={review.profilePic} alt="Profile" className="h-6 w-6 rounded-full" />
+                          <img src={review.userId.profilePic} alt="Profile" className="h-6 w-6 rounded-full" />
                           <span className="font-medium">{review.username}</span>
                         </div>
                         <span className="text-sm text-gray-500">
@@ -281,7 +290,6 @@ const ProfileAd = () => {
                       </div>
                       <p className="text-sm text-gray-700">{review.review}</p>
 
-                      {/* Replies Section */}
                       {review.replies && review.replies.length > 0 && (
                         <div className="replies-section bg-gray-100 p-2 rounded-md mt-2">
                           <h4 className="font-medium text-gray-700">Replies</h4>
@@ -295,7 +303,6 @@ const ProfileAd = () => {
                         </div>
                       )}
 
-                      {/* Reply Button */}
                       <button
                         className="text-blue-500 text-sm mt-2"
                         onClick={() => setShowReplyForm(review._id)}
@@ -303,7 +310,6 @@ const ProfileAd = () => {
                         Reply
                       </button>
 
-                      {/* Reply Form (conditionally rendered for the selected review) */}
                       {showReplyForm === review._id && (
                         <ReplyForm
                           onSubmit={(text) => handleReplySubmit(review._id, text)}
@@ -316,6 +322,7 @@ const ProfileAd = () => {
                   <p className="text-sm text-gray-500">No feedback available.</p>
                 )}
               </div>
+              <Pagination currentPage={currentPage} onPageChange={setCurrentPage} totalPages={totalPages} />
             </CardContent>
           </Card>
         </div>
@@ -408,7 +415,7 @@ const ProfileAd = () => {
           </div>
         )}
       </div>
-    </Layout>
+    </Layout >
   );
 };
 
