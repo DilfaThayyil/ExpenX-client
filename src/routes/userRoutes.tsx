@@ -11,7 +11,7 @@ import SlotBooking from '@/pages/user/slotBooking';
 import { NotFound } from '@/pages/404/404';
 import UserProtectedRoute from './UserProtectedRoutes'
 import Advisors from '@/pages/user/Advisors'
-// import PublicRoute from './publicRoute'
+import UserWallet from '@/pages/user/Wallet'
 import WithNavbar from '@/layout/withNav'
 
 const UserRoutes = () => {
@@ -31,6 +31,7 @@ const UserRoutes = () => {
                     <Route path="groups" element={<Groups />} />
                     <Route path="profile" element={<Profile />} />
                     <Route path="slotBooking" element={<SlotBooking />} />
+                    <Route path="wallet" element={<UserWallet/>}/>
                     <Route path='Advisors' element={<Advisors />} />
                 </Route>
             </Route>

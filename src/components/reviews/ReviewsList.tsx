@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getReviewsForAdvisor } from '@/services/review/reviewServices';
+import Pagination from "@/components/admin/Pagination";
 import ReviewItem from './ReviewItem';
 import ReviewForm from './ReviewForm';
+
 
 interface ReviewsListProps {
   advisorId: string;
@@ -18,24 +20,33 @@ const ReviewsList: React.FC<ReviewsListProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [currentPage,setCurrentPage] = useState<number>(1)
+  const [totalPages,setTotalPages] = useState<number>(1)
+  const limit = 1
 
   const fetchReviews = async () => {
     setLoading(true);
-    try {
-      const response = await getReviewsForAdvisor(advisorId);
-      setReviews(response.data);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching reviews:', err);
-      setError('Failed to load reviews');
-    } finally {
-      setLoading(false);
+  try {
+    const response = await getReviewsForAdvisor(advisorId, currentPage, limit);
+    if (Array.isArray(response.data.reviews)) {
+      setReviews(response.data.reviews);
+      setTotalPages(response.data.totalPages || 1);
+    } else {
+      setReviews([]); 
     }
+    setError(null);
+  } catch (err) {
+    console.error('Error fetching reviews:', err);
+    setError('Failed to load reviews');
+    setReviews([]); 
+  } finally {
+    setLoading(false);
+  }
   };
 
   useEffect(() => {
     fetchReviews();
-  }, [advisorId]);
+  }, [advisorId,currentPage]);
 
   const handleReviewAdded = () => {
     fetchReviews();
@@ -98,6 +109,7 @@ const ReviewsList: React.FC<ReviewsListProps> = ({
           ))}
         </div>
       )}
+        <Pagination currentPage={currentPage} onPageChange={setCurrentPage} totalPages={totalPages} />
     </div>
   );
 };
