@@ -1,29 +1,13 @@
 import { useState } from "react";
-import { Edit, Trash2, Eye } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Trash2, Eye } from "lucide-react";
+import useShowToast from '@/customHook/showToaster'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog";
+import { cancelSlot } from '@/services/advisor/advisorService'
+import Store from '@/store/store'
 
 interface Slot {
     _id: string;
@@ -50,6 +34,17 @@ const SlotTable: React.FC<{
 }> = ({ slots, onEdit, onDelete }) => {
     const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
     const [slotToDelete, setSlotToDelete] = useState<string | null>(null);
+    const Toast = useShowToast()
+    const advisorId = Store((state) => state.user._id)
+    const handleCancel = async (slotId: string, userId: string | undefined) => {
+        try {
+            const response = await cancelSlot(slotId, advisorId, userId);
+            console.log("res-cancelSlot : ", response)
+            Toast(response.message, 'success');
+        } catch (error) {
+            Toast("Error cancelling slot.", "error");
+        }
+    };
 
     const getStatusColor = (status: Slot['status']) => {
         switch (status) {
@@ -95,13 +90,17 @@ const SlotTable: React.FC<{
                                 <Button variant="ghost" size="icon" onClick={() => setSelectedSlot(slot)}>
                                     <Eye className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" onClick={() => onEdit(slot)}>
-                                    <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="icon" onClick={() => setSlotToDelete(slot._id)}>
-                                    <Trash2 className="text-red-500 h-4 w-4" />
-                                    {/* <p className="text-red-500">Delete</p> */}
-                                </Button>
+                                {slot.status === "Available" && (
+                                    <Button variant="ghost" size="icon" onClick={() => setSlotToDelete(slot._id)}>
+                                        <Trash2 className="text-red-500 h-4 w-4" />
+                                    </Button>
+                                )}
+                                {slot.status === "Booked" && new Date(slot.date) >= new Date() && (
+                                    <Button variant="ghost" onClick={() => handleCancel(slot._id, slot.bookedBy?._id)}>
+                                        <Trash2 className="text-red-500 h-4 w-4" />
+                                        Cancel
+                                    </Button>
+                                )}
                             </td>
                         </tr>
                     ))}
@@ -142,7 +141,7 @@ const SlotTable: React.FC<{
                                             <p className="text-sm">{selectedSlot.fee}</p>
                                         </div>
                                     </div>
-                                    
+
                                     <div>
                                         <p className="text-sm font-medium text-gray-500">Location</p>
                                         <p className="text-sm">

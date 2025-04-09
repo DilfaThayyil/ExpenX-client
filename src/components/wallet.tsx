@@ -5,7 +5,7 @@ import { EmptyComponent } from "./empty/Empty";
 
 
 
-export const WalletComponent = ({ transactions, loading }) => {
+export const WalletComponent = ({ transactions, loading,wallet }) => {
     let totalIncome = 0;
     let totalExpense = 0;
     transactions.forEach((transaction) => {
@@ -45,7 +45,7 @@ export const WalletComponent = ({ transactions, loading }) => {
                             <div className="space-y-4 text-center">
                                 <div className="space-y-1">
                                     <p className="text-emerald-100 text-sm">Available Balance</p>
-                                    <h3 className="text-3xl font-bold tracking-tight">${totalIncome.toFixed(2)}</h3>
+                                    <h3 className="text-3xl font-bold tracking-tight">${wallet.balance}</h3>
                                 </div>
                                 <div className="flex items-center space-x-4 text-sm">
                                     {/* <div className="flex items-center">

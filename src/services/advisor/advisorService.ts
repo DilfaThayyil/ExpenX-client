@@ -145,10 +145,10 @@ export const fetchRecentClients = async (advisorId: string) => {
   }
 }
 
-export const getClientMeetings = async (clientId: string | undefined,advisorId:string) => {
+export const getClientMeetings = async (clientId: string | undefined, advisorId: string) => {
   try {
-    const response = await axiosInstance.get(`${BASEURL}/getClientMeetings`,{
-      params:{clientId,advisorId}
+    const response = await axiosInstance.get(`${BASEURL}/getClientMeetings`, {
+      params: { clientId, advisorId }
     })
     return response.data
   } catch (err) {
@@ -185,37 +185,60 @@ export const getExpenseByCategory = async (clientId: string | undefined, expense
   }
 }
 
-export const getDocuments = async(clientId:string,advisorId:string)=>{
-  try{
-    const response = await axiosInstance.get(`${BASEURL}/getDocuments`,{
+export const getDocuments = async (clientId: string, advisorId: string) => {
+  try {
+    const response = await axiosInstance.get(`${BASEURL}/getDocuments`, {
       params: { clientId, advisorId },
     })
     return response.data
-  }catch(err){
+  } catch (err) {
     console.error(err)
     throw err
   }
 }
 
-export const uploadDocument = async(formData:FormData)=>{
-  try{
-    const response = await axiosInstance.post(`${BASEURL}/uploadDocument`,formData,{
-      headers:{"Content-Type" : "multipart/form-data"}
+export const uploadDocument = async (formData: FormData) => {
+  try {
+    const response = await axiosInstance.post(`${BASEURL}/uploadDocument`, formData, {
+      headers: { "Content-Type": "multipart/form-data" }
     })
-    console.log("response-servvvv : ",response.data)
+    console.log("response-servvvv : ", response.data)
     return response.data
-  }catch(err){
+  } catch (err) {
     console.error(err)
     throw err
   }
-} 
+}
 
-export const getTransactions = async(userId:string|undefined)=>{
-  try{
+export const getTransactions = async (userId: string | undefined) => {
+  try {
     const response = await axiosInstance.get(`${BASEURL}/getTransactions/${userId}`)
     return response.data
-  }catch(err){
+  } catch (err) {
     console.error(err)
     throw err
   }
 }
+
+export const cancelSlot = async (slotId: string,advisorId:string,userId:string|undefined) => {
+  try {
+    const response = await axiosInstance.patch(`${BASEURL}/cancelSlot/${slotId}`,{
+      advisorId,userId
+    })
+    return response.data
+  } catch (err) {
+    console.error(err)
+    throw err
+  }
+}
+
+export const getWallet = async (userId:string) => {
+  try {
+    const response = await axiosInstance.get(`${BASEURL}/getWallet/${userId}`)
+    return response.data
+  } catch (err) {
+    console.error(err)
+    throw err
+  }
+}
+

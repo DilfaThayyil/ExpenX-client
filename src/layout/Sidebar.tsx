@@ -8,7 +8,8 @@ const userMenuItems = [
   { title: "Groups", url: "/groups", icon: Calendar },
   { title: "Slot Booking", url: "/slotBooking", icon: Search },
   { title: "Profile", url: "/profile", icon: Settings },
-  { title: "Advisors", url: "/advisors", icon: UserCircle }
+  { title: "Advisors", url: "/advisors", icon: UserCircle },
+  { title: "Wallet", url: "/wallet", icon: Wallet  },
 ];
 
 const advisorMenuItems = [

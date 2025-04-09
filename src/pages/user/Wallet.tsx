@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { WalletComponent } from '@/components/wallet'
 import Layout from '@/layout/Sidebar'
 import Store from '@/store/store'
-import { getTransactions ,getWallet} from '@/services/advisor/advisorService'
+import { getTransactions,getWallet } from '@/services/advisor/advisorService'
 
-export default function AdvisorWallet() {
+export default function UserWallet() {
     const advisorId = Store((state) => state.user._id)
     const [transactions, setTransactions] = useState([])
     const [loading, setLoading] = useState(true)
@@ -16,7 +16,6 @@ export default function AdvisorWallet() {
     useEffect(()=>{
         fetchUserWallet()
     },[])
-
     const fetchTransactions = async () => {
         try{
             setLoading(true)
@@ -39,7 +38,7 @@ export default function AdvisorWallet() {
         }
     }
     return (
-        <Layout role='advisor'>
+        <Layout role='user'>
             <div className="container mx-auto p-4 max-w-6xl">
                 <div className="">
                     {/* Advisor Wallet */}
