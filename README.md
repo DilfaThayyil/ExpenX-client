@@ -1,50 +1,85 @@
-# React + TypeScript + Vite
+# 💸 Expense Tracker Web App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack modern web application designed to help users track their expenses, manage appointments with financial advisors, and engage in real-time communication — all in a beautifully responsive and user-friendly interface.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## Expanding the ESLint configuration
+- ✨ **Modern UI/UX** with React, TailwindCSS, Chakra UI & MUI
+- 🧠 **Zustand** for lightweight global state management
+- 🌍 **Multi-language support** using i18next
+- 📊 **Dynamic charts & visualizations** via Chart.js & Recharts
+- 🔐 **Authentication** with JWT and Google OAuth
+- 🧾 **Expense Management** with categorization and filtering
+- 📅 **Advisor Slot Booking** with real-time availability
+- 💬 **Real-time chat** between users and advisors using Socket.IO
+- 📹 **Video/Audio Calls** powered by ZegoCloud UIKit
+- 💳 **Stripe Integration** for secure payments
+- ☁️ **Cloud uploads** with AWS S3 + Multer for profile pictures & docs
+- 🛠️ **Built with Vite** for lightning-fast performance
+- 📦 **Modular, scalable architecture** following best practices
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+---
 
-- Configure the top-level `parserOptions` property like this:
+## 🧱 Tech Stack
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### 🖥️ Frontend
+- [React](https://reactjs.org/)
+- [Vite](https://vitejs.dev/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [Chakra UI](https://chakra-ui.com/)
+- [Material UI](https://mui.com/)
+- [Framer Motion](https://www.framer.com/motion/)
+- [Zustand](https://github.com/pmndrs/zustand)
+- [React Router DOM v7](https://reactrouter.com/)
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### 📊 Data Visualization
+- [Chart.js](https://www.chartjs.org/)
+- [Recharts](https://recharts.org/)
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### 📦 State & Utilities
+- [Zustand](https://zustand-demo.pmnd.rs/)
+- [clsx](https://github.com/lukeed/clsx)
+- [class-variance-authority](https://cva.style/)
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+### 🌍 Internationalization
+- [i18next](https://www.i18next.com/)
+- [react-i18next](https://react.i18next.com/)
+
+### 🛡️ Auth & API
+- [JWT](https://jwt.io/)
+- [Google OAuth](https://developers.google.com/identity)
+- [Axios](https://axios-http.com/)
+
+### 📦 File Upload & Cloud
+- [AWS S3](https://aws.amazon.com/s3/)
+- [Multer + multer-s3](https://github.com/badunk/multer-s3)
+
+### 🔌 Real-time Features
+- [Socket.IO](https://socket.io/)
+- [ZegoCloud UIKit](https://www.zegocloud.com/)
+
+### 💰 Payments
+- [Stripe](https://stripe.com/)
+
+---
+
+## 🧪 Development
+
+### Prerequisites
+- Node.js ≥ 18
+- MongoDB
+- Stripe & Google OAuth keys
+
+### Install & Run
+
+```bash
+# Install dependencies
+npm install
+
+# Start the frontend dev server
+npm run dev
+
+# Build for production
+npm run build
