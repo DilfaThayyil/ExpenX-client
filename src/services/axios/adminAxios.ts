@@ -14,13 +14,19 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
     const { clearAdminEmail } = useAdminStore.getState();
 
-    // Check if 401 AND not retried yet
+    // Prevent infinite refresh loop
+    if (originalRequest?.url?.includes("/admin/refresh-token")) {
+      console.warn("🛑 Refresh token request failed. Preventing infinite loop.");
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
       const errorMessage = error.response?.data?.message || "";
 
-      // Check if it's a refresh token failure
-      if (errorMessage === "Refresh token expired") {
-        console.log("Refresh token expired. Logging out...");
+      if (errorMessage === "Refresh token expired" || errorMessage === "Refresh token is blacklisted.") {
+        console.log(`🚫 ${errorMessage}. Logging out...`);
 
         clearAdminEmail();
 
@@ -44,21 +50,24 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(error);
       }
 
-      originalRequest._retry = true;
+      // Try to refresh token
       try {
-        console.log("Attempting to refresh token...");
+        console.log("🔄 Attempting to refresh token...");
         await axiosInstance.post(`/admin/refresh-token`);
-        console.log("Token refreshed successfully.");
-        return axiosInstance(originalRequest); // retry original request
-      } catch (refreshError) {
-        console.log("Refresh token request failed.");
+        console.log("✅ Token refreshed successfully.");
+        return axiosInstance(originalRequest);
+      } catch (refreshError: any) {
+        const errorMessage = refreshError?.response?.data?.message || "";
+        console.log("❌ Refresh failed:", errorMessage);
 
         clearAdminEmail();
 
         Swal.fire({
           icon: "error",
           title: "Session Expired",
-          text: "Please login again.",
+          text: errorMessage === "Refresh token is blacklisted."
+            ? "Your session is no longer valid. Please login again."
+            : "Please login again.",
           timer: 6000,
           timerProgressBar: true,
           willClose: () => {
@@ -72,29 +81,34 @@ axiosInstance.interceptors.response.use(
           console.error("Logout failed:", logoutErr);
         }
 
-        return Promise.reject(refreshError); // final reject
+        return Promise.reject(refreshError);
       }
-    }
-    else if (error.response.status === 403) {
-      console.log("admin store cleard due to 403 . Logging out...")
+    } else if (error.response?.status === 403) {
+      console.log("⛔ Forbidden: Admin is blocked or not privileged.");
       clearAdminEmail();
-      await axiosInstance.post("/admin/logout")
+
+      try {
+        await axiosInstance.post("/admin/logout");
+      } catch (logoutErr) {
+        console.error("Logout failed:", logoutErr);
+      }
+
       Swal.fire({
         icon: "error",
         title: "Access Denied",
-        text: "You don't have admin Privilages..",
+        text: "You don't have admin privileges.",
         timer: 6000,
         timerProgressBar: true,
         willClose: () => {
           window.location.href = "/admin/login";
         },
       });
+
       return Promise.reject(error);
     }
 
-    return Promise.reject(error); // any other error
+    return Promise.reject(error);
   }
 );
-
 
 export default axiosInstance;
