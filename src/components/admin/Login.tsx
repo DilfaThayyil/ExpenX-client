@@ -55,10 +55,11 @@ const AdminLogin: React.FC = () => {
 
     try {
       const response=await adminLogin(email,password)
+      console.log("*****Login****response-admin : ",response)
         if(response.error){
-            Toaster(response.error,'error',true)
+            Toaster(response.error.message,'error',true)
         }else{
-          Toaster("admin logged in successfully",'success',true)
+          Toaster(response.message,'success',true)
           setAdminEmail(email)
           navigate('/admin')
         }

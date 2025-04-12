@@ -12,9 +12,9 @@ export const AdminNavbar = () => {
     const Toaster = useShowToast()
     const navigate = useNavigate()
     const handleConfirmLogout = async () => {
-        await adminLogout()
+        const response = await adminLogout()
         useAdminStore.getState().clearAdminEmail();
-        Toaster("Logged out successfully!",'success');
+        Toaster(response.message,'success');
         setTimeout(() => {
           navigate("/admin/login")
         }, 1500);
