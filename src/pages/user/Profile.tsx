@@ -10,20 +10,10 @@ import FormInput from '@/components/InputField';
 // import Progresss from '@/components/progressBar'
 import useShowToast from '@/customHook/showToaster';
 import { updateUser, uploadImageToCloudinary } from '@/services/user/userService';
-// import { userLogout } from '@/services/user/AuthServices'
 import GoalsList from '@/components/goals/GoalsList';
 
 
-
-// interface ExpenseGoal {
-//   title: string;
-//   current: number;
-//   target: number;
-//   deadline: string;
-// }
-
 const Profile = () => {
-
   const Toaster = useShowToast()
   const user = Store(state => state.user)
   const [profilePic, setProfilePic] = useState<File | null>(null)

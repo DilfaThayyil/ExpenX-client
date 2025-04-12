@@ -1,19 +1,6 @@
 import axiosInstance from '../axios/axios';
 const BASEURL = 'http://localhost:3000/advisor';
-
-
-interface Slot {
-  id?: string;
-  date: string;
-  startTime: string;
-  fee: number;
-  duration: number;
-  maxBookings: number;
-  status: 'Available' | 'Booked' | 'Cancelled';
-  location: "Virtual" | "Physical";
-  locationDetails?: string;
-  description?: string;
-}
+import {Slot} from './types'
 
 
 export const uploadImageToCloudinary = async (formData: FormData) => {

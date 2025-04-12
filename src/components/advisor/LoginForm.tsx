@@ -1,7 +1,7 @@
-import React, { useState, FormEvent } from 'react';
-import { AlertCircle, Briefcase, PieChart } from 'lucide-react';
+import React, { useState } from 'react';
+import {  Briefcase, PieChart } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate ,Link} from 'react-router-dom';
 import toastr from 'toastr'
 import "react-toastify/dist/ReactToastify.css";
 import FormInput from '../InputField';
@@ -15,50 +15,50 @@ import Store from '@/store/store';
 
 const AdvisorLogin: React.FC = () => {
   const navigate = useNavigate();
-  const {setUser} = Store()
+  const { setUser } = Store()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
-  const [formSubmitted,setFormSubmitted] = useState(false)
+  const [formSubmitted, setFormSubmitted] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
- const handleChange = (e:React.ChangeEvent<HTMLInputElement>)=>{
-  setFormData({
-    ...formData,
-    [e.target.name] : e.target.value
-  })
- }
-
-
- const validateForm = () => {
-  const errors: string[] = [];
-  const validEmail = isValidateEmail(formData.email);
-  const validPassword = isValidatePassword(formData.password);
-
-  if (!formData.email) {
-    errors.push("Email is required.");
-  } else if (!validEmail) {
-    errors.push("Invalid email format or domain not allowed.");
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
   }
 
-  if (!formData.password) {
-    errors.push("Password is required.");
-  } else if (!validPassword) {
-    errors.push(
-      "Password must be at least 8 characters long and contain one uppercase letter, one number, and one special character."
-    );
-  }
 
-  return errors;
-};
+  const validateForm = () => {
+    const errors: string[] = [];
+    const validEmail = isValidateEmail(formData.email);
+    const validPassword = isValidatePassword(formData.password);
+
+    if (!formData.email) {
+      errors.push("Email is required.");
+    } else if (!validEmail) {
+      errors.push("Invalid email format or domain not allowed.");
+    }
+
+    if (!formData.password) {
+      errors.push("Password is required.");
+    } else if (!validPassword) {
+      errors.push(
+        "Password must be at least 8 characters long and contain one uppercase letter, one number, and one special character."
+      );
+    }
+
+    return errors;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     setFormSubmitted(true);
-    
+
     const errors = validateForm();
     if (errors.length > 0) {
       errors.forEach((error) => toastr.error(error));
@@ -81,8 +81,8 @@ const AdvisorLogin: React.FC = () => {
     }
   };
 
-  const toggleModal = ()=>{
-    setIsModalOpen((prev)=>!prev)
+  const toggleModal = () => {
+    setIsModalOpen((prev) => !prev)
   }
 
   return (
@@ -120,15 +120,15 @@ const AdvisorLogin: React.FC = () => {
               onChange={handleChange}
               required
               passwordVisible={passwordVisible}
-              onPasswordVisibilityChange={()=>setPasswordVisible}
+              onPasswordVisibilityChange={() => setPasswordVisible}
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="text-sm">
-            <button 
+              <button
                 type="button"
-                onClick={toggleModal} 
+                onClick={toggleModal}
                 className="font-medium text-emerald-600 hover:text-emerald-500"
               >
                 Forgot your password?
@@ -144,15 +144,18 @@ const AdvisorLogin: React.FC = () => {
             Sign in
           </button>
 
-            <div className="flex justify-center mt-4">
-              <GoogleAuth role={'advisor'}/>
-            </div>
-            <div className="text-center text-sm">
-              <span className="text-gray-600">New to ExpenX Advisors? </span>
-              <a href="/advisor/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <div className="flex justify-center mt-4">
+            <GoogleAuth role={'advisor'} />
+          </div>
+          <div className="text-center text-sm">
+            <span className="text-gray-600">New to ExpenX Advisors? </span>
+            <Link to='/advisor/register'>
+              <a className="font-medium text-indigo-600 hover:text-indigo-500">
                 Create an account
               </a>
-            </div>
+            </Link>
+
+          </div>
         </form>
         <ToastContainer />
 

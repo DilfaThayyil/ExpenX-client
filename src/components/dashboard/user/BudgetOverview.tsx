@@ -1,14 +1,7 @@
-// src/components/dashboard/BudgetOverview.tsx
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import { Progress } from "@/components/ui/progress";
+import {BudgetOverviewProps} from './types'
 
-interface BudgetOverviewProps {
-  totalSpent: number;
-//   budget: number;
-//   progress: number;
-  loading?: boolean;
-}
 
 const BudgetOverview: React.FC<BudgetOverviewProps> = ({ 
   totalSpent, 

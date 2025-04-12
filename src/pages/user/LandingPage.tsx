@@ -2,53 +2,8 @@ import { useState } from 'react';
 import { Users, Calculator, Receipt, MessageSquare, PieChart, Shield, Clock } from 'lucide-react';
 import Navbar from '@/layout/Nav';
 import { useTranslation } from 'react-i18next';
+import {Link} from 'react-router-dom'
 
-
-
-interface TranslationContent {
-  nav: {
-    features: string;
-    pricing: string;
-    about: string;
-    startAdvisor: string;
-    login: string;
-    signup: string;
-  };
-  hero: {
-    title: string;
-    subtitle: string;
-  };
-  features: {
-    title: string;
-    groupExpenses: string;
-    groupExpensesDesc: string;
-    smartCalc: string;
-    smartCalcDesc: string;
-    billScan: string;
-    billScanDesc: string;
-    groupChat: string;
-    groupChatDesc: string;
-  };
-  chat: {
-    title: string
-    advisor: string
-    user: string
-  };
-  benefits: {
-    title: string;
-    secure: string;
-    secureDes: string;
-    save: string;
-    saveDes: string;
-    overview: string;
-    overviewDes: string;
-  }
-
-}
-
-export interface Translations {
-  [key: string]: TranslationContent;
-}
 
 
 const LandingPage = () => {
@@ -84,10 +39,12 @@ const LandingPage = () => {
               {t('hero.subtitle')}
             </p>
             <div className="flex items-center justify-center gap-4">
-              <a href="/login" className={`px-6 py-3 rounded-lg transition-colors ${darkMode ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-emerald-600 hover:bg-emerald-700'} text-white text-lg font-medium`}>
-              Get Started as User
-              </a>
-              
+              <Link to='/login'>
+                <a className={`px-6 py-3 rounded-lg transition-colors ${darkMode ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-emerald-600 hover:bg-emerald-700'} text-white text-lg font-medium`}>
+                  Get Started as User
+                </a>
+              </Link>
+
             </div>
           </div>
         </div>
@@ -191,19 +148,19 @@ const LandingPage = () => {
             <div className="flex flex-col items-center text-center">
               <Clock className="h-12 w-12 text-emerald-600 mb-4" />
               <h3 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              {t('benefits.save')}
+                {t('benefits.save')}
               </h3>
               <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>
-              {t('benefits.saveDes')}
+                {t('benefits.saveDes')}
               </p>
             </div>
             <div className="flex flex-col items-center text-center">
               <PieChart className="h-12 w-12 text-emerald-600 mb-4" />
               <h3 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              {t('benefits.overview')}
+                {t('benefits.overview')}
               </h3>
               <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>
-              {t('benefits.overviewDes')}
+                {t('benefits.overviewDes')}
               </p>
             </div>
           </div>

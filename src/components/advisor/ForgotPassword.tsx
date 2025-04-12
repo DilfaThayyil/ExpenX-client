@@ -3,17 +3,13 @@ import { handleforgetpassword } from '../../services/advisor/AuthServices';
 import toastr from 'toastr';
 import { isValidateEmail } from '../../utility/validator';
 import Loading from '../../style/loading';
-import { useNavigate } from 'react-router-dom';
 import OTPVerification from './Otp';
+import {ForgetPasswordProps} from './types'
 
 
-interface ForgetPasswordProps {
-  toggleModal: () => void;
-}
 
 const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal}) => {
 
-  const navigate = useNavigate()
   const [email, setEmail] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [showOtp, setShowOtp] = useState<boolean>(false);

@@ -12,14 +12,6 @@ import Layout from "@/layout/Sidebar";
 import Store from '@/store/store'
 
 
-const transactionData = [
-    { id: 1, type: 'Income', description: 'Salary', amount: 5000, date: '2025-03-15', category: 'Income' },
-    { id: 2, type: 'Expense', description: 'Rent', amount: 1500, date: '2025-03-10', category: 'Housing' },
-    { id: 3, type: 'Expense', description: 'Groceries', amount: 300, date: '2025-03-20', category: 'Food' },
-    { id: 4, type: 'Expense', description: 'Flight Tickets', amount: 800, date: '2025-03-05', category: 'Travel' },
-];
-
-
 const ClientProfilePage = () => {
     const [customStartDate, setCustomStartDate] = useState<Date | null>(null);
     const [customEndDate, setCustomEndDate] = useState<Date | null>(null);

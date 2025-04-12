@@ -13,18 +13,7 @@ import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Store from "@/store/store";
 import useAdminStore from '@/store/adminStore'
-// import { useState } from "react";
-
-interface MenuItem {
-  title: string;
-  url: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-}
-
-interface AppSidebarProps {
-  menuItems: MenuItem[];
-  role: "user" | "advisor" | "admin"
-}
+import {AppSidebarProps} from './types'
 
 export function AppSidebar({ menuItems, role }: AppSidebarProps) {
   const router = useLocation();

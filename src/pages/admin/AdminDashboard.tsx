@@ -3,24 +3,10 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, R
 import { Users, CreditCard, TrendingUp, DollarSign } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
 import { fetchMonthlyTrends, fetchExpenseCategories, fetchDashboardStats, fetchUserGrowth } from '@/services/admin/adminServices'
-import {AdminNavbar} from '@/layout/AdminNav'
+import { AdminNavbar } from '@/layout/AdminNav'
+import { MonthlyData, CategoryData, DashboardStats } from './types'
 
-interface MonthlyData {
-  month: string;
-  expenses: number;
-  income: number;
-  users: number;
-}
-interface CategoryData {
-  category: string;
-  amount: number;
-}
-interface DashboardStats {
-  totalUsers: number;
-  totalPayments: number;
-  averageExpense: number;
-  totalRevenue: number;
-}
+
 
 const AdminDashboard = () => {
   const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
@@ -102,7 +88,7 @@ const AdminDashboard = () => {
 
   return (
     <Layout role='admin'>
-      <AdminNavbar/>
+      <AdminNavbar />
       <div className="p-16 space-y-6 bg-gray-50 min-h-screen">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-800"> Dashboard</h1>

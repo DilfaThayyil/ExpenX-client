@@ -3,13 +3,8 @@ import { getReviewsForAdvisor } from '@/services/review/reviewServices';
 import Pagination from "@/components/admin/Pagination";
 import ReviewItem from './ReviewItem';
 import ReviewForm from './ReviewForm';
+import {ReviewsListProps} from './types'
 
-
-interface ReviewsListProps {
-  advisorId: string;
-  currentUserId: string;
-  isAdvisor: boolean
-}
 
 const ReviewsList: React.FC<ReviewsListProps> = ({ 
   advisorId, 

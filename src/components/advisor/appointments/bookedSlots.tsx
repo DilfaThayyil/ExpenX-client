@@ -1,32 +1,7 @@
 import { useNavigate } from "react-router-dom";
-// import Store from '@/store/store'
-// import ChatWindow from '@/components/chat/chat'
-// import { createChat, fetchChats } from "@/services/chat/chatServices";
-// import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import {BookedAppointmentsTableProps,Booking} from './types'
 
-interface Booking {
-    date: string;
-    endTime: string;
-    startTime: string;
-    bookedBy: {
-        _id: string; username: string; email: string
-    };
-    _id: string;
-    userName: string;
-    userEmail: string;
-    slotId: string;
-    bookedDate: string;
-    paymentStatus: "Paid" | "Pending";
-    location: "Virtual" | "Physical";
-    locationDetails: string;
-    status: 'Available' | 'Booked' | 'Cancelled';
-    description: string;
-}
-
-interface BookedAppointmentsTableProps {
-    appointments?: Booking | Booking[];
-}
 
 const BookedAppointmentsTable: React.FC<BookedAppointmentsTableProps> = ({ appointments }) => {
     const navigate = useNavigate();

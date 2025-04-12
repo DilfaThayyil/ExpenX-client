@@ -1,20 +1,8 @@
-// src/components/dashboard/RecentActivity.tsx
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreditCard } from 'lucide-react';
+import {RecentActivityProps} from './types'
 
-interface Activity {
-  id: number | string;
-  type: string;
-  description: string;
-  amount: number;
-  timestamp: string;
-}
-
-interface RecentActivityProps {
-  activities: Activity[];
-  loading?: boolean;
-}
 
 const RecentActivity: React.FC<RecentActivityProps> = ({ activities, loading = false }) => {
   return (

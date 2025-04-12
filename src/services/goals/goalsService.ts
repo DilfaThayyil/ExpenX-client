@@ -1,18 +1,6 @@
 import axiosInstance from '../axios/axios'
 const BASEURL = 'http://localhost:3000/user'
-
-export interface Goal {
-    _id?: string;
-    userId?: string;
-    title: string;
-    description?: string;
-    target: number;
-    current: number;
-    deadline: Date | string;
-    category?: string;
-    createdAt?: Date | string;
-    updatedAt?: Date | string;
-}
+import {Goal} from './types'
 
 
 export const getGoals = async (userId: string) => {

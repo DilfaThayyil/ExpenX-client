@@ -1,20 +1,9 @@
 import React, { useState, useEffect } from "react";
 import FormInput from "@/components/InputField";
 import { message } from 'antd'
+import {Slot} from './types'
 
 
-interface Slot {
-  _id: string;
-  date: string;
-  startTime: string;
-  fee: number;
-  duration: number;
-  maxBookings: number;
-  status: "Available" | "Booked" | "Cancelled";
-  location: "Virtual" | "Physical";
-  locationDetails?: string;
-  description?: string;
-}
 
 const SlotCreationModal: React.FC<{
   onClose: () => void;

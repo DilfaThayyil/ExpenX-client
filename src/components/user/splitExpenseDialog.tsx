@@ -1,37 +1,13 @@
 import { useState } from 'react';
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { GroupExpense } from '@/pages/user/Groups'
+import { SplitExpenseDialogProps } from './types'
 
-interface Member {
-    email: string;
-    name: string;
-}
-interface Group {
-    members: Member[];
-}
-interface SplitExpenseDialogProps {
-    isOpen: boolean;
-    onClose: () => void;
-    group: Group;
-    onSubmit: (expense: GroupExpense) => void;
-    loading: boolean;
-}
 
 const SplitExpenseDialog: React.FC<SplitExpenseDialogProps> = ({
     isOpen,
@@ -85,17 +61,17 @@ const SplitExpenseDialog: React.FC<SplitExpenseDialogProps> = ({
 
     const handleShareChange = (memberEmail: string, value: number) => {
         const newShares = { ...shares };
-        
+
         if (splitType === 'percentage') {
-            newShares[memberEmail] = value; 
+            newShares[memberEmail] = value;
         } else {
             newShares[memberEmail] = value;
         }
-    
+
         setShares(newShares);
         setExpense(prev => ({ ...prev, shares: newShares }));
     };
-    
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSubmit({

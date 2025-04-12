@@ -2,11 +2,8 @@ import React, { useState } from 'react';
 import { createReview } from '@/services/review/reviewServices';
 import StarRating from './StarRating';
 import Store from '@/store/store'
+import {ReviewFormProps} from './types'
 
-interface ReviewFormProps {
-  advisorId: string;
-  onReviewAdded: () => void;
-}
 
 const  ReviewForm: React.FC<ReviewFormProps> = ({ advisorId, onReviewAdded }) => {
   const [rating, setRating] = useState<number>(0);

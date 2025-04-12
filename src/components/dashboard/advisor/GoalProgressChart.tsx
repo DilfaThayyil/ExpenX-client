@@ -1,12 +1,8 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { moneyColors } from "@/style/theme";
+import {GoalProgressChartProps} from './types'
 
-interface GoalProgressChartProps {
-  timeframe: 'monthly' | 'quarterly' | 'yearly';
-  setTimeframe: React.Dispatch<React.SetStateAction<'monthly' | 'quarterly' | 'yearly'>>;
-  goalProgress: { completed: number; inProgress: number; notStarted: number }
-}
 
  
 export default function GoalProgressChart({ timeframe, setTimeframe, goalProgress }: GoalProgressChartProps) {

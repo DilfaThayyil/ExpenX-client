@@ -13,30 +13,11 @@ import { loadStripe } from '@stripe/stripe-js';
 import PaymentForm from '@/components/user/PaymentForm'
 import { bookSlot, paymentInitiate } from '@/services/user/userService'
 import { STRIPE_PUBLISHABLE_KEY } from '@/utility/env'
-import ReportModal, { IReportData } from '@/components/modals/reportModal';
-
-
+import ReportModal from '@/components/modals/reportModal';
+import {IReportData} from '@/components/modals/types'
+import {Slot} from './types'
 const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
-interface Slot {
-  advisorId: {
-    _id: string;
-    username: string;
-    email: string;
-    profilePic: string;
-  };
-  _id: string;
-  date: string;
-  startTime: string;
-  fee: number;
-  duration: number;
-  maxBookings: number;
-  status: 'Available' | 'Booked' | 'Cancelled';
-  bookedBy: string;
-  location: 'Virtual' | 'Physical';
-  locationDetails?: string;
-  description?: string;
-}
 
 const SlotBooking: React.FC = () => {
   const [advisorReport, setAdvisorReport] = useState<IReportData | null>(null)

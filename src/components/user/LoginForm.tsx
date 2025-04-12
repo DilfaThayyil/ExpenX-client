@@ -10,6 +10,7 @@ import ForgetPassword from './ForgotPassword';
 import GoogleAuth from './GoogleAuth';
 import FormInput from '../InputField';
 import Store from '@/store/store';
+import {Link} from 'react-router-dom'
 
 
 const LoginPage = () => {
@@ -54,9 +55,9 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     setFormSubmitted(true);
-    
+
     const errors = validateForm();
     if (errors.length > 0) {
       errors.forEach((error) => toastr.error(error));
@@ -99,7 +100,7 @@ const LoginPage = () => {
 
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          
+
 
           <div className="space-y-4">
             <FormInput
@@ -128,9 +129,9 @@ const LoginPage = () => {
 
           <div className="flex items-center justify-between">
             <div className="text-sm">
-              <button 
+              <button
                 type="button"
-                onClick={toggleModal} 
+                onClick={toggleModal}
                 className="font-medium text-emerald-600 hover:text-emerald-500"
               >
                 Forgot your password?
@@ -146,22 +147,25 @@ const LoginPage = () => {
             Sign in
           </button>
 
-            <div className="flex justify-center mt-4">
-              <GoogleAuth role={'user'}/>
-            </div>
+          <div className="flex justify-center mt-4">
+            <GoogleAuth role={'user'} />
+          </div>
 
-        <div className="text-center text-sm">
-          <span className="text-gray-600">New to ExpenX? </span>
-          <a href="/register" className="font-medium text-emerald-600 hover:text-emerald-500">
-            Create an account
-          </a>
-        </div>
+          <div className="text-center text-sm">
+            <span className="text-gray-600">New to ExpenX? </span>
+            <Link to="/register">
+              <a className="font-medium text-emerald-600 hover:text-emerald-500">
+                Create an account
+              </a>
+            </Link>
+
+          </div>
         </form>
-        
+
         <ToastContainer />
 
       </div>
-      {isModalOpen && <ForgetPassword toggleModal={toggleModal}/>}
+      {isModalOpen && <ForgetPassword toggleModal={toggleModal} />}
     </div>
   );
 };

@@ -6,14 +6,10 @@ import NotificationBell from '@/components/chat/notificationBell'
 import { Button } from "@/components/ui/button";
 import { advisorLogout } from '@/services/advisor/AuthServices'
 import { userLogout } from '@/services/user/AuthServices'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import {DropdownMenu,DropdownMenuContent,DropdownMenuItem,DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import { useNavigate } from 'react-router-dom'
 import Store from '@/store/store'
+
 
 const Navbar = () => {
   const navigate = useNavigate()

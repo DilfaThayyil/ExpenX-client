@@ -8,13 +8,8 @@ import ClientActivities from "@/components/dashboard/advisor/ClientActivities";
 import { moneyColors } from "@/style/theme";
 import { fetchDashboard, fetchRevenue,fetchClientGoals } from '@/services/advisor/advisorService'
 import Store from '@/store/store'
+import {Stats} from './types'
 
-interface Stats {
-  totalRevenue: number
-  activeClients: number
-  completedGoals: number
-  slotUtilization: number
-}
 
 export default function DashboardPage() {
   const [timeframe, setTimeframe] = useState<'monthly' | 'quarterly' | 'yearly'>("monthly");

@@ -1,37 +1,6 @@
 import { StateCreator } from 'zustand';
+import {UserType,State,Actions} from './types'
 
-
-export interface onlineUsers {
-    id: string;
-    socketId: string;
-}
-
-export type UserType = {
-    _id: string;
-    username:string
-    email: string;
-    phone: string;
-    location: string;
-    role: string;
-    country: string;
-    description: string;
-    language: string;
-    profilePic: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    users: onlineUsers[] | any;
-    lastSeen?: string;
-};
-
-type State = {
-    user: UserType;
-};
-
-type Actions = {
-    setUser: (user: UserType) => void;
-    updateUser: (key: keyof UserType, value: string | string[]) => void;
-    clearUser: () => void;
-    isProfileComplete: () => boolean;
-};
 
 const defaultUser: UserType = {
     _id: '',

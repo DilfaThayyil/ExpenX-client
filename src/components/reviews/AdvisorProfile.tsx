@@ -2,19 +2,8 @@ import { FaBriefcase, FaStar, FaCalendarAlt } from 'react-icons/fa';
 import {useNavigate} from 'react-router-dom'
 import ReviewsList from './ReviewsList';
 import './AdvisorProfile.css'
+import {AdvisorProfileProps} from './types'
 
-interface AdvisorProfileProps {
-  advisor: {
-    _id: string;
-    username: string;
-    profilePic: string;
-    bio: string;
-    specialties: string[];
-    experience: number;
-  };
-  currentUserId: string;
-  isOwnProfile: boolean;
-}
 
 const AdvisorProfile: React.FC<AdvisorProfileProps> = ({ 
   advisor,

@@ -8,24 +8,8 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog";
 import { cancelSlot } from '@/services/advisor/advisorService'
 import Store from '@/store/store'
+import {Slot} from './types'
 
-interface Slot {
-    _id: string;
-    date: string;
-    startTime: string;
-    fee: number;
-    duration: number;
-    maxBookings: number;
-    status: 'Available' | 'Booked' | 'Cancelled';
-    bookedBy?: {
-        _id: string;
-        username: string;
-        email: string
-    };
-    location: 'Virtual' | 'Physical';
-    locationDetails?: string;
-    description?: string;
-}
 
 const SlotTable: React.FC<{
     slots: Slot[];

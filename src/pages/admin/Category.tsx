@@ -1,14 +1,11 @@
 import DataTable from "@/components/admin/DataTable";
-import { fetchCategories, manageCategory } from "@/services/admin/adminServices";
+import { manageCategory } from "@/services/admin/adminServices";
 import { useState, useEffect } from "react";
 import CategoryModal from "@/components/modals/categoryModal";
 import Layout from "@/layout/Sidebar";
 import { AdminNavbar } from '@/layout/AdminNav'
+import { Category } from './types'
 
-interface Category {
-  _id: string;
-  name: string;
-}
 
 const CategoryTable = () => {
   const [categories, setCategories] = useState<Category[]>([]);

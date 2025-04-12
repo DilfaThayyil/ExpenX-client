@@ -1,9 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {NewMessageIndicatorProps} from './types'
 
-interface NewMessageIndicatorProps {
-  count: number;
-}
 
 export const NewMessageIndicator: React.FC<NewMessageIndicatorProps> = ({ count }) => {
   if (count <= 0) return null;

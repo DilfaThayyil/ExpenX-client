@@ -5,10 +5,8 @@ import useShowToast from '../../customHook/showToaster'
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Store from "@/store/store";
+import {GoogleAuthProps} from './types'
 
-interface GoogleAuthProps{
-  role: 'user'| 'advisor'
-} 
 
 const GoogleAuth:React.FC<GoogleAuthProps> = ({role}) => {
 

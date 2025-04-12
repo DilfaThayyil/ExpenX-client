@@ -1,26 +1,9 @@
 import { IndianRupee , Users, Target, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { moneyColors } from "@/style/theme";
+import {StatCardProps,Stats} from './types'
 
-export interface Stats{
-  totalRevenue: number;
-  // revenueChange: string | number;
-  activeClients: number;
-  // clientsChange: string | number;
-  completedGoals: number;
-  // goalsChange: string | number;
-  slotUtilization: number;
-  // utilizationChange: string | number;
-};
 
-interface StatCardProps{
-  title: string;
-  value: number;
-  change?: string | number;
-  icon: JSX.Element;
-  iconBg: string;
-  bgGradient?: string;
-};
 
 
 export default function StatsCards({ stats }:{stats:Stats}) {

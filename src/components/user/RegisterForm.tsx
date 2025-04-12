@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
-import { Wallet, CheckCircle2} from 'lucide-react';
+import { Wallet, CheckCircle2 } from 'lucide-react';
 import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
 import GoogleAuth from './GoogleAuth';
 import FormInput from '../InputField';
-import {createUser, otpGenerate} from '../../services/user/AuthServices'; 
-import {isValidateEmail,isValidatePassword,} from '../../utility/validator';
+import { createUser, otpGenerate } from '../../services/user/AuthServices';
+import { isValidateEmail, isValidatePassword, } from '../../utility/validator';
 import useShowToast from '../../customHook/showToaster';
 import OTPVerification from './Otp';
+import {Link} from 'react-router-dom'
 
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState<{
-    username:string
-    email:string
-    password:string
-    confirmPassword:string
+    username: string
+    email: string
+    password: string
+    confirmPassword: string
   }>({
     username: '',
     email: '',
@@ -33,7 +34,7 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
-  
+
   const Toaster = useShowToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,8 +136,8 @@ const RegisterPage = () => {
     }
   };
 
-  if(otpSent){
-    return <OTPVerification email={formData.email} purpose='register' role='user'/>
+  if (otpSent) {
+    return <OTPVerification email={formData.email} purpose='register' role='user' />
   }
 
   return (
@@ -160,7 +161,7 @@ const RegisterPage = () => {
               OTP sent successfully!
             </div>
           )}
-          
+
           <div className="space-y-4">
             <FormInput
               id="username"
@@ -214,8 +215,8 @@ const RegisterPage = () => {
             type="submit"
             disabled={loading}
             className={`w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
-              ${loading 
-                ? 'bg-emerald-400 cursor-not-allowed' 
+              ${loading
+                ? 'bg-emerald-400 cursor-not-allowed'
                 : 'bg-emerald-600 hover:bg-emerald-700'
               } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors`}
           >
@@ -226,15 +227,18 @@ const RegisterPage = () => {
 
         {/* Google Login */}
         <div className="flex justify-center mt-4">
-          <GoogleAuth role={'user'}/>
+          <GoogleAuth role={'user'} />
         </div>
 
         {/* Login Link */}
         <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <a href="/login" className="text-emerald-600 hover:underline font-medium">
+          <Link to="/login">
+            <a className="text-emerald-600 hover:underline font-medium">
               Sign in
-          </a>
+            </a>
+          </Link>
+
         </p>
       </div>
     </div>

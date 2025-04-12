@@ -3,13 +3,10 @@ import { handleforgetpassword } from '../../services/user/AuthServices';
 import toastr from 'toastr';
 import { isValidateEmail } from '../../utility/validator';
 import Loading from '../../style/loading';
-// import Otp from '../user/Otp';
 import OTPVerification from './Otp';
+import {ForgetPasswordProps} from './types'
 
 
-interface ForgetPasswordProps {
-  toggleModal: () => void;
-}
 
 const ForgetPassword: React.FC<ForgetPasswordProps> = ({ toggleModal}) => {
 

@@ -3,16 +3,10 @@ import { Goal } from '@/services/goals/goalsService';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import FormInput from '@/components/InputField'
+import { GoalFormProps } from './types'
 
-
-interface GoalFormProps {
-  onSubmit: (goal: Omit<Goal, '_id'>) => Promise<void>;
-  onCancel: () => void;
-  initialData?: Goal;
-}
 
 const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel, initialData }) => {
   const [formData, setFormData] = useState<Omit<Goal, '_id'>>({
@@ -20,8 +14,8 @@ const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel, initialData }) 
     description: initialData?.description || '',
     target: initialData?.target || 0,
     current: initialData?.current || 0,
-    deadline: initialData?.deadline 
-      ? new Date(initialData.deadline).toISOString().split('T')[0] 
+    deadline: initialData?.deadline
+      ? new Date(initialData.deadline).toISOString().split('T')[0]
       : new Date().toISOString().split('T')[0],
     category: initialData?.category || 'savings'
   });
@@ -164,14 +158,14 @@ const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel, initialData }) 
         </CardContent>
 
         <CardFooter className="flex justify-between">
-          <Button 
-            type="button" 
+          <Button
+            type="button"
             variant="outline"
             onClick={onCancel}
           >
             Cancel
           </Button>
-          <Button 
+          <Button
             type="submit"
             disabled={loading}
           >
