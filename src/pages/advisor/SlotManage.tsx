@@ -7,25 +7,8 @@ import Layout from '@/layout/Sidebar';
 import Store from '@/store/store';
 import Pagination from "@/components/admin/Pagination"; 
 import useShowToast from '@/customHook/showToaster';
-  
-interface Slot {
-  _id: string;
-  advisorId?:{
-    id: string;
-    username: string;
-    email: string;
-    profilePic: string
-  },
-  date: string;
-  startTime: string;
-  fee: number;
-  duration: number;
-  maxBookings: number;
-  status: 'Available' | 'Booked' | 'Cancelled';
-  location: 'Virtual' | 'Physical';
-  locationDetails?: string;
-  description?: string;
-}
+import {Slot} from './types'
+
 
 const SlotManage: React.FC = () => {
   const [slots, setSlots] = useState<Slot[]>([]);

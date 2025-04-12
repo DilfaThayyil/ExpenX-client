@@ -3,8 +3,6 @@ import axiosInstance from '../axios/adminAxios'
 const BASEURL = "http://localhost:3000/admin";
 
 
-
-
 export const adminLogin = async (email: string, password: string) => {
   try {
     const response = await axiosInstance.post(`${BASEURL}/login`, {

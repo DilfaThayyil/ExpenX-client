@@ -12,6 +12,7 @@ import AchievementCard from '@/components/dashboard/user/AchievementCard'
 import { getDashboardData } from '@/services/user/userService'
 import { useNavigate } from 'react-router-dom'
 
+
 const DashboardPage: React.FC = () => {
   const user = Store(state => state.user);
   const navigate = useNavigate()

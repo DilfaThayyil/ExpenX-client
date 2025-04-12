@@ -11,22 +11,8 @@ import Loading from '@/style/loading'
 import { NewMessageIndicator } from './MessageIndicator';
 import notification from '@/assets/audio/mixkit-correct-answer-tone-2870.wav'
 import { TypingIndicator } from './TypingIndicator';
+import {ChatProps,Message} from './types'
 
-interface Message {
-  id: string;
-  senderId: string;
-  receiverId: string;
-  roomId: string;
-  text: string;
-  url?: string;
-  fileType?: string;
-  fileName?: string;
-  createdAt: string;
-}
-
-interface ChatProps {
-  receivers: { _id: string; username: string; email: string; profilePic: string }[]
-}
 
 const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   const [activeContact, setActiveContact] = useState(receivers[0]);

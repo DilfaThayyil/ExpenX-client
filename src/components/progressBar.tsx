@@ -1,9 +1,5 @@
-interface ProgressProps {
-    value: number;
-    color?: string;
-    className?: string;
-  }
-  
+import {ProgressProps} from './types'
+
   const Progress = ({ value, color = 'bg-emerald-500', className }: ProgressProps) => {
     return (
       <div className={`relative w-full bg-gray-200 rounded ${className}`}>

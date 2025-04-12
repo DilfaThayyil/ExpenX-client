@@ -4,23 +4,7 @@ import Pagination from '@/components/admin/Pagination';
 import Table from '@/components/admin/Table';
 import { manageUser, fetchReports } from '@/services/admin/adminServices';
 import useShowToast from '@/customHook/showToaster';
-
-interface User {
-  _id: string;
-  username: string;
-  email: string;
-  isBlocked:boolean
-}
-
-interface Report {
-  _id: string;
-  userId: User;
-  advisorId: User;
-  reason: string;
-  customReason?: string;
-  createdAt: string;
-}
-
+import {Report} from './types'
 
 
 const ReportTable = () => {

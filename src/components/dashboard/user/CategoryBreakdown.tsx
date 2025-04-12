@@ -7,17 +7,8 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
+import {CategoryBreakdownProps} from './types'
 
-interface ExpenseCategory {
-  category: string;
-  amount: number;
-  color: string;
-}
-
-interface CategoryBreakdownProps {
-  categories: ExpenseCategory[];
-  loading?: boolean;
-}
 
 const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({ categories, loading = false }) => {
   return (

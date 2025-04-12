@@ -16,16 +16,9 @@ import useShowToast from '@/customHook/showToaster';
 import Loading from '@/style/loading';
 import Store from '../../store/store'
 import Pagination from "@/components/admin/Pagination";
+import {Expense} from './types'
 
 
-
-interface Expense {
-    id?: number;
-    date: Date;
-    amount: number;
-    category: string;
-    description: string;
-}
 
 const Expenses = () => {
 

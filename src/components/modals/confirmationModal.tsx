@@ -1,13 +1,8 @@
 import React from 'react';
 import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
+import {ConfirmationModalProps} from './types'
 
-interface ConfirmationModalProps {
-  open: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  slot: string;
-}
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   open,

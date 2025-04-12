@@ -2,19 +2,8 @@ import { useState, useEffect } from "react";
 import { manageCategory } from "@/services/admin/adminServices";
 import FormInput from "@/components/InputField";
 import useShowToast from "@/customHook/showToaster";
+import {ModalProps} from './types'
 
-interface Category {
-  _id?: string;
-  name: string;
-}
-
-interface ModalProps {
-  isOpen: boolean;
-  closeModal: () => void;
-  category?: Category | null;
-  onCategoryUpdate: (updatedCategory: Category) => void;
-  onCategoryAdd: (newCategory: Category) => void;
-}
 
 const CategoryModal: React.FC<ModalProps> = ({ 
   isOpen, 

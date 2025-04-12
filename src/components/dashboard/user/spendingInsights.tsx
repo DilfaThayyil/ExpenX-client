@@ -1,22 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
+import {SpendingInsightsProps} from './types'
 
-interface InsightItem {
-  title: string;
-  value: string | number;
-  description: string;
-  trend?: 'up' | 'down' | 'neutral';
-  trendValue?: string;
-  icon: React.ElementType;
-  iconBgColor?: string;
-  iconColor?: string;
-}
-
-interface SpendingInsightsProps {
-  insights: InsightItem[];
-  loading?: boolean;
-}
 
 const SpendingInsights: React.FC<SpendingInsightsProps> = ({ insights, loading = false }) => {
   return (

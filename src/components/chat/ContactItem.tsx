@@ -1,21 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {ContactProps} from './types'
 
-interface ContactProps {
-  contact: {
-    _id: string;
-    username: string;
-    email: string;
-    profilePic: string;
-    status?: string;
-    lastMessage?: string;
-    unread?: number;
-    time?: string;
-  };
-  active: boolean;
-  onClick: () => void;
-  children?: React.ReactNode;  
-}
 
 const UnreadBadge = ({ count }: { count: number }) => {
   if (count <= 0) return null;

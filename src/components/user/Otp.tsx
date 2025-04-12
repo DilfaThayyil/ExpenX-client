@@ -3,12 +3,7 @@ import { Wallet, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { verifyOtp, resendOtp,handleforgetpasswordOtp } from '../../services/user/AuthServices';
 import toastr from 'toastr';
-
-interface otpProps{
-  email:string
-  purpose:string
-  role:'user'|'advisor'
-}
+import {otpProps} from './types'
 
 
 const OTPVerification:React.FC<otpProps> = ({email,purpose,role}) => {

@@ -4,36 +4,7 @@ import StarRating from './StarRating';
 import ReplyForm from './ReplyForm';
 import ReplyItem from './ReplyItem';
 import { addReplyToReview, deleteReview, updateReview } from '@/services/review/reviewServices';
-
-interface User {
-  _id: string;
-  name: string;
-  avatar?: string;
-}
-
-interface Reply {
-  _id: string;
-  advisorId: User;
-  text: string;
-  createdAt: string;
-}
-
-interface Review {
-  _id: string;
-  userId: User;
-  advisorId: string;
-  rating: number;
-  review: string;
-  createdAt: string;
-  replies: Reply[];
-}
-
-interface ReviewItemProps {
-  review: Review;
-  currentUserId: string;
-  isAdvisor: boolean;
-  onReviewUpdated: () => void;
-}
+import {ReviewItemProps} from './types'
 
 const ReviewItem: React.FC<ReviewItemProps> = ({ 
   review, 
@@ -47,7 +18,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
   const [editedReview, setEditedReview] = useState<string>(review.review);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
+  
   const isOwnReview = currentUserId === review.userId._id;
   
   const handleReplySubmit = async (text: string) => {

@@ -1,11 +1,7 @@
-// src/components/dashboard/Header.tsx
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {HeaderProps} from './types'
 
-
-interface HeaderProps {
-  username: string;
-}
 
 export const getGreeting = (): string => {
   const hour = new Date().getHours();
@@ -13,6 +9,7 @@ export const getGreeting = (): string => {
   if (hour < 18) return "Good Afternoon";
   return "Good Evening";
 };
+
 
 const Header: React.FC<HeaderProps> = ({ username }) => {
   return (

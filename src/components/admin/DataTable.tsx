@@ -6,13 +6,9 @@ import Loading from "@/style/loading";
 import { Pencil, Trash } from "lucide-react";
 import { fetchUsers, fetchAdvisors, fetchCategories, manageUser, manageCategory } from "@/services/admin/adminServices";
 import CategoryModal from "../modals/categoryModal";
+import {DataTableProps} from './types'
 
 
-
-interface DataTableProps<T> {
-  type: "user" | "advisor" | "category";
-  onEdit?: (item: any) => void
-}
 
 const DataTable = <T,>({ type }: DataTableProps<T>) => {
   const [data, setData] = useState<T[]>([]);

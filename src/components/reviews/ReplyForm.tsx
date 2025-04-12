@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
+import {ReplyFormProps} from './types'
 
-interface ReplyFormProps {
-  onSubmit: (text: string) => Promise<void>;
-  onCancel: () => void;
-}
 
 const ReplyForm: React.FC<ReplyFormProps> = ({ onSubmit, onCancel }) => {
   const [replyText, setReplyText] = useState<string>('');

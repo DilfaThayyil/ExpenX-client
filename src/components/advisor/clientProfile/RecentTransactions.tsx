@@ -1,13 +1,10 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { getTransactions } from '@/services/advisor/advisorService'
 import { EmptyComponent } from '@/components/empty/Empty';
-// import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useEffect, useState } from 'react'
+import {TransactionProps} from './types'
 
-interface TransactionProps {
-    clientId: string | undefined;
-}
 
 const RecentTransactions: React.FC<TransactionProps> = ({ clientId }) => {
 

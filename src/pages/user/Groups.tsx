@@ -11,41 +11,10 @@ import { Users, Plus, Receipt, Trash2 } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
 import { createGroup, getUserGroups, addMember, addExpenseInGroup } from '../../services/user/userService'
 import useShowToast from '@/customHook/showToaster';
-// import Loading from '@/style/loading';
 import Store from '../../store/store'
+import {Group,Group1,GroupExpense} from './types'
 
 
-
-interface Group {
-    _id: string;
-    name: string;
-    totalExpenses: number;
-    memberCount: number;
-    balance: number;
-    lastActivity: string;
-    members: GroupMember[];
-    expenses: GroupExpense[];
-}
-interface GroupMember {
-    name: string;
-    email: string;
-    avatar: string;
-    paid: number;
-    owed: number;
-}
-export interface GroupExpense {
-    id?: string;
-    date: string;
-    title: string;
-    totalAmount: number;
-    paidBy: string;
-    splitMethod: string;
-    splits?: Record<string, number>;
-}
-interface Group1 {
-    name: string;
-    members: string[];
-}
 
 const GroupsPage = () => {
     const Toaster = useShowToast()

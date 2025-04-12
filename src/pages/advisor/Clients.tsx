@@ -6,28 +6,8 @@ import Layout from "@/layout/Sidebar";
 import Store from "@/store/store";
 import Pagination from "@/components/admin/Pagination";
 import ChatWindow from "@/components/chat/chat";
+import {Booking} from './types'
 
-export interface Booking {
-  date: string;
-  endTime: string;
-  startTime: string;
-  bookedBy: {
-    _id: string;
-    username: string;
-    email: string;
-    profilePic: string;
-  };
-  _id: string;
-  userName: string;
-  userEmail: string;
-  slotId: string;
-  bookedDate: string;
-  paymentStatus: "Paid" | "Pending";
-  location: "Virtual" | "Physical";
-  status: "Available" | "Booked" | "Cancelled";
-  locationDetails: string;
-  description: string;
-}
 
 const Clients: React.FC = () => {
   const [bookedAppointments, setBookedAppointments] = useState<Booking[]>([]);

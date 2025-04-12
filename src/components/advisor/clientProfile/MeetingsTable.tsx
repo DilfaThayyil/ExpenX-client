@@ -5,31 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react'
+import {IMeeting} from './types'
+import {MeetingsTableProps} from './types'
 
-export interface IUser {
-    _id: string;
-    username: string;
-    email: string;
-    profilePic: string;
-}
-
-export interface IMeeting {
-    _id: string;
-    advisorId: IUser;
-    bookedBy: IUser | null;
-    date: string;
-    startTime: string;
-    endTime: string;
-    fee: number;
-    duration: number;
-    maxBookings: number;
-    status: "Available" | "Booked" | "Cancelled";
-    location: "Virtual" | "Physical";
-    locationDetails: string;
-    description: string;
-    createdAt: string;
-    updatedAt: string;
-}
 
 const getStatusColor = (status: IMeeting['status']) => {
     switch (status) {
@@ -43,10 +21,6 @@ const getStatusColor = (status: IMeeting['status']) => {
             return 'bg-gray-100 text-gray-800';
     }
 };
-
-interface MeetingsTableProps {
-    meetings: IMeeting[]
-}
 
 const MeetingsTable: React.FC<MeetingsTableProps> = ({ meetings }) => {
     const [selectedMeeting, setSelectedMeeting] = useState<IMeeting | null>(null)

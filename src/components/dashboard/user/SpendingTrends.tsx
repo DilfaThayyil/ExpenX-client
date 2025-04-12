@@ -1,4 +1,3 @@
-// src/components/dashboard/SpendingTrend.tsx
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -10,17 +9,8 @@ import {
     Tooltip,
     ResponsiveContainer
 } from 'recharts';
+import {SpendingTrendProps} from './types'
 
-interface TrendData {
-    date: string;
-    expenses: number;
-    payments: number
-}
-
-interface SpendingTrendProps {
-    data: TrendData[];
-    loading?: boolean;
-}
 
 const SpendingTrend: React.FC<SpendingTrendProps> = ({ data, loading = false }) => {
     return (

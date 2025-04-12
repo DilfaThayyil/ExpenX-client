@@ -2,17 +2,8 @@ import { AxiosError } from "axios";
 import axiosInstance from "../axios/axios";
 import { JwtPayload } from "jwt-decode";
 const BASEURL = 'http://localhost:3000/user/auth'
+import {IcreateUser,ErrorResponse} from './types'
 
-
-interface IcreateUser {
-  username: string
-  email: string
-  password: string
-}
-
-interface ErrorResponse {
-  error: string
-}
 
 export const createUser = async (userData: IcreateUser) => {
 

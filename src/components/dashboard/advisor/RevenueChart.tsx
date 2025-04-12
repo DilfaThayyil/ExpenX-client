@@ -1,12 +1,8 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { moneyColors } from "@/style/theme";
+import {RevenueChartProps,TimeframeSelectorProps} from './types'
 
-interface RevenueChartProps {
-  timeframe: "monthly" | "quarterly" | "yearly";
-  setTimeframe: React.Dispatch<React.SetStateAction<"monthly" | "quarterly" | "yearly">>;
-  revenueData: Record<string, { name: string; revenue: number }[]>;
-}
 
 export default function RevenueChart({ timeframe, setTimeframe, revenueData }: RevenueChartProps) {
   return (
@@ -49,10 +45,7 @@ export default function RevenueChart({ timeframe, setTimeframe, revenueData }: R
   );
 }
 
-interface TimeframeSelectorProps {
-  timeframe: "monthly" | "quarterly" | "yearly";
-  setTimeframe: React.Dispatch<React.SetStateAction<"monthly" | "quarterly" | "yearly">>;
-}
+
 
 function TimeframeSelector({ timeframe, setTimeframe }: TimeframeSelectorProps) {
   return (

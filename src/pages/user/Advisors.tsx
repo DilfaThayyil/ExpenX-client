@@ -8,16 +8,7 @@ import { getAdvisors } from '@/services/review/reviewServices'
 import AdvisorProfile from "@/components/reviews/AdvisorProfile";
 import Layout from "@/layout/Sidebar";
 import Loading from "@/style/loading";
-
-interface advisorData {
-    _id: string
-    username: string
-    profilePic: string
-    bio: string
-    specialties: string[]
-    experience: number
-}
-
+import {advisorData} from './types'
 
 
 const Advisors: React.FC = () => {

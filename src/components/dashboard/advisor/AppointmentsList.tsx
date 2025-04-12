@@ -3,16 +3,8 @@ import { Calendar } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import {comingAppointments} from '@/services/advisor/advisorService'
 import { moneyColors } from "@/style/theme";
+import {Appointment} from './types'
 
-interface Appointment {
-  _id: string;
-  bookedBy: {
-    username: string;
-  };
-  date: string;
-  startTime: string;
-  description: string;
-}
 
 export default function AppointmentsList({advisorId}:{advisorId:string}) {
   const [appointments,setAppointments] = useState<Appointment[]>([])

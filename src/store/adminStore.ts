@@ -1,10 +1,5 @@
 import { create } from "zustand";
-
-interface AdminState {
-  adminEmail: string;
-  setAdminEmail: (email: string) => void;
-  clearAdminEmail: () => void;
-}
+import {AdminState} from './types'
 
 const loadAdminEmailFromLocalStorage = (): string => {
   try {

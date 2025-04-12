@@ -1,33 +1,7 @@
 import axiosInstance from '../axios/axios';
 const BASEURL = 'http://localhost:3000/user';
-import { IReportData } from '@/components/modals/reportModal'
+import { IReportData } from '@/components/modals/types'
 
-export interface DashboardData {
-  monthlyExpenses: {
-    category: string;
-    amount: number;
-    count: number;
-    color: string;
-  }[];
-  trendData: {
-    date: string;
-    expenses: number;
-    payments: number;
-  }[];
-  recentActivity: {
-    id: string;
-    date: Date;
-    amount: number;
-    description: string;
-    category: string;
-    type: 'expense' | 'payment';
-  }[];
-  budgetInfo: {
-    totalSpent: number;
-    budget: number;
-    progress: number;
-  };
-}
 
 
 export const uploadImageToCloudinary = async (formData: FormData) => {
@@ -186,20 +160,6 @@ export const getDashboardData = async (userId: string) => {
     throw err
   }
 }
-
-// export const exportExpense = async (userId: string, format: string) => {
-//   try {
-//     const response = await axiosInstance.get(
-//       `${BASEURL}/exportExpense/${userId}?format=${format}`,
-//       { responseType: 'blob' }
-//     );
-//     return response;
-//   } catch (err) {
-//     console.error("Export service error:", err);
-//     throw err;
-//   }
-// }
-
 
 export const exportExpense = async (userId: string, format: string, startDate?: Date | null, endDate?: Date | null) => {
   try{

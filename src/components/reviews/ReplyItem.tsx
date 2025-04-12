@@ -1,18 +1,7 @@
 import React from 'react';
 import { format } from 'date-fns';
+import {ReplyItemProps} from './types'
 
-
-interface FeedbackReply {
-  _id: string;
-  advisorId: string;
-  text: string;
-  createdAt: string;
-}
-
-interface ReplyItemProps {
-  reply: FeedbackReply;
-  isOwnReply: boolean;
-}
 
 const ReplyItem: React.FC<ReplyItemProps> = ({ reply, isOwnReply }) => {
   return (

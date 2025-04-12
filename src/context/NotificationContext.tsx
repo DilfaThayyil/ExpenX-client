@@ -2,20 +2,9 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { getNotification, markAllNotificationsAsRead } from "@/services/chat/chatServices";
 import { socket,initializeSocket } from "@/socket/socket";
 import Store from "@/store/store";
+import {NotificationContextProps} from './types'
 
-interface Notification {
-    _id: string;
-    senderId: string;
-    receiverId: string;
-    message: string;
-    isRead: boolean;
-    createdAt: string;
-}
 
-interface NotificationContextProps {
-    notifications: Notification[];
-    markNotificationsAsRead: () => void;
-}
 
 const NotificationContext = createContext<NotificationContextProps>({
     notifications: [],

@@ -6,10 +6,9 @@ import { getDocuments } from '@/services/advisor/advisorService'
 import Store from '@/store/store'
 import { DocumentsTable } from './DocumentsTable'
 import { DocumentUploadCard } from './DocumentUpload'
+import {DocumentsTabProps} from './types'
 
-interface DocumentsTabProps {
-    clientId: string | undefined;
-}
+
 export const DocumentsTab: React.FC<DocumentsTabProps> = ({ clientId }) => {
     const advisorId = Store((state) => state.user._id)
     const [documentsData, setDocumentsData] = useState([])

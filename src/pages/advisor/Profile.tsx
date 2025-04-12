@@ -15,30 +15,8 @@ import Loading from '@/style/loading';
 import ReplyItem from '@/components/reviews/ReplyItem';
 import ReplyForm from '@/components/reviews/ReplyForm';
 import Pagination from "@/components/admin/Pagination";
+import {Feedback} from './types'
 
-
-interface Feedback {
-  _id: string;
-  advisorId: string;
-  userId: {
-    _id: string
-    username: string
-    profilePic: string
-  }
-  username: string;
-  profilePic: string;
-  rating: number;
-  review: string;
-  replies: FeedbackReply[];
-  createdAt: string;
-}
-
-interface FeedbackReply {
-  _id: string;
-  advisorId: string;
-  text: string;
-  createdAt: string;
-}
 
 const ProfileAd = () => {
 

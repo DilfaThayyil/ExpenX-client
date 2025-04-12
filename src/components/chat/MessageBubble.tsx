@@ -1,22 +1,8 @@
 import Store from '@/store/store';
 import { format } from 'date-fns';
 import { File, Download } from 'lucide-react';
+import {MessageBubbleProps} from './types'
 
-interface Message {
-  id: string;
-  senderId: string;
-  receiverId: string;
-  text: string;
-  url?: string;
-  fileUrl?: string;
-  fileType?: string;
-  fileName?: string;
-  createdAt: string;
-}
-
-interface MessageBubbleProps {
-  message: Message;
-}
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const sender = Store((state) => state.user);

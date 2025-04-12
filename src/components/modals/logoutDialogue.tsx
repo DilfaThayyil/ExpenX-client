@@ -1,11 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import {LogoutDialogProps} from './types'
 
-interface LogoutDialogProps {
-  open: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-}
 
 export const LogoutDialog: React.FC<LogoutDialogProps> = ({ open, onClose, onConfirm }) => {
   return (

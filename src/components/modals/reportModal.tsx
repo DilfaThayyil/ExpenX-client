@@ -2,24 +2,8 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { message } from "antd";
 import { reportAdvisor } from "@/services/user/userService";
+import {IReportModalProps,IReportData} from './types'
 
-interface IReportModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    advisorId: string | null;
-    userId: string;
-    setReport: (report: IReportData) => void;
-    slotId: string
-}
-
-export interface IReportData {
-    userId: string;
-    advisorId: string;
-    reason: "Spam" | "Inappropriate Content" | "Harassment" | "Other";
-    status: "pending" | "reviewed" | "resolved";
-    customReason?: string;
-    createdAt?: string;
-}
 
 const REPORT_REASONS = ["Spam", "Inappropriate Content", "Harassment", "Other"];
 

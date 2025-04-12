@@ -1,4 +1,4 @@
-import { X, Image, File, Play } from 'lucide-react'
+import { X, File, Play } from 'lucide-react'
 
 export const getFileType = (file: File): string => {
     if (file.type.startsWith('image/')) return 'image';

@@ -1,18 +1,6 @@
-import React from 'react';
+import {FormInputProps} from './types'
 import { Eye, EyeOff } from 'lucide-react';
 
-interface FormInputProps {
-  id: string;
-  name: string;
-  type: string;
-  label: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  required?: boolean;
-  isPassword?: boolean;
-  passwordVisible?: boolean;
-  onPasswordVisibilityChange?: () => void;
-}
 
 const FormInput = ({
   id,

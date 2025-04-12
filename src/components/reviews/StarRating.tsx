@@ -1,11 +1,6 @@
 import React from 'react';
 import { FaStar } from 'react-icons/fa';
-
-interface StarRatingProps {
-  rating: number;
-  onRatingChange?: (rating: number) => void;
-  readonly?: boolean;
-}
+import {StarRatingProps} from './types'
 
 const StarRating: React.FC<StarRatingProps> = ({ 
   rating, 

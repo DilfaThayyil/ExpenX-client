@@ -3,13 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
 import useShowToast from "@/customHook/showToaster";
 import { DashboardCard, ActionButton } from './DocumentsTab'
-import { IDocumentFile } from './DocumentUpload'
+import { DocumentsTableProps } from './types'
 import { EmptyComponent } from '@/components/empty/Empty';
 
 
-interface DocumentsTableProps {
-    documentsData: IDocumentFile[];
-}
+
 
 export const DocumentsTable: React.FC<DocumentsTableProps> = ({ documentsData }) => {
     const Toast = useShowToast();

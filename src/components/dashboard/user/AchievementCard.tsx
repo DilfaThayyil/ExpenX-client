@@ -1,14 +1,8 @@
-// src/components/dashboard/AchievementCard.tsx
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Award } from 'lucide-react';
+import {AchievementCardProps} from './types'
 
-interface AchievementCardProps {
-  title: string;
-  description: string;
-  icon?: React.ElementType;
-  loading?: boolean;
-}
 
 const AchievementCard: React.FC<AchievementCardProps> = ({ 
   title, 

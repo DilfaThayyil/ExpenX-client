@@ -1,10 +1,6 @@
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import {useState} from 'react'
-
-interface PaymentFormProps {
-  clientSecret:string;
-  onSuccess: () => void;
-}
+import {PaymentFormProps} from './types'
 
 const PaymentForm: React.FC<PaymentFormProps> = ({ clientSecret,onSuccess }) => {
   const stripe = useStripe();

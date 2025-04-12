@@ -6,16 +6,7 @@ import { uploadDocument } from '@/services/advisor/advisorService'
 import Store from '@/store/store'
 import useShowToast from "@/customHook/showToaster";
 import { DashboardCard } from './DocumentsTab'
-
-export interface IDocumentFile {
-    _id: string;
-    userId: string;
-    advisorId: string;
-    name: string;
-    type: "PDF" | "XLSX" | "DOCX" | "CSV";
-    url: string;
-    uploadedAt: Date
-}
+import {IDocumentFile} from './types'
 
 
 export const DocumentUploadCard = ({ clientId }) => {
