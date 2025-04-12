@@ -8,7 +8,7 @@ import Store from "@/store/store";
 
 interface GoogleAuthProps{
   role: 'user'| 'advisor'
-}
+} 
 
 const GoogleAuth:React.FC<GoogleAuthProps> = ({role}) => {
 
@@ -28,7 +28,7 @@ const GoogleAuth:React.FC<GoogleAuthProps> = ({role}) => {
           }
   
           if (userData?.message) {
-            setUser(userData.user)
+            setUser(userData.user2)
             Toast(userData.message, 'success', true);
             setTimeout(() => {
               navigate(role === 'advisor' ? "/advisor/home" : "/home");

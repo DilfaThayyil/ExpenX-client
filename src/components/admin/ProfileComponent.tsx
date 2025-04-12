@@ -15,9 +15,9 @@ const AdminProfile = () => {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleConfirmLogout = async () => {
-    await adminLogout()
+    const response = await adminLogout()
     useAdminStore.getState().clearAdminEmail();
-    toast.success("Logged out successfully!");
+    toast.success(response.message);
     setTimeout(() => {
       navigate("/admin/login")
     }, 1500);
