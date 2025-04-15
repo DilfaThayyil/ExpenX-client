@@ -19,16 +19,16 @@ export const adminLogin = async (email: string, password: string) => {
   }
 };
 
-export const fetchUsers = async (page: number, limit: number) => {
+export const fetchUsers = async (page: number, limit: number,search:string) => {
   const response = await axiosInstance.get(`${BASEURL}/users`, {
-    params: { page, limit },
+    params: { page, limit, search},
   });
   return response.data;
 }
 
-export const fetchAdvisors = async (page: number, limit: number) => {
+export const fetchAdvisors = async (page: number, limit: number, search:string) => {
   const response = await axiosInstance.get(`${BASEURL}/advisors`, {
-    params: { page, limit },
+    params: { page, limit, search},
   });
   return response.data;
 }
@@ -58,10 +58,10 @@ export const manageUser = async (action: string,type:'user'|'advisor', email: st
   }
 }
 
-export const fetchCategories = async(page:number,limit:number)=>{
+export const fetchCategories = async(page:number,limit:number,search:string)=>{
   try{
     const response = await axiosInstance.get(`${BASEURL}/categories`,{
-      params:{page,limit}
+      params:{page,limit,search}
     })
     return response.data
   }catch(err){

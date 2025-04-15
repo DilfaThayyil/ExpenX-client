@@ -17,6 +17,7 @@ import Loading from '@/style/loading';
 import Store from '../../store/store'
 import Pagination from "@/components/admin/Pagination";
 import {Expense} from './types'
+import useDebounce from '@/hooks/use-debounce'
 
 
 
@@ -32,10 +33,11 @@ const Expenses = () => {
         description: ''
     })
     const [loading, setLoading] = useState<boolean>(false)
-    const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedQuery, setSearchQuery] = useDebounce('', 500);
+    const [inputValue, setInputValue] = useState('');    
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
     const userId = Store((state) => state.user._id)
-    const [isExporting, setIsExporting] = useState(false);
+    const [isExporting, setIsExporting] = useState<boolean>(false);
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [selectedDateRange, setSelectedDateRange] = useState<string>('');
     const [exportFilter, setExportFilter] = useState('daily');
@@ -65,19 +67,21 @@ const Expenses = () => {
                     console.error('User ID is not defined.');
                     return;
                 }
-                console.log("limit :", limit)
-                console.log("currentPage : ", currentPage)
-                const response = await getExpenses(userId, currentPage, limit)
-                console.log(response)
+                console.log("debouncedSearch : ",debouncedQuery)
+                const response = await getExpenses(userId, currentPage, limit, debouncedQuery)
                 setExpenses(response.data.expenses)
-                console.log("totalpages : ", response.data.totalPages)
                 setTotalPages(response.data.totalPages)
             } catch (error) {
                 console.error('Error fetching expenses:', error);
             }
         };
         fetchExpenses();
-    }, [userId, currentPage]);
+    }, [userId, currentPage,debouncedQuery]);
+
+    const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value);
+        setSearchQuery(e.target.value); 
+      };
 
     const handleDeleteExpense = async (id: number | undefined) => {
         console.log("deleteExpensId :; ", id)
@@ -249,7 +253,7 @@ const Expenses = () => {
     const averageDailyExpense = totalDays > 0 ? (total / totalDays).toFixed(2) : "0.00";
 
     const filteredExpenses = expenses.filter(expense =>
-        expense.description.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        expense.description.toLowerCase().includes(debouncedQuery.toLowerCase()) &&
         (selectedCategory ? expense.category === selectedCategory : true) &&
         isWithinRange(expense.date)
     );
@@ -294,8 +298,8 @@ const Expenses = () => {
                             <Input
                                 className="pl-10"
                                 placeholder="Search expenses..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                value={inputValue}
+                                onChange={handleChangeInput}
                             />
                         </div>
                     </div>
