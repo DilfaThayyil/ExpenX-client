@@ -22,6 +22,7 @@ export interface FormInputProps {
     isPassword?: boolean;
     passwordVisible?: boolean;
     onPasswordVisibilityChange?: () => void;
+    error?: string;
 }
 
 export interface ProgressProps {

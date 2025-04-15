@@ -70,7 +70,7 @@ export const userLogin = async (email: string, password: string) => {
     });
     return response.data;
   } catch (err) {
-    console.log(err);
+    throw err
   }
 }
 

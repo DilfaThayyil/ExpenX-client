@@ -12,7 +12,8 @@ const FormInput = ({
   required = false,
   isPassword = false,
   passwordVisible,
-  onPasswordVisibilityChange
+  onPasswordVisibilityChange,
+  error
 }: FormInputProps) => {
   return (
     <div>
@@ -42,6 +43,9 @@ const FormInput = ({
           </div>
         )}
       </div>
+      {error && (
+        <p className="mt-1 text-sm text-red-600">{error}</p>
+      )}
     </div>
   );
 };

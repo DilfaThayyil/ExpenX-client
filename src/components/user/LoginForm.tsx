@@ -15,7 +15,6 @@ import {Link} from 'react-router-dom'
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  // const {setUser} = Store()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -23,25 +22,29 @@ const LoginPage = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
+    const { name, value } = e.target;
+    setFormData((formData)=>({
       ...formData,
-      [e.target.name]: e.target.value,
-    });
+      [name]: value,
+    }))
+    setFormErrors((prev) => ({
+      ...prev,
+      [name]: '',
+    }));
   };
 
   const validateForm = () => {
     const errors: string[] = [];
     const validEmail = isValidateEmail(formData.email);
     const validPassword = isValidatePassword(formData.password);
-
     if (!formData.email) {
       errors.push("Email is required.");
     } else if (!validEmail) {
       errors.push("Invalid email format or domain not allowed.");
     }
-
     if (!formData.password) {
       errors.push("Password is required.");
     } else if (!validPassword) {
@@ -49,15 +52,12 @@ const LoginPage = () => {
         "Password must be at least 8 characters long and contain one uppercase letter, one number, and one special character."
       );
     }
-
     return errors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setFormSubmitted(true);
-
     const errors = validateForm();
     if (errors.length > 0) {
       errors.forEach((error) => toastr.error(error));
@@ -68,16 +68,24 @@ const LoginPage = () => {
     try {
       const response = await userLogin(formData.email, formData.password);
       if (response.message) {
-        // setUser(response.user2)
         Store.getState().setUser(response.user2);
         toastr.success(response.message);
         setTimeout(() => navigate("/home"), 1000);
       } else if (response.error) {
         toastr.error(response.error || "Login failed");
       }
-    } catch (error) {
-      toastr.error("Login failed");
-      console.error("Login failed:", error);
+    } catch (error: any) {
+      if (error.response?.data?.errors) {
+        const errorsArray = error.response.data.errors;
+        const fieldErrors: { [key: string]: string } = {};
+        errorsArray.forEach((err: { field: string; message: string }) => {
+          fieldErrors[err.field] = err.message;
+        });
+        setFormErrors(fieldErrors);
+      } else {
+        toastr.error(error.response?.data?.error);
+        console.error("Login failed:", error);
+      }
     }
   };
 
@@ -100,17 +108,15 @@ const LoginPage = () => {
 
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-
-
           <div className="space-y-4">
             <FormInput
               id="email"
               name="email"
-              type="email"
-              label="Your email address"
+              type="text"
+              label="Your email address"     
               value={formData.email}
               onChange={handleChange}
-              required
+              error={formErrors.email}
             />
 
             <FormInput
@@ -120,10 +126,10 @@ const LoginPage = () => {
               label="Password"
               value={formData.password}
               onChange={handleChange}
-              required
               isPassword
               passwordVisible={passwordVisible}
               onPasswordVisibilityChange={() => setPasswordVisible(!passwordVisible)}
+              error={formErrors.password}
             />
           </div>
 
@@ -161,7 +167,6 @@ const LoginPage = () => {
 
           </div>
         </form>
-
         <ToastContainer />
 
       </div>

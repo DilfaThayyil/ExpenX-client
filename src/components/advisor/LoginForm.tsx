@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import {  Briefcase, PieChart } from 'lucide-react';
+import { Briefcase, PieChart } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
-import { useNavigate ,Link} from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import toastr from 'toastr'
 import "react-toastify/dist/ReactToastify.css";
 import FormInput from '../InputField';
@@ -23,12 +23,18 @@ const AdvisorLogin: React.FC = () => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
+    const { name, value } = e.target
+    setFormData((formData) => ({
       ...formData,
-      [e.target.name]: e.target.value
-    })
+      [name]: value
+    }))
+    setFormErrors((prev) => ({
+      ...prev,
+      [name]: ''
+    }))
   }
 
 
@@ -56,9 +62,7 @@ const AdvisorLogin: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setFormSubmitted(true);
-
     const errors = validateForm();
     if (errors.length > 0) {
       errors.forEach((error) => toastr.error(error));
@@ -75,9 +79,18 @@ const AdvisorLogin: React.FC = () => {
       } else if (response.error) {
         toast.error(response.error || "Login failed");
       }
-    } catch (error) {
-      toast.error("Login failed");
-      console.error("Login failed:", error);
+    } catch (error: any) {
+      if (error.response?.data?.errors) {
+        const errorsArray = error.response.data.errors;
+        const fieldErrors: { [key: string]: string } = {};
+        errorsArray.forEach((err: { field: string; message: string }) => {
+          fieldErrors[err.field] = err.message;
+        });
+        setFormErrors(fieldErrors);
+      } else {
+        toastr.error(error.response?.data?.error);
+        console.error("Login failed:", error);
+      }
     }
   };
 
@@ -103,11 +116,10 @@ const AdvisorLogin: React.FC = () => {
               label="Your email address"
               id="email"
               name='email'
-              type="email"
+              type="text"
               value={formData.email}
               onChange={handleChange}
-              required
-
+              error={formErrors.email}
             />
 
             <FormInput
@@ -118,9 +130,9 @@ const AdvisorLogin: React.FC = () => {
               isPassword
               value={formData.password}
               onChange={handleChange}
-              required
               passwordVisible={passwordVisible}
-              onPasswordVisibilityChange={() => setPasswordVisible}
+              onPasswordVisibilityChange={() => setPasswordVisible(!passwordVisible)}
+              error={formErrors.password}
             />
           </div>
 
