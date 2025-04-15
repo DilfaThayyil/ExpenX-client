@@ -8,6 +8,7 @@ import Store from '@/store/store';
 import Pagination from "@/components/admin/Pagination"; 
 import useShowToast from '@/customHook/showToaster';
 import {Slot} from './types'
+import useDebounce from '@/hooks/use-debounce'
 
 
 const SlotManage: React.FC = () => {
@@ -15,7 +16,8 @@ const SlotManage: React.FC = () => {
   const [filteredSlots, setFilteredSlots] = useState<Slot[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [inputValue, setInputValue] = useState('');  
+  const [debouncedQuery, setSearchQuery] = useDebounce('', 500);
   const [filterStatus, setFilterStatus] = useState<string>("All");
   const [filterLocation, setFilterLocation] = useState<string>("All");
   const [startDateFilter, setStartDateFilter] = useState<string>('');
@@ -29,7 +31,8 @@ const SlotManage: React.FC = () => {
 
   const fetchSlot = async () => {
     try {
-      const response = await fetchSlots(advisor._id, currentPage, ITEMS_PER_PAGE);
+      console.log("serachQuery : ",debouncedQuery)
+      const response = await fetchSlots(advisor._id, currentPage, ITEMS_PER_PAGE,debouncedQuery);
       const { slots, totalPages } = response.data;
       setSlots(slots);
       setFilteredSlots(slots);
@@ -42,15 +45,15 @@ const SlotManage: React.FC = () => {
 
   useEffect(() => {
     fetchSlot();
-  }, [currentPage]);
+  }, [currentPage,debouncedQuery]);
 
   // Apply filters and search
   const applyFilters = useCallback(() => {
     let filtered = [...slots];
 
     // Apply search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+    if (inputValue.trim()) {
+      const query = inputValue.toLowerCase();
       filtered = filtered.filter(slot => 
         (slot.description && slot.description.toLowerCase().includes(query)) ||
         slot.date.toLowerCase().includes(query) ||
@@ -79,19 +82,23 @@ const SlotManage: React.FC = () => {
     }
 
     setFilteredSlots(filtered);
-  }, [slots, searchQuery, filterStatus, filterLocation, startDateFilter, endDateFilter]);
+  }, [slots, inputValue, filterStatus, filterLocation, startDateFilter, endDateFilter]);
 
   useEffect(() => {
     applyFilters();
   }, [applyFilters]);
 
   const resetFilters = () => {
-    setSearchQuery('');
     setFilterStatus("All");
     setFilterLocation("All");
     setStartDateFilter('');
     setEndDateFilter('');
     setFilteredSlots(slots);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+    setSearchQuery(e.target.value); 
   };
 
   const createNewSlot = async (newSlot: Slot) => {
@@ -149,8 +156,8 @@ const SlotManage: React.FC = () => {
               <input
                 type="text"
                 placeholder="Search by date, time, fee, or description..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={inputValue}
+                onChange={handleChange}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
@@ -252,7 +259,7 @@ const SlotManage: React.FC = () => {
           {/* Results Summary */}
           <div className="text-sm text-gray-600 mb-4">
             Showing {filteredSlots.length} {filteredSlots.length === 1 ? 'slot' : 'slots'}
-            {(searchQuery || filterStatus !== "All" || filterLocation !== "All" || startDateFilter || endDateFilter) && 
+            {(inputValue || filterStatus !== "All" || filterLocation !== "All" || startDateFilter || endDateFilter) && 
               ' with applied filters'}
           </div>
 
@@ -269,7 +276,7 @@ const SlotManage: React.FC = () => {
           </div>
 
           {/* Show pagination when not filtered */}
-          {(searchQuery === '' && filterStatus === "All" && filterLocation === "All" && !startDateFilter && !endDateFilter) && (
+          {(inputValue === '' && filterStatus === "All" && filterLocation === "All" && !startDateFilter && !endDateFilter) && (
             <div className="mt-6">
               <Pagination
                 currentPage={currentPage}

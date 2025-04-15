@@ -40,10 +40,11 @@ export const createExpense = async (formData: FormData, userId: string) => {
 };
 
 
-export const getExpenses = async (userId: string,currentPage:number,limit:number) => {
+export const getExpenses = async (userId: string,currentPage:number,limit:number,search:string) => {
   try {
+    console.log("debouncedSearch : ",search)
     const response = await axiosInstance.get(`${BASEURL}/getExpenses/${userId}`,{
-      params: { currentPage, limit }
+      params: { currentPage, limit, search }
     });
     return response.data;
   } catch (error) {

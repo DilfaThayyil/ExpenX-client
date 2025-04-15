@@ -6,7 +6,8 @@ import Loading from "@/style/loading";
 import { Pencil, Trash } from "lucide-react";
 import { fetchUsers, fetchAdvisors, fetchCategories, manageUser, manageCategory } from "@/services/admin/adminServices";
 import CategoryModal from "../modals/categoryModal";
-import {DataTableProps} from './types'
+import { DataTableProps } from './types'
+import useDebounce from '@/hooks/use-debounce'
 
 
 
@@ -14,7 +15,8 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [inputValue, setInputValue] = useState('');
+  const [debouncedQuery, setSearchQuery] = useDebounce('', 500);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(3);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -23,14 +25,15 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
   const Toast = useShowToast();
 
 
-  const fetchFunction = async (page: number, limit: number) => {
+  const fetchFunction = async (page: number, limit: number, debouncedQuery: string) => {
     switch (type) {
       case "user":
-        return await fetchUsers(page, limit);
+        console.log("searching....", debouncedQuery)
+        return await fetchUsers(page, limit, debouncedQuery);
       case "advisor":
-        return await fetchAdvisors(page, limit);
+        return await fetchAdvisors(page, limit, debouncedQuery);
       case "category":
-        return await fetchCategories(page, limit);
+        return await fetchCategories(page, limit, debouncedQuery);
       default:
         throw new Error("Invalid type");
     }
@@ -48,8 +51,8 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      try {
-        const response = await fetchFunction(currentPage, limit);
+      try {debouncedQuery
+        const response = await fetchFunction(currentPage, limit, debouncedQuery);
         if (type === 'category') {
           setData(Array.isArray(response.data.categories) ? response.data.categories : [])
         } else {
@@ -64,7 +67,7 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
       }
     };
     fetchData();
-  }, [type, currentPage]);
+  }, [type, currentPage, debouncedQuery]);
 
   const handleAction = async (action: string, id: string) => {
     if (action === "edit" && type === "category") {
@@ -114,6 +117,11 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
     setData((prev) => [...prev, newCategory])
   }
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+    setSearchQuery(e.target.value);
+  };
+
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -133,12 +141,12 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
         type="text"
         className="p-2 border border-gray-300 rounded-lg w-full mb-2"
         placeholder={`Search ${type}`}
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        value={inputValue}
+        onChange={handleChange}
       />
       <Table<T>
         data={data.filter((item: any) =>
-          JSON.stringify(item).toLowerCase().includes(searchQuery.toLowerCase())
+          JSON.stringify(item).toLowerCase().includes(debouncedQuery.toLowerCase())
         )}
         columns={
           type === "category"

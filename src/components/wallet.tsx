@@ -5,7 +5,7 @@ import { EmptyComponent } from "./empty/Empty";
 
 
 
-export const WalletComponent = ({ transactions, loading,wallet }) => {
+export const WalletComponent = ({ transactions, loading, wallet }) => {
     let totalIncome = 0;
     let totalExpense = 0;
     transactions.forEach((transaction) => {
@@ -16,7 +16,7 @@ export const WalletComponent = ({ transactions, loading,wallet }) => {
         }
     });
     return (
-        <Card className="col-span-1 md:col-span-2 bg-gradient-to-br from-emerald-50 to-emerald-100 overflow-hidden">
+        <Card className="col-span-1 md:col-span-2 bg-gradient-to-br from-emerald-200 to-emerald-300 overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="flex items-center">
                     <Wallet className="h-5 w-5 text-emerald-600 mr-2" />
@@ -35,6 +35,11 @@ export const WalletComponent = ({ transactions, loading,wallet }) => {
             <CardContent>
                 {loading ? (
                     <p className="text-center text-gray-500">Loading transactions...</p>
+                ) : !wallet || !wallet.balance ? (
+                    <div className="text-center py-10">
+                        <p className="text-xl font-semibold text-gray-700">No wallet found</p>
+                        <p className="text-gray-500">You don't have a wallet yet. Please make a payment.</p>
+                    </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {/* Wallet Balance */}
@@ -107,6 +112,7 @@ export const WalletComponent = ({ transactions, loading,wallet }) => {
                         </div>
                     </div>
                 )}
+
             </CardContent>
         </Card>
     )

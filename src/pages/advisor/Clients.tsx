@@ -7,6 +7,7 @@ import Store from "@/store/store";
 import Pagination from "@/components/admin/Pagination";
 import ChatWindow from "@/components/chat/chat";
 import {Booking} from './types'
+import useDebounce from '@/hooks/use-debounce'
 
 
 const Clients: React.FC = () => {
@@ -20,7 +21,8 @@ const Clients: React.FC = () => {
   }[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [inputValue, setInputValue] = useState('');  
+  const [debouncedQuery, setSearchQuery] = useDebounce('', 500);
   const [filterStatus, setFilterStatus] = useState<string>("All");
   const [filterPayment, setFilterPayment] = useState<string>("All");
   const [filterLocation, setFilterLocation] = useState<string>("All");
@@ -35,8 +37,8 @@ const Clients: React.FC = () => {
 
     const fetchBookedSlots = async () => {
       try {
-        const response = await getBookedSlotsForAdvisor(advisorId, currentPage, ITEMS_PER_PAGE);
-
+        console.log("client-serach : ",debouncedQuery)
+        const response = await getBookedSlotsForAdvisor(advisorId, currentPage, ITEMS_PER_PAGE,debouncedQuery);
         const { bookedSlots, totalPages } = response.data;
         setBookedAppointments(Array.isArray(bookedSlots) ? bookedSlots : bookedSlots ? [bookedSlots] : []);
         setTotalPages(totalPages);
@@ -47,16 +49,16 @@ const Clients: React.FC = () => {
     };
 
     fetchBookedSlots();
-  }, [advisorId, currentPage]);
+  }, [advisorId, currentPage,debouncedQuery]);
 
   useEffect(() => {
     let filtered = bookedAppointments;
 
-    if (searchQuery) {
+    if (inputValue) {
       filtered = filtered.filter(
         (appointment) =>
-          appointment.bookedBy.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          appointment.bookedBy.email.toLowerCase().includes(searchQuery.toLowerCase())
+          appointment.bookedBy.username.toLowerCase().includes(inputValue.toLowerCase()) ||
+          appointment.bookedBy.email.toLowerCase().includes(inputValue.toLowerCase())
       );
     }
     if (filterStatus !== "All") {
@@ -69,13 +71,18 @@ const Clients: React.FC = () => {
       filtered = filtered.filter((appointment) => appointment.location === filterLocation);
     }
     setFilteredAppointments(filtered);
-  }, [bookedAppointments, searchQuery, filterStatus, filterPayment, filterLocation]);
+  }, [bookedAppointments, inputValue, filterStatus, filterPayment, filterLocation]);
 
   const clearFilters = () => {
     setSearchQuery('');
     setFilterStatus('All');
     setFilterPayment('All');
     setFilterLocation('All');
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+    setSearchQuery(e.target.value); 
   };
 
   const handleShowChat = () => {
@@ -142,8 +149,8 @@ const Clients: React.FC = () => {
                 type="text"
                 className="p-2 pl-10 border border-gray-300 rounded-lg w-full"
                 placeholder="Search by client name or email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={inputValue}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -212,7 +219,7 @@ const Clients: React.FC = () => {
             <p className="text-sm text-gray-600">
               Showing {filteredAppointments.length} of {bookedAppointments.length} appointments
             </p>
-            {(filterStatus !== "All" || filterPayment !== "All" || filterLocation !== "All" || searchQuery) && (
+            {(filterStatus !== "All" || filterPayment !== "All" || filterLocation !== "All" || inputValue) && (
               <div className="text-sm text-blue-600">
                 Filters active
               </div>
