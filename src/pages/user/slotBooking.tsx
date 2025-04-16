@@ -14,8 +14,8 @@ import PaymentForm from '@/components/user/PaymentForm'
 import { bookSlot, paymentInitiate } from '@/services/user/userService'
 import { STRIPE_PUBLISHABLE_KEY } from '@/utility/env'
 import ReportModal from '@/components/modals/reportModal';
-import {IReportData} from '@/components/modals/types'
-import {Slot} from './types'
+import { IReportData } from '@/components/modals/types'
+import { Slot } from './types'
 const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
 
@@ -99,16 +99,28 @@ const SlotBooking: React.FC = () => {
   }
 
   const handlePaymentSuccess = async () => {
-    await bookSlot(selectedSlot!, userId)
-    setSlots(prevSlots =>
-      prevSlots.map(slot =>
-        slot._id === selectedSlot
-          ? { ...slot, status: 'Booked', bookedBy: userId }
-          : slot
+    try {
+      const response = await bookSlot(selectedSlot!, userId)
+      console.log("response-slotBookSuccess : ", response)
+      setSlots(prevSlots =>
+        prevSlots.map(slot =>
+          slot._id === selectedSlot
+            ? { ...slot, status: 'Booked', bookedBy: userId }
+            : slot
+        )
       )
-    )
-    message.success('Payment successful and slot booked!');
-    setPaymentIntent(null);
+      message.success('Payment successful and slot booked!');
+      setPaymentIntent(null);
+    } catch (error: any) {
+      console.error("Error during slot booking", error);
+      setPaymentIntent(null);
+      setIsPayModal(false);
+      if (error.response && error.response.data?.message) {
+        message.error(error.response.data.message);
+      } else {
+        message.error("An unexpected error occurred while booking the slot.");
+      }
+    }
   }
 
 
@@ -183,7 +195,7 @@ const SlotBooking: React.FC = () => {
                             {/* Fee */}
                             <td className="px-6 py-4 text-sm text-gray-700 font-semibold">
                               <span className="px-3 py-1 rounded-md bg-green-100 text-green-800">
-                                ${slot.fee}
+                                ₹{slot.fee}
                               </span>
                             </td>
 
