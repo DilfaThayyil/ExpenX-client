@@ -101,7 +101,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel, initialData }) 
                 id="target"
                 name="target"
                 type="number"
-                label="Target Amount ($)"
+                label="Target Amount (₹)"
                 value={formData.target.toString()}
                 onChange={handleNumberChange}
                 required
@@ -113,7 +113,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel, initialData }) 
                 id="current"
                 name="current"
                 type="number"
-                label="Current Amount ($)"
+                label="Current Amount (₹)"
                 value={formData.current.toString()}
                 onChange={handleNumberChange}
               />

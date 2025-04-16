@@ -25,7 +25,7 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities, loading = f
                   <p className="text-sm text-gray-600">{activity.timestamp}</p>
                 </div>
                 <p className="font-semibold text-gray-900">
-                  ${activity.amount.toFixed(2)}
+                ₹{activity.amount.toFixed(2)}
                 </p>
               </div>
             ))

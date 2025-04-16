@@ -16,7 +16,7 @@ import useShowToast from '@/customHook/showToaster';
 import Loading from '@/style/loading';
 import Store from '../../store/store'
 import Pagination from "@/components/admin/Pagination";
-import {Expense} from './types'
+import { Expense } from './types'
 import useDebounce from '@/hooks/use-debounce'
 
 
@@ -34,7 +34,7 @@ const Expenses = () => {
     })
     const [loading, setLoading] = useState<boolean>(false)
     const [debouncedQuery, setSearchQuery] = useDebounce('', 500);
-    const [inputValue, setInputValue] = useState('');    
+    const [inputValue, setInputValue] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
     const userId = Store((state) => state.user._id)
     const [isExporting, setIsExporting] = useState<boolean>(false);
@@ -67,7 +67,7 @@ const Expenses = () => {
                     console.error('User ID is not defined.');
                     return;
                 }
-                console.log("debouncedSearch : ",debouncedQuery)
+                console.log("debouncedSearch : ", debouncedQuery)
                 const response = await getExpenses(userId, currentPage, limit, debouncedQuery)
                 setExpenses(response.data.expenses)
                 setTotalPages(response.data.totalPages)
@@ -76,28 +76,28 @@ const Expenses = () => {
             }
         };
         fetchExpenses();
-    }, [userId, currentPage,debouncedQuery]);
+    }, [userId, currentPage, debouncedQuery]);
 
     const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
-        setSearchQuery(e.target.value); 
-      };
-
-    const handleDeleteExpense = async (id: number | undefined) => {
-        console.log("deleteExpensId :; ", id)
-        if (!id) return;
-        try {
-            setLoading(true);
-            await deleteExpense(id);
-            setExpenses((prev) => prev.filter(exp => exp.id !== id));
-            Toaster('Expense deleted successfully!', 'success');
-        } catch (error) {
-            console.error('Error deleting expense:', error);
-            Toaster('Failed to delete expense', 'error');
-        } finally {
-            setLoading(false);
-        }
+        setSearchQuery(e.target.value);
     };
+
+    // const handleDeleteExpense = async (id: number | undefined) => {
+    //     console.log("deleteExpensId :; ", id)
+    //     if (!id) return;
+    //     try {
+    //         setLoading(true);
+    //         await deleteExpense(id);
+    //         setExpenses((prev) => prev.filter(exp => exp.id !== id));
+    //         Toaster('Expense deleted successfully!', 'success');
+    //     } catch (error) {
+    //         console.error('Error deleting expense:', error);
+    //         Toaster('Failed to delete expense', 'error');
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -391,7 +391,7 @@ const Expenses = () => {
                                             <TableHead>Description</TableHead>
                                             <TableHead>Category</TableHead>
                                             <TableHead className="text-right">Amount</TableHead>
-                                            <TableHead className="text-right">Actions</TableHead>
+                                            {/* <TableHead className="text-right">Actions</TableHead> */}
                                         </TableRow>
                                     </TableHeader>
                                     {loading ? (
@@ -404,16 +404,16 @@ const Expenses = () => {
                                                     <TableCell>{expense.description}</TableCell>
                                                     <TableCell>{expense.category}</TableCell>
                                                     <TableCell className="text-right">
-                                                        ${expense.amount.toFixed(2)}
+                                                    ₹{expense.amount.toFixed(2)}
                                                     </TableCell>
-                                                    <TableCell className="text-right">
+                                                    {/* <TableCell className="text-right">
                                                         <Button variant="ghost" size="icon">
                                                             <Edit className="h-4 w-4" />
                                                         </Button>
                                                         <Button onClick={() => handleDeleteExpense(expense.id)} variant="ghost" size="icon" className="text-red-600">
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
-                                                    </TableCell>
+                                                    </TableCell> */}
                                                 </TableRow>
                                             ))}
                                         </TableBody>
@@ -440,7 +440,7 @@ const Expenses = () => {
                                 <div className="space-y-4">
                                     <div>
                                         <p className="text-sm text-gray-600">Total Amount</p>
-                                        <p className="text-3xl font-bold text-emerald-600">${totalAmount.toFixed(2)}</p>
+                                        <p className="text-3xl font-bold text-emerald-600">₹{totalAmount.toFixed(2)}</p>
                                     </div>
                                     {/* <div>
                                         <p className="text-sm text-gray-600">Monthly Budget</p>
@@ -454,11 +454,11 @@ const Expenses = () => {
                                         <div className="mt-2 space-y-2">
                                             <div className="flex justify-between">
                                                 <span className="text-gray-600">Average Daily</span>
-                                                <span className="font-medium">${averageDailyExpense}</span>
+                                                <span className="font-medium">₹{averageDailyExpense}</span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-gray-600">Largest Amount</span>
-                                                <span className="font-medium">${largestAmount}</span>
+                                                <span className="font-medium">₹{largestAmount}</span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-gray-600">Total Expenses</span>
