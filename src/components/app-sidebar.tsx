@@ -7,19 +7,23 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar
 } from "@/components/ui/sidebar";
 import { User2 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Store from "@/store/store";
 import useAdminStore from '@/store/adminStore'
-import {AppSidebarProps} from './types'
+import { AppSidebarProps } from './types'
 
 export function AppSidebar({ menuItems, role }: AppSidebarProps) {
   const router = useLocation();
   const currentPath = router.pathname;
   const user = Store((state) => state.user);
-  const adminEmail = useAdminStore((state)=>state.adminEmail)
+  const adminEmail = useAdminStore((state) => state.adminEmail)
+  const { state } = useSidebar()
+  const isCollapsed = state === 'collapsed'
+
   // const [isDarkMode, setIsDarkMode] = useState(false);
 
   // const toggleTheme = () => {
@@ -28,7 +32,7 @@ export function AppSidebar({ menuItems, role }: AppSidebarProps) {
   // };
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       {/* ExpenX Logo */}
       <div className="flex items-center justify-center p-6 border-b border-gray-200">
         <img
@@ -36,11 +40,13 @@ export function AppSidebar({ menuItems, role }: AppSidebarProps) {
           alt="ExpenX Logo"
           className="w-16 h-16"
         />
-        <div className="flex flex-col">
-          <span className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-            xpenX
-          </span>
-        </div>
+        {!isCollapsed && (
+          <div className="flex flex-col">
+            <span className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+              xpenX
+            </span>
+          </div>
+        )}
       </div>
 
       <SidebarContent className="mt-6">
@@ -54,13 +60,15 @@ export function AppSidebar({ menuItems, role }: AppSidebarProps) {
                 return (
                   <SidebarMenuItem
                     key={item.title}
-                    className={`rounded-lg transition-colors duration-200 ${
-                      isActive
-                        ? "bg-emerald-100 text-emerald-600"
-                        : "hover:bg-gray-200 text-gray-700 dark:hover:bg-gray-700 dark:text-gray-300"
-                    }`}
+                    className={`rounded-lg transition-colors duration-200 ${isActive
+                      ? "bg-emerald-100 text-emerald-600"
+                      : "hover:bg-gray-200 text-gray-700 dark:hover:bg-gray-700 dark:text-gray-300"
+                      }`}
                   >
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      isActive={isActive}>
                       <Link
                         to={item.url}
                         className="flex items-center space-x-8 px-8 py-6 text-2xl font-bold"
@@ -82,8 +90,12 @@ export function AppSidebar({ menuItems, role }: AppSidebarProps) {
         <div className="flex items-center justify-between">
           {/* User Info */}
           <SidebarMenuButton className="flex items-center space-x-4 text-lg font-semibold text-gray-700 dark:text-gray-300">
-            <User2 className="w-8 h-8 text-emerald-600" />
-            <span>{role ==='admin' ? adminEmail : user.username}</span>
+            {!isCollapsed && (
+              <>
+                <User2 className="w-8 h-8 text-emerald-600" />
+                <span>{role === "admin" ? adminEmail : user.username}</span>
+              </>
+            )}
           </SidebarMenuButton>
 
           {/* Dark/Light Mode Toggle
