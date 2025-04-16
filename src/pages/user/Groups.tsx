@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import SplitExpenseDialog from '@/components/user/splitExpenseDialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { Users, Plus, Receipt, Trash2 } from 'lucide-react';
+import { Users, Plus, ReceiptIndianRupee, Trash2 } from 'lucide-react';
 import Layout from '@/layout/Sidebar';
 import { createGroup, getUserGroups, addMember, addExpenseInGroup } from '../../services/user/userService'
 import useShowToast from '@/customHook/showToaster';
@@ -284,7 +284,7 @@ const GroupsPage = () => {
                                         </span>
                                     </div>
                                     <div className="text-sm text-gray-600">
-                                        <p>Total Expenses: ${group.expenses.reduce((sum, expense) => sum + expense.totalAmount, 0)}</p>
+                                        <p>Total Expenses: ₹{group.expenses.reduce((sum, expense) => sum + expense.totalAmount, 0)}</p>
                                         <p className="mt-1">{group.expenses.length > 0 ? group.expenses[group.expenses.length - 1].title : "No expenses yet"}</p>
                                     </div>
                                 </CardContent>
@@ -321,12 +321,12 @@ const GroupsPage = () => {
                                                             </Avatar>
                                                             <div>
                                                                 <p className="font-medium">{member.name}</p>
-                                                                <p className="text-sm text-gray-600">Paid: ${totalPaid}</p>
-                                                                <p className="text-sm text-gray-600">Owed: ${Math.ceil(totalOwed)}</p>
+                                                                <p className="text-sm text-gray-600">Paid: ₹{totalPaid}</p>
+                                                                <p className="text-sm text-gray-600">Owed: ₹{Math.ceil(totalOwed)}</p>
                                                             </div>
                                                         </div>
                                                         <Badge variant={totalPaid < totalOwed ? "destructive" : "secondary"}>
-                                                            {totalPaid < totalOwed ? "Owes" : "Owed"} ${Math.ceil(totalPaid - totalOwed)}
+                                                            {totalPaid < totalOwed ? "Owes" : "Owed"} ₹{Math.ceil(totalPaid - totalOwed)}
                                                         </Badge>
                                                     </div>
                                                 );
@@ -359,7 +359,7 @@ const GroupsPage = () => {
                                         <div className="flex justify-between items-center mb-4">
                                             <h3 className="text-lg font-semibold">Recent Expenses</h3>
                                             <Button onClick={() => setIsExpenseDialogOpen(true)}>
-                                                <Receipt className="mr-2 h-4 w-4" /> Add Expense
+                                                <ReceiptIndianRupee className="mr-2 h-4 w-4" /> Add Expense
                                             </Button>
 
                                             <SplitExpenseDialog
@@ -386,7 +386,7 @@ const GroupsPage = () => {
                                                         <TableCell>{expense.title}</TableCell>
                                                         <TableCell>{expense.paidBy}</TableCell>
                                                         <TableCell className="text-right">
-                                                            ${expense.totalAmount}
+                                                        ₹{expense.totalAmount}
                                                         </TableCell>
                                                     </TableRow>
                                                 ))}

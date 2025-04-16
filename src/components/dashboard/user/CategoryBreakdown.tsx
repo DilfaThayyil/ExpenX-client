@@ -38,7 +38,7 @@ const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({ categories, loadi
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => [`$${value}`, 'Amount']} />
+                <Tooltip formatter={(value) => [`₹${value}`, 'Amount']} />
               </PieChart>
             </ResponsiveContainer>
             {/* ✅ Scrollable list for categories */}
@@ -52,7 +52,7 @@ const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({ categories, loadi
                     />
                     <span className="text-sm">{category.category}</span>
                   </div>
-                  <span className="font-medium">${category.amount.toFixed(2)}</span>
+                  <span className="font-medium">₹{category.amount.toFixed(2)}</span>
                 </div>
               ))}
             </div>

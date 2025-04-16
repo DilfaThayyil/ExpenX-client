@@ -1,6 +1,8 @@
 import axiosInstance from '../axios/axios';
 const BASEURL = 'http://localhost:3000/user';
 import { IReportData } from '@/components/modals/types'
+import { Expense } from '@/pages/user/types'
+
 
 
 
@@ -29,7 +31,7 @@ export const updateUser = async (formData: { profilePic: string; username: strin
 }
 
 
-export const createExpense = async (formData: FormData, userId: string) => {
+export const createExpense = async (formData: Expense, userId: string) => {
   try {
     const response = await axiosInstance.post(`${BASEURL}/createExpense/${userId}`, formData);
     return response;
@@ -115,7 +117,6 @@ export const bookSlot = async (slotId: string, userId: string) => {
     const response = await axiosInstance.patch(`${BASEURL}/bookslot`, { slotId, userId })
     return response.data
   } catch (err) {
-    console.error(err)
     throw err
   }
 }

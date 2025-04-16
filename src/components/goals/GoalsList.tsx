@@ -152,8 +152,8 @@ const GoalsList: React.FC = () => {
                         className="h-2"
                       />
                       <div className="flex justify-between text-sm">
-                        <span>${goal.current.toLocaleString()}</span>
-                        <span>${goal.target.toLocaleString()}</span>
+                        <span>₹{goal.current.toLocaleString()}</span>
+                        <span>₹{goal.target.toLocaleString()}</span>
                       </div>
                     </div>
                     <div className="flex space-x-2 mt-2">
@@ -162,7 +162,7 @@ const GoalsList: React.FC = () => {
                         size="sm"
                         onClick={() => handleUpdateProgress(goal._id!, 100)}
                       >
-                        Add $100
+                        Add ₹100
                       </Button>
                       <Button 
                         variant="outline" 

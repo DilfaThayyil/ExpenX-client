@@ -29,7 +29,7 @@ const SpendingTrend: React.FC<SpendingTrendProps> = ({ data, loading = false }) 
                             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                             <XAxis dataKey="date" />
                             <YAxis />
-                            <Tooltip formatter={(value) => [`$${value}`, 'Amount']} />
+                            <Tooltip formatter={(value) => [`₹${value}`, 'Amount']} />
                             <Line type="monotone" dataKey="expenses" stroke="#10B981" strokeWidth={2} />
                             <Line type="monotone" dataKey="payments" stroke="#3B82F6" strokeWidth={2} />
                         </LineChart>
