@@ -40,6 +40,7 @@ export interface GroupExpense {
     paidBy: string;
     splitMethod: string;
     splits?: Record<string, number>;
+    share?:{}
 }
 export interface Group1 {
     name: string;

@@ -98,7 +98,7 @@ const ReviewsList: React.FC<ReviewsListProps> = ({
               key={review._id}
               review={review}
               currentUserId={currentUserId}
-              isAdvisor={isAdvisor}
+              advisorId={advisorId}
               onReviewUpdated={fetchReviews}
             />
           ))}

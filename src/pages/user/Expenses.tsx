@@ -8,10 +8,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, } from
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Plus, Search, Calendar as CalendarIcon, Edit, Trash2, Download, } from 'lucide-react';
+import { Plus, Search, Calendar as CalendarIcon, Download, } from 'lucide-react';
 import { format } from 'date-fns';
 import Layout from '@/layout/Sidebar';
-import { getExpenses, createExpense, getCategories, exportExpense, deleteExpense } from '../../services/user/userService'
+import { getExpenses, createExpense, getCategories, exportExpense } from '../../services/user/userService'
 import useShowToast from '@/customHook/showToaster';
 import Loading from '@/style/loading';
 import Store from '../../store/store'

@@ -9,7 +9,7 @@ import {ReviewItemProps} from './types'
 const ReviewItem: React.FC<ReviewItemProps> = ({ 
   review, 
   currentUserId, 
-  isAdvisor,
+  advisorId,
   onReviewUpdated 
 }) => {
   const [showReplyForm, setShowReplyForm] = useState<boolean>(false);
@@ -23,7 +23,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
   
   const handleReplySubmit = async (text: string) => {
     try {
-      await addReplyToReview(review._id, text);
+      await addReplyToReview(advisorId,review._id, text);
       setShowReplyForm(false);
       onReviewUpdated();
     } catch (err) {
@@ -123,7 +123,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
           </div>
           
           <div className="review-actions">
-            {(isAdvisor || isOwnReview) && (
+            {(advisorId || isOwnReview) && (
               <button 
                 className="reply-button"
                 onClick={() => setShowReplyForm(!showReplyForm)}

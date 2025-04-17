@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { GroupExpense } from '@/pages/user/Groups'
+import { GroupExpense } from '@/pages/user/types'
 import { SplitExpenseDialogProps } from './types'
 
 
@@ -24,7 +24,7 @@ const SplitExpenseDialog: React.FC<SplitExpenseDialogProps> = ({
         totalAmount: 0,
         paidBy: '',
         splitMethod: 'equal',
-        shares: {}
+        share: {}
     });
 
     const calculateEqualShares = (amount: number) => {
@@ -76,7 +76,7 @@ const SplitExpenseDialog: React.FC<SplitExpenseDialogProps> = ({
         e.preventDefault();
         onSubmit({
             ...expense,
-            shares: shares
+            share: shares
         });
     };
 

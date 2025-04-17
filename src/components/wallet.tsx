@@ -1,4 +1,4 @@
-import { Wallet, RefreshCw, CreditCard, ArrowUpCircle, ArrowDownCircle, Plus, ArrowUpRight, Download, Upload } from "lucide-react";
+import { Wallet, CreditCard, Download, Upload } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmptyComponent } from "./empty/Empty";
