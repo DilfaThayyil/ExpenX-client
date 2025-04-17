@@ -19,7 +19,6 @@ const Profile = () => {
   const [profilePic, setProfilePic] = useState<File | null>(null)
   const [previewPic, setPreviewPic] = useState(user.profilePic)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [formSubmitted, setFormSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState<{
     username: string
@@ -63,11 +62,9 @@ const Profile = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setFormSubmitted(true)
     const errors = validateForm()
     if (errors.length > 0) {
       errors.forEach((error) => Toaster(error, 'error', true))
-      setFormSubmitted(false)
       return
     }
     try {

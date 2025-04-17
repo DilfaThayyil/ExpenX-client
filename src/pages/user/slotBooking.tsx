@@ -38,7 +38,6 @@ const SlotBooking: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [slots, setSlots] = useState<Slot[]>([]);
-  const [isPayModal, setIsPayModal] = useState<boolean>(false)
   const sender = Store((state) => state.user);
   const ITEMS_PER_PAGE = 5;
   const userId = sender._id;
@@ -78,7 +77,6 @@ const SlotBooking: React.FC = () => {
           50
         )
         setPaymentIntent(response);
-        setIsPayModal(false)
       }
     } catch (error) {
       console.error('Error initiating payment', error);
@@ -114,7 +112,6 @@ const SlotBooking: React.FC = () => {
     } catch (error: any) {
       console.error("Error during slot booking", error);
       setPaymentIntent(null);
-      setIsPayModal(false);
       if (error.response && error.response.data?.message) {
         message.error(error.response.data.message);
       } else {

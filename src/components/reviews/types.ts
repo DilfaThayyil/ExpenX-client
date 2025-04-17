@@ -60,7 +60,7 @@ export interface Review {
 export interface ReviewItemProps {
     review: Review;
     currentUserId: string;
-    isAdvisor: boolean;
+    advisorId: string;
     onReviewUpdated: () => void;
 }
 
