@@ -21,7 +21,6 @@ export default function AdvisorWallet() {
         try{
             setLoading(true)
             const response = await getTransactions(advisorId)
-            console.log("res-transactions : ", response.transactions)
             setTransactions(response.transactions)
         }catch(err){
             console.error("Error fetching transactions : ",err)
@@ -32,7 +31,6 @@ export default function AdvisorWallet() {
     const fetchUserWallet = async()=>{
         try{
             const response = await getWallet(advisorId)
-            console.log("res-wallet : ",response)
             setWallet(response)
         }catch(err){
             console.error(err)

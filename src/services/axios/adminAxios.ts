@@ -26,8 +26,6 @@ axiosInstance.interceptors.response.use(
       const errorMessage = error.response?.data?.message || "";
 
       if (errorMessage === "Refresh token expired" || errorMessage === "Refresh token is blacklisted.") {
-        console.log(`🚫 ${errorMessage}. Logging out...`);
-
         clearAdminEmail();
 
         Swal.fire({
@@ -52,13 +50,10 @@ axiosInstance.interceptors.response.use(
 
       // Try to refresh token
       try {
-        console.log("🔄 Attempting to refresh token...");
         await axiosInstance.post(`/admin/refresh-token`);
-        console.log("✅ Token refreshed successfully.");
         return axiosInstance(originalRequest);
       } catch (refreshError: any) {
         const errorMessage = refreshError?.response?.data?.message || "";
-        console.log("❌ Refresh failed:", errorMessage);
 
         clearAdminEmail();
 
@@ -84,7 +79,6 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     } else if (error.response?.status === 403) {
-      console.log("⛔ Forbidden: Admin is blocked or not privileged.");
       clearAdminEmail();
 
       try {

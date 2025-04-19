@@ -37,7 +37,6 @@ const Clients: React.FC = () => {
 
     const fetchBookedSlots = async () => {
       try {
-        console.log("client-serach : ",debouncedQuery)
         const response = await getBookedSlotsForAdvisor(advisorId, currentPage, ITEMS_PER_PAGE,debouncedQuery);
         const { bookedSlots, totalPages } = response.data;
         setBookedAppointments(Array.isArray(bookedSlots) ? bookedSlots : bookedSlots ? [bookedSlots] : []);

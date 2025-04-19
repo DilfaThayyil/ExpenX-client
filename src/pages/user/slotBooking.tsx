@@ -99,7 +99,6 @@ const SlotBooking: React.FC = () => {
   const handlePaymentSuccess = async () => {
     try {
       const response = await bookSlot(selectedSlot!, userId)
-      console.log("response-slotBookSuccess : ", response)
       setSlots(prevSlots =>
         prevSlots.map(slot =>
           slot._id === selectedSlot

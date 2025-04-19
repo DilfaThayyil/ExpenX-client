@@ -44,7 +44,6 @@ export const createExpense = async (formData: Expense, userId: string) => {
 
 export const getExpenses = async (userId: string,currentPage:number,limit:number,search:string) => {
   try {
-    console.log("debouncedSearch : ",search)
     const response = await axiosInstance.get(`${BASEURL}/getExpenses/${userId}`,{
       params: { currentPage, limit, search }
     });
@@ -165,7 +164,6 @@ export const getDashboardData = async (userId: string) => {
 
 export const exportExpense = async (userId: string, format: string, startDate?: Date | null, endDate?: Date | null) => {
   try{
-    console.log("export-service : userId : ",userId," , format : ",format," , startDate : ",startDate," ,endDate : ",endDate)
     const params: any = { format, userId };
     if (startDate) params.startDate = startDate.toISOString();
     if (endDate) params.endDate = endDate.toISOString();
@@ -173,7 +171,6 @@ export const exportExpense = async (userId: string, format: string, startDate?: 
       params,
       responseType: 'blob',
     });
-    console.log("response - service : ",response)
     return response
   }catch(err){
     console.error("Export service error : ",err)
