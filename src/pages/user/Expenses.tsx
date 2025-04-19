@@ -67,7 +67,6 @@ const Expenses = () => {
                     console.error('User ID is not defined.');
                     return;
                 }
-                console.log("debouncedSearch : ", debouncedQuery)
                 const response = await getExpenses(userId, currentPage, limit, debouncedQuery)
                 setExpenses(response.data.expenses)
                 setTotalPages(response.data.totalPages)
@@ -84,7 +83,6 @@ const Expenses = () => {
     };
 
     // const handleDeleteExpense = async (id: number | undefined) => {
-    //     console.log("deleteExpensId :; ", id)
     //     if (!id) return;
     //     try {
     //         setLoading(true);
@@ -191,7 +189,6 @@ const Expenses = () => {
                 setIsExporting(false);
                 return;
             }
-            console.log("Exporting:", userId, format, startDate, endDate);
             const response = await exportExpense(userId, format, startDate, endDate);
             if (response.status === 404) {
                 throw new Error('No expense found for this date range')
@@ -423,7 +420,6 @@ const Expenses = () => {
                         </Card>
                         <div className="flex justify-end mt-4">
                             <Pagination currentPage={currentPage} onPageChange={(page) => {
-                                console.log("Changing page to: ", page);
                                 setCurrentPage(page);
                             }} totalPages={totalPages} />
                         </div>

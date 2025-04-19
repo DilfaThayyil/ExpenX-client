@@ -6,7 +6,6 @@ export let socket: Socket;
 
 export const initializeSocket = () => {
   if (!socket || !socket.connected) {
-    console.log("Initializing socket connection...");
     
     socket = io(BACKEND_ENDPOINT, {
       transports: ["websocket", "polling"],
@@ -40,7 +39,6 @@ export const initializeSocket = () => {
 
 export const identifyUser = (userId: string) => {
   if (socket && socket.connected) {
-    console.log("Identifying user to socket:", userId);
     socket.emit("addUser", userId);
   } else {
     console.warn("Socket not connected. Cannot identify user.");

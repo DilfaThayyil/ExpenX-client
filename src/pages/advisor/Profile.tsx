@@ -46,7 +46,6 @@ const ProfileAd = () => {
   const fetchReviews = async () => {
     try {
       const response = await getReviewsForAdvisor(user._id,currentPage,limit)
-      console.log("res-getFeedbacks ******* : ", response.data)
       const {reviews,totalPages} = response.data
       setFeedbacks(reviews);
       setTotalPages(totalPages)

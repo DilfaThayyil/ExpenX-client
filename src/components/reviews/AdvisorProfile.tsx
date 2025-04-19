@@ -1,4 +1,4 @@
-import { FaBriefcase, FaStar, FaCalendarAlt } from 'react-icons/fa';
+import { FaBriefcase, FaCalendarAlt } from 'react-icons/fa';
 import {useNavigate} from 'react-router-dom'
 import ReviewsList from './ReviewsList';
 import './AdvisorProfile.css'

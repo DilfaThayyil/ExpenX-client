@@ -55,7 +55,6 @@ const AdminLogin: React.FC = () => {
 
     try {
       const response=await adminLogin(email,password)
-      console.log("*****Login****response-admin : ",response)
         if(response.error){
             Toaster(response.error.message,'error',true)
         }else{

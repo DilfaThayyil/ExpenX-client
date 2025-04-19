@@ -20,7 +20,6 @@ const defaultUser: UserType = {
 const loadUserFromLocalStorage = (): UserType => {
     try {
         const user = localStorage.getItem('userProfile');
-        // console.log('User in localStorage: ', localStorage.getItem('userProfile'));
         return user ? JSON.parse(user) : defaultUser;
     } catch (error) {
         console.error('Error loading user from localStorage', error);
@@ -44,7 +43,6 @@ export const createUserSlice: StateCreator<State & Actions> = (set, get) => ({
         try {
             saveUserToLocalStorage(user);
             set({ user });
-            console.log("logged user : ",user)
         } catch (error) {
             console.error('Error updating user:', error);
         }
@@ -66,7 +64,6 @@ export const createUserSlice: StateCreator<State & Actions> = (set, get) => ({
         try {
             localStorage.removeItem('userProfile');
             set({ user: { ...defaultUser } });
-            console.log("user data after clearing store : ",{user:{...defaultUser}})
         } catch (error) {
             console.error('Error clearing user:', error);
         }

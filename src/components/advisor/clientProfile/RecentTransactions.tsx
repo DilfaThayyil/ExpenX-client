@@ -12,7 +12,6 @@ const RecentTransactions: React.FC<TransactionProps> = ({ clientId }) => {
     useEffect(() => {
         const fetchTransactions = async () => {
             const response = await getTransactions(clientId)
-            console.log("transactions : ", response.transactions)
             setTransactions(response.transactions)
         }
         fetchTransactions()
