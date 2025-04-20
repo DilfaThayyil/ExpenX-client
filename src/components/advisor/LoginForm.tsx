@@ -21,7 +21,6 @@ const AdvisorLogin: React.FC = () => {
     password: ''
   });
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
-  const [formSubmitted, setFormSubmitted] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
@@ -62,11 +61,9 @@ const AdvisorLogin: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormSubmitted(true);
     const errors = validateForm();
     if (errors.length > 0) {
       errors.forEach((error) => toastr.error(error));
-      setFormSubmitted(false);
       return;
     }
 

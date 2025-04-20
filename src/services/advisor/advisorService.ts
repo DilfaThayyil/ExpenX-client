@@ -146,9 +146,7 @@ export const getClientMeetings = async (clientId: string | undefined, advisorId:
 
 export const getClient = async (clientId: string | undefined) => {
   try {
-    console.log("starting....service : ", clientId)
     const response = await axiosInstance.get(`${BASEURL}/getClient/${clientId}`)
-    console.log("service-getClient : ", response.data)
     return response.data
   } catch (err) {
     console.error(err)
@@ -156,7 +154,7 @@ export const getClient = async (clientId: string | undefined) => {
   }
 }
 
-export const getExpenseByCategory = async (clientId: string | undefined, expenseTimeframe: string, customStartDate: string, customEndDate: string) => {
+export const getExpenseByCategory = async (clientId: string | undefined, expenseTimeframe: string, customStartDate: string|null, customEndDate: string|null) => {
   try {
     const params: any = { clientId, expenseTimeframe };
 
@@ -172,7 +170,7 @@ export const getExpenseByCategory = async (clientId: string | undefined, expense
   }
 }
 
-export const getDocuments = async (clientId: string, advisorId: string) => {
+export const getDocuments = async (clientId: string|undefined, advisorId: string) => {
   try {
     const response = await axiosInstance.get(`${BASEURL}/getDocuments`, {
       params: { clientId, advisorId },
@@ -189,7 +187,6 @@ export const uploadDocument = async (formData: FormData) => {
     const response = await axiosInstance.post(`${BASEURL}/uploadDocument`, formData, {
       headers: { "Content-Type": "multipart/form-data" }
     })
-    console.log("response-servvvv : ", response.data)
     return response.data
   } catch (err) {
     console.error(err)

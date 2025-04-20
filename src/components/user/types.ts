@@ -24,7 +24,14 @@ export interface GroupExpense {
     totalAmount: number;
     paidBy: string;
     splitMethod: string;
-    splits?: Record<string, number>;
+    splits?: {
+        user: string;
+        amountOwed: number;
+        percentage: number;
+        status: string;
+        _id: string;
+    }[];
+    share?: Record<string, number>
 }
 
 export interface Member {

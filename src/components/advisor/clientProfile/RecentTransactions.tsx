@@ -3,12 +3,12 @@ import { getTransactions } from '@/services/advisor/advisorService'
 import { EmptyComponent } from '@/components/empty/Empty';
 import { Badge } from '@/components/ui/badge';
 import { useEffect, useState } from 'react'
-import {TransactionProps} from './types'
+import { TransactionProps, Transaction } from './types'
 
 
 const RecentTransactions: React.FC<TransactionProps> = ({ clientId }) => {
 
-    const [transactions, setTransactions] = useState([])
+    const [transactions, setTransactions] = useState<Transaction[]>([])
     useEffect(() => {
         const fetchTransactions = async () => {
             const response = await getTransactions(clientId)

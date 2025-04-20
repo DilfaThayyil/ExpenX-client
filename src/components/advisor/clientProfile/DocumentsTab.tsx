@@ -6,7 +6,7 @@ import { getDocuments } from '@/services/advisor/advisorService'
 import Store from '@/store/store'
 import { DocumentsTable } from './DocumentsTable'
 import { DocumentUploadCard } from './DocumentUpload'
-import {DocumentsTabProps} from './types'
+import {DocumentsTabProps,ActionButtonProps,DashboardCardProps} from './types'
 
 
 export const DocumentsTab: React.FC<DocumentsTabProps> = ({ clientId }) => {
@@ -17,7 +17,6 @@ export const DocumentsTab: React.FC<DocumentsTabProps> = ({ clientId }) => {
         const fetchDocuments = async () => {
             try {
                 const response = await getDocuments(clientId, advisorId);
-                console.log("res-Documents : ", response.documents)
                 setDocumentsData(response.documents);
             } catch (error) {
                 console.error("Error fetching documents", error);
@@ -35,7 +34,7 @@ export const DocumentsTab: React.FC<DocumentsTabProps> = ({ clientId }) => {
     );
 };
 
-export const ActionButton = ({ icon, onClick }) => {
+export const ActionButton = ({ icon, onClick }:ActionButtonProps) => {
     return (
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onClick}>
             {icon}
@@ -43,7 +42,7 @@ export const ActionButton = ({ icon, onClick }) => {
     );
 };
 
-export const DashboardCard = ({ title, actions, children, className }) => {
+export const DashboardCard = ({ title, actions, children, className }:DashboardCardProps) => {
     return (
         <Card className={`overflow-hidden hover:shadow-md transition-shadow ${className}`}>
             <CardHeader className="pb-2">

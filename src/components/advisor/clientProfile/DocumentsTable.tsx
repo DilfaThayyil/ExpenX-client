@@ -1,4 +1,4 @@
-import { Upload, FileText, MoreHorizontal, Share2, Download, Filter, FileSpreadsheet } from 'lucide-react';
+import { Upload, FileText, Share2, Download, Filter, FileSpreadsheet } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
 import useShowToast from "@/customHook/showToaster";
@@ -65,7 +65,6 @@ export const DocumentsTable: React.FC<DocumentsTableProps> = ({ documentsData })
                                         <div className="flex justify-end gap-2">
                                             <ActionButton icon={<Download size={16} />} onClick={() => handleDownload(document.url)} />
                                             <ActionButton icon={<Share2 size={16} />} onClick={() => handleShare(document.url)} />
-                                            <ActionButton icon={<MoreHorizontal size={16} />} onClick={undefined} />
                                         </div>
                                     </td>
                                 </tr>

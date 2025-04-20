@@ -22,7 +22,6 @@ const GroupsPage = () => {
     const [loading, setLoading] = useState<boolean>(false)
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [isExpenseDialogOpen, setIsExpenseDialogOpen] = useState(false);
-    // const [newExpense, setNewExpense] = useState<GroupExpense>({ id: '', date: new Date().toISOString(), title: '', totalAmount: 0, paidBy: '', splitMethod: 'equal' })
     const [newGroup, setNewGroup] = useState<Group1>({ name: '', members: [] })
     const [groups, setGroups] = useState<Group[]>([])
     const [memberError, setMemberError] = useState('')

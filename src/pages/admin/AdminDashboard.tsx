@@ -22,36 +22,34 @@ const AdminDashboard = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        const [monthlyResponse, categoryResponse, statsResponse, userGrowthResponse] = await Promise.all([
-          fetchMonthlyTrends(),
-          fetchExpenseCategories(),
-          fetchDashboardStats(),
-          fetchUserGrowth()
-        ]);
-        setMonthlyData(monthlyResponse);
-        setCategoryData(categoryResponse);
-        setStats(statsResponse);
-        setUserGrowth(userGrowthResponse)
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching dashboard data:', err);
-        setError('Failed to load dashboard data. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDashboardData();
-
     const intervalId = setInterval(() => {
       fetchDashboardData();
     }, 5 * 60 * 1000);
-
     return () => clearInterval(intervalId);
   }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const [monthlyResponse, categoryResponse, statsResponse, userGrowthResponse] = await Promise.all([
+        fetchMonthlyTrends(),
+        fetchExpenseCategories(),
+        fetchDashboardStats(),
+        fetchUserGrowth()
+      ]);
+      setMonthlyData(monthlyResponse);
+      setCategoryData(categoryResponse);
+      setStats(statsResponse);
+      setUserGrowth(userGrowthResponse)
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError('Failed to load dashboard data. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading && !monthlyData.length) {
     return (
@@ -65,27 +63,26 @@ const AdminDashboard = () => {
       </Layout>
     );
   }
-
-  // if (error) {
-  //   return (
-  //     <Layout role='admin'>
-  //       <div className="p-6 flex items-center justify-center min-h-screen">
-  //         <div className="text-center bg-red-50 p-6 rounded-lg max-w-md">
-  //           <div className="text-red-500 text-4xl mb-4">⚠️</div>
-  //           <h2 className="text-xl font-bold text-red-700 mb-2">Error Loading Dashboard</h2>
-  //           <p className="text-gray-700 mb-4">{error}</p>
-  //           <button 
-  //             onClick={() => window.location.reload()} 
-  //             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-  //           >
-  //             Retry
-  //           </button>
-  //         </div>
-  //       </div>
-  //     </Layout>
-  //   );
-  // }
-
+  if (error) {
+    return (
+      <Layout role="admin">
+        <AdminNavbar />
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
+          <div className="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
+            <h2 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h2>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <button
+              onClick={fetchDashboardData}
+              className="px-6 py-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-all"
+            >
+              {loading ? "Retrying..." : "Retry"}
+            </button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+  
   return (
     <Layout role='admin'>
       <AdminNavbar />

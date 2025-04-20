@@ -2,7 +2,24 @@ import { Avatar } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { MessageSquare, Phone } from 'lucide-react';
 
-const ClientHeader = ({client,lastMeeting,nextMeeting}) => {
+export interface MeetingType {
+    date: string;
+};
+
+export interface ClientType {
+    username: string;
+    email: string;
+    phone: string;
+    profilePic?: string;
+};
+
+export interface ClientHeaderProps {
+    client: ClientType | null;
+    lastMeeting?: MeetingType | null;
+    nextMeeting?: MeetingType | null;
+}
+
+const ClientHeader: React.FC<ClientHeaderProps> = ({ client, lastMeeting, nextMeeting }) => {
     // Financial health score (0-100)
     // const healthScore = 78;
     // const getHealthColor = (score) => {
@@ -10,7 +27,7 @@ const ClientHeader = ({client,lastMeeting,nextMeeting}) => {
     //     if (score < 71) return 'bg-orange-500';
     //     return 'bg-green-500';
     // };
-    const formatDate = (dateString) => {
+    const formatDate = (dateString: string) => {
         if (!dateString) return "N/A";
         return new Date(dateString).toLocaleDateString("en-US", {
             month: "long",
@@ -24,7 +41,7 @@ const ClientHeader = ({client,lastMeeting,nextMeeting}) => {
             <div className="p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center gap-6">
                 <div className="relative">
                     <Avatar className="h-24 w-24 rounded-xl border-4 border-white dark:border-slate-700 shadow-lg">
-                        <img src={client ? client.profilePic : "/api/placeholder/150/150"} alt="Client profile" className="object-cover" />
+                        <img src={client ? client.profilePic : "/api/placeholder/150/150"} alt="Client profile" className="object-cover rounded-xl" />
                     </Avatar>
                     {/* <div className={`absolute -bottom-2 -right-2 h-8 w-8 rounded-full ${getHealthColor(healthScore)} flex items-center justify-center text-white font-bold border-2 border-white dark:border-slate-700`}>
                         {healthScore}

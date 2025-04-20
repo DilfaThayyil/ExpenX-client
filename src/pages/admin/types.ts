@@ -16,6 +16,12 @@ export interface DashboardStats {
 }
 
 export interface Category {
-    _id: string;
+    _id?: string;
     name: string;
 }
+export interface User {
+    _id: string;
+    username: string;
+    email: string;
+    isBlocked:boolean
+  }

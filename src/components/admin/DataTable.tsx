@@ -11,7 +11,7 @@ import useDebounce from '@/hooks/use-debounce'
 
 
 
-const DataTable = <T,>({ type }: DataTableProps<T>) => {
+const DataTable = <T,>({ type }: DataTableProps) => {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +28,6 @@ const DataTable = <T,>({ type }: DataTableProps<T>) => {
   const fetchFunction = async (page: number, limit: number, debouncedQuery: string) => {
     switch (type) {
       case "user":
-        console.log("searching....", debouncedQuery)
         return await fetchUsers(page, limit, debouncedQuery);
       case "advisor":
         return await fetchAdvisors(page, limit, debouncedQuery);

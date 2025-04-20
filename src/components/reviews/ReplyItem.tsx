@@ -8,14 +8,14 @@ const ReplyItem: React.FC<ReplyItemProps> = ({ reply, isOwnReply }) => {
     <div className={`reply-item ${isOwnReply ? 'own-reply' : ''}`}>
       <div className="reply-header">
         <div className="user-info">
-          {reply.advisorId.profilePic && (
+          {reply.advisorId.avatar && (
             <img 
-              src={reply.advisorId.profilePic} 
-              alt={reply.advisorId.username} 
+              src={reply.advisorId.avatar} 
+              alt={reply.advisorId.name} 
               className="avatar-small"
             />
           )}
-          <span className="username">{reply.advisorId.username}</span>
+          <span className="username">{reply.advisorId.name}</span>
         </div>
         
         <div className="reply-date">

@@ -16,15 +16,8 @@ export interface ReplyFormProps {
     onCancel: () => void;
 }
 
-export interface FeedbackReply {
-    _id: string;
-    advisorId: string;
-    text: string;
-    createdAt: string;
-}
-
 export interface ReplyItemProps {
-    reply: FeedbackReply;
+    reply: Reply;
     isOwnReply: boolean;
 }
 

@@ -8,7 +8,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   open,
   onClose,
   onConfirm,
-  slot,
 }) => {
   return (
     <Modal open={open} onClose={onClose} center>

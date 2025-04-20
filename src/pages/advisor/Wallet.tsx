@@ -3,12 +3,13 @@ import { WalletComponent } from '@/components/wallet'
 import Layout from '@/layout/Sidebar'
 import Store from '@/store/store'
 import { getTransactions ,getWallet} from '@/services/advisor/advisorService'
+import {WalletType} from './types'
 
 export default function AdvisorWallet() {
     const advisorId = Store((state) => state.user._id)
     const [transactions, setTransactions] = useState([])
     const [loading, setLoading] = useState(true)
-    const [wallet,setWallet] = useState({})
+    const [wallet,setWallet] = useState<WalletType|null>(null)
 
     useEffect(() => {
         fetchTransactions();

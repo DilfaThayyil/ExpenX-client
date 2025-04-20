@@ -11,37 +11,27 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    console.log("error - TTTTTTTTTTTTTTTTTTT : ", error)
     const originalRequest = error.config;
 
-    // 💣 Stop retrying if the failed request is the refresh-token route itself
     if (originalRequest?.url?.includes('/user/auth/refresh-token')) {
       console.warn("🔁 Refresh token request failed. Preventing infinite loop.");
       return Promise.reject(error);
     }
 
     if (error.response) {
-      // 🔒 Access token expired
       if (error.response.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
         try {
-          console.log("🔄 Refreshing access token...");
           await axiosInstance.post(`/user/auth/refresh-token`);
-          console.log("✅ Token refreshed successfully.");
           return axiosInstance(originalRequest);
         } catch (error) {
           const err = error as AxiosError<any>;
           const message = err?.response?.data?.message;
-
-          console.log("❌ Refresh token failed:", message || "Unknown error");
-
           if (message === "Refresh token is blacklisted.") {
             console.log("🚫 Refresh token is blacklisted. Forcing logout...");
           }
 
           Store.getState().clearUser();
-          console.log("🧹 Store cleared due to refresh failure.");
-
           Swal.fire({
             icon: "error",
             title: "Access Denied",
@@ -64,9 +54,7 @@ axiosInstance.interceptors.response.use(
         }
       }
       else if (error.response.status === 403) {
-        console.log('❌ User is blocked by admin!');
         Store.getState().clearUser()
-        console.log("store cleared due to 403 . Logginh out...")
         await axiosInstance.post(`/user/auth/logout`);
         Swal.fire({
           icon: "error",

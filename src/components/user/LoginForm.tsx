@@ -20,7 +20,6 @@ const LoginPage = () => {
     password: ''
   });
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [formSubmitted, setFormSubmitted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
@@ -57,11 +56,9 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormSubmitted(true);
     const errors = validateForm();
     if (errors.length > 0) {
       errors.forEach((error) => toastr.error(error));
-      setFormSubmitted(false);
       return;
     }
 

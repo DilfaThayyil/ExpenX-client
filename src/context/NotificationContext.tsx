@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { getNotification, markAllNotificationsAsRead } from "@/services/chat/chatServices";
 import { socket,initializeSocket } from "@/socket/socket";
 import Store from "@/store/store";
-import {NotificationContextProps} from './types'
+import {NotificationContextProps,Notification} from './types'
 
 
 

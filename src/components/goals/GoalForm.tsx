@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Goal } from '@/services/goals/goalsService';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import FormInput from '@/components/InputField'
-import { GoalFormProps } from './types'
+import { GoalFormProps, Goal } from './types'
 
 
 const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel, initialData }) => {
@@ -127,7 +126,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel, initialData }) 
                 name="deadline"
                 type="date"
                 label="Target Date"
-                value={formData.deadline}
+                value={formData.deadline.toString()}
                 onChange={handleChange}
                 required
               />

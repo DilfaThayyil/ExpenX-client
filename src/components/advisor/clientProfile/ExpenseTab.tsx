@@ -1,16 +1,17 @@
+import {ExpensesTabProps,ExpenseItemProps,ExpenseBreakdownChartProps,ExpenseDataType} from './types'
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, } from 'recharts';
-import { Button } from '@/components/ui/button';
-import { TabsContent } from '@/components/ui/tabs';
 import { Plane, CreditCard, ShoppingBag, Home } from 'lucide-react'
-import React from 'react';
-import { DashboardCard } from './DocumentsTab';
 import { Progress } from '@/components/ui/progress';
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { TabsContent } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { DashboardCard } from './DocumentsTab';
+import DatePicker from "react-datepicker";
 import { useState } from 'react'
+import React from 'react';
 
 
-export const ExpensesTab = ({ expenseTimeframe, setExpenseTimeframe, expenseData, setCustomDates }) => {
+export const ExpensesTab:React.FC<ExpensesTabProps> = ({ expenseTimeframe, setExpenseTimeframe, expenseData, setCustomDates }) => {
     return (
         <TabsContent value="expenses" className="mt-0">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -26,7 +27,7 @@ export const ExpensesTab = ({ expenseTimeframe, setExpenseTimeframe, expenseData
     );
 };
 
-export const TopExpensesCard = ({ expenseData }) => {
+export const TopExpensesCard: React.FC<{ expenseData: ExpenseDataType[] }> = ({ expenseData }) => {
     const totalExpenses = expenseData.reduce((sum, expense) => sum + expense.value, 0);
     const topExpenses = [...expenseData].sort((a, b) => b.value - a.value).slice(0, 4);
 
@@ -41,8 +42,8 @@ export const TopExpensesCard = ({ expenseData }) => {
                             icon={<ExpenseIcon category={expense.name} size={16} />}
                             name={expense.name}
                             amount={`$${expense.value.toLocaleString()}`}
-                            percentage={percentage}
-                        />
+                            percentage={percentage.toString()}
+                            />
                     );
                 })}
             </div>
@@ -52,8 +53,8 @@ export const TopExpensesCard = ({ expenseData }) => {
         </DashboardCard>
     );
 };
-const ExpenseIcon = ({ category, size }) => {
-    const icons = {
+const ExpenseIcon: React.FC<{ category: string; size: number }> = ({ category, size }) => {
+    const icons: Record<string, React.ReactElement> = {
         "Housing": <Home size={size} />,
         "Food": <ShoppingBag size={size} />,
         "Shopping": <CreditCard size={size} />,
@@ -63,7 +64,7 @@ const ExpenseIcon = ({ category, size }) => {
 };
 
 
-export const ExpenseItem = ({ icon, name, amount, percentage }) => {
+export const ExpenseItem:React.FC<ExpenseItemProps> = ({ icon, name, amount, percentage }) => {
     return (
         <div className="space-y-2">
             <div className="flex justify-between">
@@ -73,15 +74,15 @@ export const ExpenseItem = ({ icon, name, amount, percentage }) => {
                 </div>
                 <span className="font-medium">{amount}</span>
             </div>
-            <Progress value={percentage} className="h-2" />
+            <Progress value={Number(percentage)} className="h-2" />
         </div>
     );
 };
 
-export const ExpenseBreakdownChart = ({ timeframe, setTimeframe, expenseData, setCustomDates }) => {
+export const ExpenseBreakdownChart:React.FC<ExpenseBreakdownChartProps> = ({ timeframe, setTimeframe, expenseData, setCustomDates }) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [customStartDate, setCustomStartDate] = useState(null);
-    const [customEndDate, setCustomEndDate] = useState(null);
+    const [customStartDate, setCustomStartDate] = useState<Date|undefined>(undefined);
+    const [customEndDate, setCustomEndDate] = useState<Date|null>(null);
 
     const handleCustomDateRange = () => {
         setShowDatePicker(true);
@@ -89,7 +90,7 @@ export const ExpenseBreakdownChart = ({ timeframe, setTimeframe, expenseData, se
 
     const applyCustomDateFilter = () => {
         if (customStartDate && customEndDate) {
-            setCustomDates(customStartDate, customEndDate);
+            setCustomDates(customStartDate.toISOString().split('T')[0],customEndDate.toISOString().split('T')[0]);
             setTimeframe("custom");
             setShowDatePicker(false);
         }
@@ -159,7 +160,7 @@ export const ExpenseBreakdownChart = ({ timeframe, setTimeframe, expenseData, se
                             <label className="block text-sm font-medium">Start Date</label>
                             <DatePicker
                                 selected={customStartDate}
-                                onChange={(date) => setCustomStartDate(date)}
+                                onChange={(date) => setCustomStartDate(date ?? undefined)}
                                 className="border p-2 w-full rounded"
                                 selectsStart
                                 startDate={customStartDate}
@@ -193,7 +194,7 @@ export const ExpenseBreakdownChart = ({ timeframe, setTimeframe, expenseData, se
     );
 };
 
-export const ExpenseBreakdownLegend = ({ expenseData }) => {
+export const ExpenseBreakdownLegend: React.FC<{ expenseData: ExpenseDataType[] }> = ({ expenseData }) => {
     const totalExpenses = expenseData.reduce((sum, expense) => sum + expense.value, 0);
 
     const biggestExpense = expenseData.length > 0

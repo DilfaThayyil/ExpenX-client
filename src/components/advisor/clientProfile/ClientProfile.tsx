@@ -1,33 +1,31 @@
 import { getClientMeetings, getClient, getExpenseByCategory } from '@/services/advisor/advisorService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { IMeeting } from './types'
 import MeetingCalendar from './MeetingCalender';
 import RecentTransactions from './RecentTransactions'
 import { DocumentsTab } from './DocumentsTab';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { ExpensesTab } from './ExpenseTab';
-import ClientHeader from './ClientHeader';
+import ClientHeader, { ClientType } from './ClientHeader';
 import MeetingsTab from './MeetingsTab';
 import Layout from "@/layout/Sidebar";
 import Store from '@/store/store'
 
 
 const ClientProfilePage = () => {
-    const [customStartDate, setCustomStartDate] = useState<Date | null>(null);
-    const [customEndDate, setCustomEndDate] = useState<Date | null>(null);
-    const [meetings, setMeetings] = useState([]);
-    const [client, setClient] = useState(null)
-    const [expense, setExpense] = useState([])
+    const [customStartDate, setCustomStartDate] = useState<string | null>(null);
+    const [customEndDate, setCustomEndDate] = useState<string | null>(null);
+    const [meetings, setMeetings] = useState<IMeeting[]>([]);
+    const [client, setClient] = useState<ClientType | null>(null)
+    const [expense, setExpense] = useState<{ name: string, value: number, color: string }[]>([])
     const [expenseTimeframe, setExpenseTimeframe] = useState('30days');
-    const [activeTab, setActiveTab] = useState('transactions');
     const { clientId } = useParams()
     const advisorId = Store((state) => state.user._id)
-    console.log("clientId-clientProfilePage : ", clientId)
 
     useEffect(() => {
         const fetchMeetings = async () => {
             const response = await getClientMeetings(clientId, advisorId)
-            console.log("meetings ; ", response.clientMeetings)
             setMeetings(response.clientMeetings)
         }
         fetchMeetings()
@@ -45,12 +43,12 @@ const ClientProfilePage = () => {
         const fetchExpenseData = async () => {
             try {
                 const response = await getExpenseByCategory(clientId, expenseTimeframe, customStartDate, customEndDate);
-                const formattedData = response.expenses.map(exp => ({
+                const formattedData = response.expenses.map((exp: {totalAmount: any;category: any}) => 
+                ({
                     name: exp.category,
                     value: exp.totalAmount,
                     color: getCategoryColor(exp.category)
                 }));
-                console.log("formatedDta-fetchExpense ^^^^^^ ", formattedData)
                 setExpense(formattedData);
             } catch (error) {
                 console.error("Error fetching expense data:", error);
@@ -59,7 +57,7 @@ const ClientProfilePage = () => {
         fetchExpenseData();
     }, [clientId, expenseTimeframe, customStartDate, customEndDate]);
 
-    const setCustomDates = (start, end) => {
+    const setCustomDates = (start: string | null, end: string | null) => {
         setCustomStartDate(start);
         setCustomEndDate(end);
     };
@@ -78,9 +76,9 @@ const ClientProfilePage = () => {
         return colors[category] || '#000000';
     };
 
-    const getMeetingDetails = (meetings) => {
+    const getMeetingDetails = (meetings: IMeeting[]) => {
         const today = new Date();
-        const sortedMeetings = meetings.sort((a, b) => new Date(a.date) - new Date(b.date));
+        const sortedMeetings = meetings.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         let lastMeeting = null;
         let nextMeeting = null;
         for (const meeting of sortedMeetings) {
@@ -101,7 +99,7 @@ const ClientProfilePage = () => {
                 <ClientHeader client={client} lastMeeting={lastMeeting} nextMeeting={nextMeeting} />
 
                 {/* Main Content with Tabs */}
-                <Tabs defaultValue="transactions" className="w-full" onValueChange={setActiveTab}>
+                <Tabs defaultValue="transactions" className="w-full">
                     <div className="mb-6 overflow-x-auto">
                         <TabsList className="bg-white dark:bg-slate-800 p-1 rounded-lg shadow-sm">
                             <TabsTrigger value="transactions" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-slate-700">
@@ -127,7 +125,7 @@ const ClientProfilePage = () => {
 
                     {/* Overview Tab */}
                     <TabsContent value="transactions" className="mt-0">
-                        <RecentTransactions clientId={clientId}/>
+                        <RecentTransactions clientId={clientId} />
                     </TabsContent>
 
                     <TabsContent value="expenses" className="mt-0">
