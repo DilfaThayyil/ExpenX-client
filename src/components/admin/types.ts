@@ -1,6 +1,10 @@
-export interface DataTableProps<T> {
-    type: "user" | "advisor" | "category";
-    onEdit?: (item: any) => void
+export interface DataTableProps<T = any> {
+  type: "user" | "advisor" | "category";
+  fetchFunction: (page: number, limit: number, search: string) => Promise<any>;
+  manageFunction: (action: string, identifier: string, extraData?: string) => Promise<any>; // ✅
+  columns: { header: string; accessor: (item: T) => any }[];
+  actions: (item: T) => React.ReactNode;
+  onEdit?: (item: T) => void;
 }
 
 export interface PaginationProps {

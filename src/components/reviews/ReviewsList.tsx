@@ -3,7 +3,7 @@ import { getReviewsForAdvisor } from '@/services/review/reviewServices';
 import Pagination from "@/components/admin/Pagination";
 import ReviewItem from './ReviewItem';
 import ReviewForm from './ReviewForm';
-import {ReviewsListProps} from './types'
+import {ReviewsListProps,Review} from './types'
 
 
 const ReviewsList: React.FC<ReviewsListProps> = ({ 
@@ -11,7 +11,7 @@ const ReviewsList: React.FC<ReviewsListProps> = ({
   currentUserId,
   isAdvisor 
 }) => {
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showReviewForm, setShowReviewForm] = useState(false);

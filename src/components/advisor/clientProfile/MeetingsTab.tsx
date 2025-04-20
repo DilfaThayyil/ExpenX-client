@@ -1,6 +1,7 @@
 import MeetingsTable from './MeetingsTable';
+import {MeetingsTableProps} from './types'
 
-const MeetingsTab = ({ meetings }) => {
+const MeetingsTab:React.FC<MeetingsTableProps> = ({ meetings }) => {
     return (
         <>
             <MeetingsTable meetings={meetings} />

@@ -3,6 +3,7 @@ import DataTable from "@/components/admin/DataTable";
 import { fetchUsers, manageUser } from "@/services/admin/adminServices";
 import useShowToast from "@/customHook/showToaster";
 import {AdminNavbar} from '@/layout/AdminNav'
+import {User} from './types'
 
 const Users = () => {
   const Toast = useShowToast();
@@ -51,7 +52,7 @@ const Users = () => {
   return (
     <Layout role="admin">
       <AdminNavbar />
-      <DataTable
+      <DataTable<User>
         type="user"
         fetchFunction={fetchUsers}
         manageFunction={handleUser}

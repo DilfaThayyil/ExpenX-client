@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
-import { getGoals,createGoal,updateGoal,deleteGoal,updateGoalProgress, Goal } from '@/services/goals/goalsService';
+import { getGoals,createGoal,updateGoal,deleteGoal,updateGoalProgress } from '@/services/goals/goalsService';
+import { Goal } from './types'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Trash2, Eye } from "lucide-react";
+import { Trash2, Eye, Pencil } from "lucide-react";
 import useShowToast from '@/customHook/showToaster'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog";
 import { cancelSlot } from '@/services/advisor/advisorService'
 import Store from '@/store/store'
-import {Slot} from './types'
+import { Slot } from './types'
 
 
 const SlotTable: React.FC<{
@@ -23,7 +23,6 @@ const SlotTable: React.FC<{
     const handleCancel = async (slotId: string, userId: string | undefined) => {
         try {
             const response = await cancelSlot(slotId, advisorId, userId);
-            console.log("res-cancelSlot : ", response)
             Toast(response.message, 'success');
         } catch (error) {
             Toast("Error cancelling slot.", "error");
@@ -75,9 +74,14 @@ const SlotTable: React.FC<{
                                     <Eye className="h-4 w-4" />
                                 </Button>
                                 {slot.status === "Available" && (
-                                    <Button variant="ghost" size="icon" onClick={() => setSlotToDelete(slot._id)}>
-                                        <Trash2 className="text-red-500 h-4 w-4" />
-                                    </Button>
+                                    <>
+                                        <Button variant="ghost" size="icon" onClick={() => onEdit(slot)}>
+                                            <Pencil className="text-red-500 h-4 w-4" />
+                                        </Button>
+                                        <Button variant="ghost" size="icon" onClick={() => setSlotToDelete(slot._id)}>
+                                            <Trash2 className="text-red-500 h-4 w-4" />
+                                        </Button>
+                                    </>
                                 )}
                                 {slot.status === "Booked" && new Date(slot.date) >= new Date() && (
                                     <Button variant="ghost" onClick={() => handleCancel(slot._id, slot.bookedBy?._id)}>

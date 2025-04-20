@@ -6,17 +6,17 @@ import { uploadDocument } from '@/services/advisor/advisorService'
 import Store from '@/store/store'
 import useShowToast from "@/customHook/showToaster";
 import { DashboardCard } from './DocumentsTab'
-import {IDocumentFile} from './types'
+import {IDocumentFile,DocumentUploadCardProps} from './types'
 
 
-export const DocumentUploadCard = ({ clientId }) => {
+export const DocumentUploadCard = ({ clientId }:DocumentUploadCardProps) => {
     const advisorId = Store((state) => state.user._id)
     const [selectedFile, setSelectedFile] = useState<File | IDocumentFile | null>(null)
     const [previewURL, setPreviewURL] = useState<string | undefined>(undefined);
     const Toast = useShowToast();
 
-    const handleFileChange = async (e) => {
-        const file = e.target.files[0];
+    const handleFileChange = async (e:React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files ? e.target.files[0] : null;
         if (!file) return;
         setSelectedFile(file);
         if (file.type.startsWith("image/")) {
@@ -33,11 +33,10 @@ export const DocumentUploadCard = ({ clientId }) => {
         }
         const formData = new FormData();
         formData.append("document", selectedFile);
-        formData.append("userId", clientId);
+        formData.append("userId", clientId?clientId:'');
         formData.append("advisorId", advisorId)
         try {
-            const response = await uploadDocument(formData);
-            console.log("res :: ", response)
+            await uploadDocument(formData);
             Toast('File uploaded successfully!', 'success')
             setSelectedFile(null);
             setPreviewURL(undefined);

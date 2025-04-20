@@ -82,22 +82,6 @@ const Expenses = () => {
         setSearchQuery(e.target.value);
     };
 
-    // const handleDeleteExpense = async (id: number | undefined) => {
-    //     if (!id) return;
-    //     try {
-    //         setLoading(true);
-    //         await deleteExpense(id);
-    //         setExpenses((prev) => prev.filter(exp => exp.id !== id));
-    //         Toaster('Expense deleted successfully!', 'success');
-    //     } catch (error) {
-    //         console.error('Error deleting expense:', error);
-    //         Toaster('Failed to delete expense', 'error');
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData({
@@ -388,7 +372,6 @@ const Expenses = () => {
                                             <TableHead>Description</TableHead>
                                             <TableHead>Category</TableHead>
                                             <TableHead className="text-right">Amount</TableHead>
-                                            {/* <TableHead className="text-right">Actions</TableHead> */}
                                         </TableRow>
                                     </TableHeader>
                                     {loading ? (
@@ -401,16 +384,8 @@ const Expenses = () => {
                                                     <TableCell>{expense.description}</TableCell>
                                                     <TableCell>{expense.category}</TableCell>
                                                     <TableCell className="text-right">
-                                                    ₹{expense.amount.toFixed(2)}
+                                                        ₹{expense.amount.toFixed(2)}
                                                     </TableCell>
-                                                    {/* <TableCell className="text-right">
-                                                        <Button variant="ghost" size="icon">
-                                                            <Edit className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button onClick={() => handleDeleteExpense(expense.id)} variant="ghost" size="icon" className="text-red-600">
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </TableCell> */}
                                                 </TableRow>
                                             ))}
                                         </TableBody>
@@ -438,13 +413,6 @@ const Expenses = () => {
                                         <p className="text-sm text-gray-600">Total Amount</p>
                                         <p className="text-3xl font-bold text-emerald-600">₹{totalAmount.toFixed(2)}</p>
                                     </div>
-                                    {/* <div>
-                                        <p className="text-sm text-gray-600">Monthly Budget</p>
-                                        <Progress value={65} className="h-2 mt-2" />
-                                        <p className="text-sm text-gray-600 mt-1">
-                                            65% of budget used
-                                        </p>
-                                    </div> */}
                                     <div className="pt-4 border-t">
                                         <p className="text-sm font-medium">Quick Stats</p>
                                         <div className="mt-2 space-y-2">
@@ -465,27 +433,6 @@ const Expenses = () => {
                                 </div>
                             </CardContent>
                         </Card>
-
-                        {/* Export Data */}
-                        {/* <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button className="w-full" variant="outline" disabled={isExporting}>
-                                    <Download className="mr-2 h-4 w-4" />
-                                    {isExporting ? 'Exporting...' : 'Export Data'}
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuItem onClick={() => handleExportData('pdf')}>
-                                    Export as PDF
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleExportData('csv')}>
-                                    Export as CSV
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleExportData('excel')}>
-                                    Export as Excel
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu> */}
                         <Select value={exportFilter} onValueChange={setExportFilter}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select Export Range" />
@@ -511,8 +458,8 @@ const Expenses = () => {
                                         <Calendar
                                             mode="single"
                                             selected={customStartDate || undefined}
-                                            onSelect={setCustomStartDate}
-                                            max={customEndDate || new Date()}
+                                            onSelect={(day) => setCustomStartDate(day ?? null)}
+                                            disabled={{ after: customEndDate || new Date() }}
                                         />
                                     </PopoverContent>
                                 </Popover>
@@ -527,9 +474,8 @@ const Expenses = () => {
                                         <Calendar
                                             mode="single"
                                             selected={customEndDate || undefined}
-                                            onSelect={setCustomEndDate}
-                                            min={customStartDate || undefined}
-                                            max={new Date()}
+                                            onSelect={(day) => setCustomEndDate(day ?? null)}
+                                            disabled={{ before: customStartDate || undefined, after: new Date() }}
                                         />
                                     </PopoverContent>
                                 </Popover>

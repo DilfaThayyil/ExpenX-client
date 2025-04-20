@@ -26,8 +26,17 @@ export interface Stats {
     completedGoals: number
     slotUtilization: number
 }
-
-
+export interface User {
+    _id: string;
+    name: string;
+    avatar?: string;
+}
+export interface Reply {
+    _id: string;
+    advisorId: User;
+    text: string;
+    createdAt: string;
+}
 export interface Feedback {
     _id: string;
     advisorId: string;
@@ -40,7 +49,7 @@ export interface Feedback {
     profilePic: string;
     rating: number;
     review: string;
-    replies: FeedbackReply[];
+    replies: Reply[];
     createdAt: string;
 }
 
@@ -69,3 +78,6 @@ export interface Slot {
     locationDetails?: string;
     description?: string;
 }
+export interface WalletType {
+    balance: number;
+};

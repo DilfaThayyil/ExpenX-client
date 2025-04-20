@@ -3,17 +3,16 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { MeetingCalendarProps } from './types'
 
-const MeetingCalendar = ({ meetings }) => {
+const MeetingCalendar = ({ meetings }: MeetingCalendarProps) => {
     const [viewMode, setViewMode] = useState('month');
     const [currentDate, setCurrentDate] = useState(new Date());
 
-    // Get days in the current month
-    const getDaysInMonth = (date) => {
+    const getDaysInMonth = (date: Date) => {
         return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
     };
 
-    // Move between day, week, and month
     const handlePrev = () => {
         setCurrentDate((prev) => {
             const newDate = new Date(prev);
@@ -36,26 +35,24 @@ const MeetingCalendar = ({ meetings }) => {
 
     const renderCalendarDays = () => {
         if (viewMode === "day") {
-            // Render a single day
-            const meetingsForDay = meetings.filter(meeting => 
+            const meetingsForDay = meetings.filter(meeting =>
                 new Date(meeting.date).toDateString() === currentDate.toDateString()
             );
 
             return (
                 <div className="p-4 text-center border rounded-lg bg-blue-100 text-blue-800">
                     {currentDate.toDateString()} <br />
-                    {meetingsForDay.length > 0 ? meetingsForDay.map(m => <p key={m.id}>{m.description}</p>) : "No meetings"}
+                    {meetingsForDay.length > 0 ? meetingsForDay.map(m => <p key={m._id}>{m.description}</p>) : "No meetings"}
                 </div>
             );
         } else if (viewMode === "week") {
-            // Get current week's start date (Sunday)
             const startOfWeek = new Date(currentDate);
             startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
 
             return Array.from({ length: 7 }, (_, i) => {
                 const day = new Date(startOfWeek);
                 day.setDate(startOfWeek.getDate() + i);
-                const meetingsForDay = meetings.filter(meeting => 
+                const meetingsForDay = meetings.filter(meeting =>
                     new Date(meeting.date).toDateString() === day.toDateString()
                 );
 
@@ -67,19 +64,22 @@ const MeetingCalendar = ({ meetings }) => {
                 );
             });
         } else {
-            // Default to month view
             const totalDays = getDaysInMonth(currentDate);
-            const meetingsByDate = meetings.reduce((acc, meeting) => {
+            const meetingsByDate: { [day: number]: { id: string; description: string; date: string }[] } = meetings.reduce((acc, meeting) => {
                 const meetingDate = new Date(meeting.date);
                 if (
                     meetingDate.getMonth() === currentDate.getMonth() &&
                     meetingDate.getFullYear() === currentDate.getFullYear()
                 ) {
                     const day = meetingDate.getDate();
-                    acc[day] = (acc[day] || []).concat(meeting);
+                    acc[day] = (acc[day] || []).concat({
+                        id: meeting._id,
+                        description: meeting.description,
+                        date: meeting.date,
+                    });
                 }
                 return acc;
-            }, {});
+            }, {} as { [day: number]: { id: string; description: string; date: string }[] });
 
             return Array.from({ length: totalDays }, (_, i) => {
                 const day = i + 1;
@@ -88,9 +88,8 @@ const MeetingCalendar = ({ meetings }) => {
                 return (
                     <div
                         key={day}
-                        className={`py-2 rounded-full text-center cursor-pointer ${
-                            hasMeeting ? "bg-blue-100 text-blue-800 font-bold" : "hover:bg-slate-100"
-                        }`}
+                        className={`py-2 rounded-full text-center cursor-pointer ${hasMeeting ? "bg-blue-100 text-blue-800 font-bold" : "hover:bg-slate-100"
+                            }`}
                         title={hasMeeting ? `Meetings: ${meetingsByDate[day]?.length}` : ""}
                     >
                         {day}

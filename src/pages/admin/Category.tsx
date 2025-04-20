@@ -1,6 +1,6 @@
 import DataTable from "@/components/admin/DataTable";
-import { manageCategory } from "@/services/admin/adminServices";
-import { useState, useEffect } from "react";
+import { manageCategory,fetchCategories } from "@/services/admin/adminServices";
+import { useState } from "react";
 import CategoryModal from "@/components/modals/categoryModal";
 import Layout from "@/layout/Sidebar";
 import { AdminNavbar } from '@/layout/AdminNav'
@@ -8,29 +8,14 @@ import { Category } from './types'
 
 
 const CategoryTable = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-
+  const [tableKey, setTableKey] = useState<number>(0);
   const columns = [
     { header: "Category Name", accessor: (item: Category) => item.name },
   ];
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetchCategories()
-      setCategories(response.categories);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
-  const handleCategoryAdd = (newCategory: Category) => {
-    setCategories((prevCategory) => [...prevCategory, newCategory])
+  const handleCategoryAdd = () => {
+    setTableKey((prev)=>prev+1)
   };
 
   const actions = (item: Category) => (
@@ -46,7 +31,10 @@ const CategoryTable = () => {
       </button>
       <button
         className="bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded"
-        onClick={() => manageCategory("delete", item._id)}
+        onClick={async () => {
+          await manageCategory("delete", item._id);
+          setTableKey(prev => prev + 1); 
+        }}
       >
         Delete
       </button>
@@ -66,6 +54,7 @@ const CategoryTable = () => {
 
         <DataTable<Category>
           type="category"
+          key={tableKey}
           fetchFunction={fetchCategories}
           manageFunction={manageCategory}
           columns={columns}
