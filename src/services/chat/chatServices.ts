@@ -1,6 +1,7 @@
 import axiosInstance from '../axios/axios'
 import {BACKENDENDPOINT} from '@/utility/env'
 const BASEURL = `${BACKENDENDPOINT}/user`
+console.log("BASSEURL----chatService : ",BASEURL)
 import {Message} from './types'
 
 
