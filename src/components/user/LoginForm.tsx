@@ -69,6 +69,7 @@ const LoginPage = () => {
         Store.getState().setUser(response.user2);
         toastr.success(response.message);
         setTimeout(() => navigate("/home"), 1000);
+        console.log("............naaavigaated to home page..........")
       } else if (response.error) {
         toastr.error(response.error || "Login failed");
       }
