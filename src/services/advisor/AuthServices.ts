@@ -1,7 +1,8 @@
 import { AxiosError } from "axios";
 import axiosInstance from "../axios/axios";
 import { JwtPayload } from "jwt-decode";
-const BASEURL = 'http://localhost:3000/advisor/auth'
+import {BACKENDENDPOINT} from '@/utility/env'
+const BASEURL = `${BACKENDENDPOINT}/advisor/auth`
 import {IAdvisorData,ErrorResponse} from './types'
 
 
