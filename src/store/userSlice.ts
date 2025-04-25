@@ -43,6 +43,7 @@ export const createUserSlice: StateCreator<State & Actions> = (set, get) => ({
         try {
             saveUserToLocalStorage(user);
             set({ user });
+            console.log("user in store : ",user)
         } catch (error) {
             console.error('Error updating user:', error);
         }
