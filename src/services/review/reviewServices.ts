@@ -1,6 +1,7 @@
 import axiosInstance from '../axios/axios'
-const BASEURL = 'http://localhost:3000/user'
-const advBASEURL = 'http://localhost:3000/advisor'
+import {BACKENDENDPOINT} from '@/utility/env'
+const BASEURL = `${BACKENDENDPOINT}/user`
+const advBASEURL = `${BACKENDENDPOINT}/advisor`
 
 export const getAdvisors = async()=>{
   const response = await axiosInstance.get(`${advBASEURL}/getAdvisors`)

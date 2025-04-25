@@ -1,5 +1,6 @@
 import axiosInstance from '../axios/axios';
-const BASEURL = 'http://localhost:3000/user';
+import {BACKENDENDPOINT} from '@/utility/env'
+const BASEURL = `${BACKENDENDPOINT}/user`
 import { IReportData } from '@/components/modals/types'
 import { Expense } from '@/pages/user/types'
 

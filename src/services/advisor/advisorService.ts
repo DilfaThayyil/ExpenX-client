@@ -1,5 +1,6 @@
 import axiosInstance from '../axios/axios';
-const BASEURL = 'http://localhost:3000/advisor';
+import {BACKENDENDPOINT} from '@/utility/env'
+const BASEURL = `${BACKENDENDPOINT}/advisor`
 import {Slot} from './types'
 
 

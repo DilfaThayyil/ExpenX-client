@@ -1,7 +1,8 @@
 import { AxiosError } from "axios";
 import axiosInstance from "../axios/axios";
 import { JwtPayload } from "jwt-decode";
-const BASEURL = 'http://localhost:3000/user/auth'
+import {BACKENDENDPOINT} from '@/utility/env'
+const BASEURL = `${BACKENDENDPOINT}/user/auth`
 import {IcreateUser,ErrorResponse} from './types'
 
 

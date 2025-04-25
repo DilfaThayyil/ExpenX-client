@@ -1,13 +1,12 @@
 import { io, Socket } from "socket.io-client";
-
-const BACKEND_ENDPOINT = "http://localhost:3000"; 
+import {BACKENDENDPOINT} from '@/utility/env'
 
 export let socket: Socket;
 
 export const initializeSocket = () => {
   if (!socket || !socket.connected) {
     
-    socket = io(BACKEND_ENDPOINT, {
+    socket = io(BACKENDENDPOINT, {
       transports: ["websocket", "polling"],
       withCredentials: true,
       path: "/socket.io", 
