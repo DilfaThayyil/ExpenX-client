@@ -84,7 +84,6 @@ const DataTable = <T,>({ type }: DataTableProps) => {
         setData(data.filter((item: any) => item._id !== id));
       }
     } catch (err) {
-      console.log(err);
       Toast(`Failed to ${action} the ${type}`, "error", true);
     }
   };

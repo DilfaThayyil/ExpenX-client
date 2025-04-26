@@ -44,7 +44,6 @@ const Users = () => {
         Toast(`User ${action}ed successfully`, "success", true);
       }
     } catch (err) {
-      console.log(err);
       Toast(`Failed to ${action} the user`, "error", true);
     }
   };

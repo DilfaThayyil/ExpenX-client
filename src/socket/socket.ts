@@ -17,19 +17,15 @@ export const initializeSocket = () => {
     });
 
     socket.on("connect", () => {
-      console.log("Socket connected successfully:", socket.id);
     });
 
-    socket.on("disconnect", (reason) => {
-      console.log(`Socket disconnected: ${reason}`);
+    socket.on("disconnect", () => {
     });
 
-    socket.on("connect_error", (err) => {
-      console.error("Socket connection error:", err.message);
+    socket.on("connect_error", () => {
     });
 
-    socket.on("error", (err) => {
-      console.error("Socket error:", err);
+    socket.on("error", () => {
     });
   }
   

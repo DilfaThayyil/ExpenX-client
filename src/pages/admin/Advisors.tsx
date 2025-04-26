@@ -48,7 +48,6 @@ const Advisors = () => {
         Toast(`Advisor ${action}ed successfully`, "success", true);
       }
     } catch (err) {
-      console.log(err);
       Toast(`Failed to ${action} the advisor`, "error", true);
     }
   };

@@ -26,9 +26,7 @@ axiosInstance.interceptors.response.use(
         } catch (error) {
           const err = error as AxiosError<any>;
           const message = err?.response?.data?.message;
-          if (message === "Refresh token is blacklisted.") {
-            console.log("🚫 Refresh token is blacklisted. Forcing logout...");
-          }
+
           Store.getState().clearUser();
           Swal.fire({
             icon: "error",

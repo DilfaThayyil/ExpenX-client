@@ -55,7 +55,7 @@ export const manageUser = async (action: string,type:'user'|'advisor', email: st
     const response = await axiosInstance.patch(endPoint, {action,email})
     return response.data;
   } catch (err) {
-    console.log(err);
+    throw err
   }
 }
 
@@ -66,7 +66,7 @@ export const fetchCategories = async(page:number,limit:number,search:string)=>{
     })
     return response.data
   }catch(err){
-    console.log(err)
+    throw err
   }
 }
 
