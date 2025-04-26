@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 import Store from "@/store/store";
 import useAdminStore from '@/store/adminStore'
 import { AppSidebarProps } from './types'
+import expenxLogo from '@/assets/image/Letter E.png'
 
 export function AppSidebar({ menuItems, role }: AppSidebarProps) {
   const router = useLocation();
@@ -36,7 +37,7 @@ export function AppSidebar({ menuItems, role }: AppSidebarProps) {
       {/* ExpenX Logo */}
       <div className="flex items-center justify-center p-6 border-b border-gray-200">
         <img
-          src="/src/assets/image/Letter E.png"
+          src={expenxLogo}
           alt="ExpenX Logo"
           className="w-16 h-16"
         />
