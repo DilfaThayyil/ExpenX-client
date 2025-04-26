@@ -15,7 +15,6 @@ import { useNavigate } from 'react-router-dom'
 
 const DashboardPage: React.FC = () => {
   const user = Store(state => state.user);
-  console.log("user*****in*****homePage : ",user)
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState({

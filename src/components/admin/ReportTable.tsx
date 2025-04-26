@@ -93,7 +93,7 @@ const ReportTable = () => {
         );
       }
     } catch (err) {
-      console.log(err);
+      Toast(`Failed to ${action} the ${type}`, "error", true);
     }
   };
   

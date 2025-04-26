@@ -35,7 +35,7 @@ export const otpGenerate = async (email: string) => {
     });
     return response.data;
   } catch (err) {
-    console.log(err);
+    throw err
   }
 };
 
@@ -111,7 +111,7 @@ export const resetPasswordAdv = async (email: string, password: string) => {
     });
     return { success: true, message: response.data.message }
   } catch (err) {
-    console.log(err);
+    throw err
   }
 };
 
@@ -124,7 +124,7 @@ export const advisorGoogleAuth = async (userCredential: JwtPayload) => {
     });
     return response.data
   } catch (err) {
-    console.log(err);
+    throw err
   }
 }
 
