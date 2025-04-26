@@ -11,7 +11,7 @@ import Loading from '@/style/loading'
 import { NewMessageIndicator } from './MessageIndicator';
 import notification from '@/assets/audio/mixkit-correct-answer-tone-2870.wav'
 import { TypingIndicator } from './TypingIndicator';
-import {ChatProps,Message} from './types'
+import { ChatProps, Message } from './types'
 
 
 const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
@@ -32,7 +32,7 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   const notificationSound = useRef<HTMLAudioElement | null>(null);
   const [currentRoomId, setCurrentRoomId] = useState<string>('');
   const [socketInitialized, setSocketInitialized] = useState<boolean>(false);
-
+  const [showMobileChat, setShowMobileChat] = useState(false);
   const filteredContacts = receivers.filter(contact =>
     contact.username.toLowerCase().includes(searchQuery.toLowerCase())
   )
@@ -323,9 +323,9 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <div className="w-full sm:w-1/3 lg:w-1/4 bg-white border-r border-gray-200 flex flex-col">
-        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
-          <div className="relative">
+      <div className={`${showMobileChat ? 'hidden' : 'w-full'} sm:w-1/3 lg:w-1/4 bg-white border-r border-gray-200 flex flex-col`}>
+        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+          <div className="relative w-full">
             <input
               type="text"
               placeholder="Search contacts..."
@@ -345,7 +345,12 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
                 key={contact._id}
                 contact={contact}
                 active={activeContact?._id === contact._id}
-                onClick={() => handleContactChange(contact)}
+                onClick={() => {
+                  handleContactChange(contact);
+                  if (window.innerWidth < 640) {
+                    setShowMobileChat(true);
+                  }
+                }}
               >
                 <NewMessageIndicator count={unreadCount} />
               </ContactItem>
@@ -354,11 +359,17 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
         </div>
       </div>
 
-      <div className="hidden sm:flex flex-1 flex-col">
+      <div className={`${showMobileChat ? 'flex' : 'hidden'} sm:flex flex-1 flex-col`}>
         {activeContact ? (
           <>
             <div className="px-4 py-2 bg-white border-b border-gray-200 flex justify-between items-center">
               <div className="flex items-center">
+                <button
+                  className="sm:hidden mr-2 text-gray-600"
+                  onClick={() => setShowMobileChat(false)}
+                >
+                  ← Back
+                </button>
                 <div className="relative">
                   <img src={activeContact.profilePic} alt={activeContact.username} className="rounded-full w-10 h-10" />
                 </div>
