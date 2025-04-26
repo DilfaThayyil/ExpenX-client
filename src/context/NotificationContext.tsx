@@ -15,7 +15,6 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const loggedInUserId = Store((state) => state.user?._id)
-    console.log("notification-user : ",loggedInUserId)
     useEffect(() => {
         if (!loggedInUserId) return;
         initializeSocket()
