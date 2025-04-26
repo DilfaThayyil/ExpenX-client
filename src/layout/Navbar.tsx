@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import {LogoutDialog} from '@/components/modals/logoutDialogue'
+import { LogoutDialog } from '@/components/modals/logoutDialogue'
 import { User, LogOut, Menu, X } from 'lucide-react';
 import toastr from 'toastr'
 import NotificationBell from '@/components/chat/notificationBell'
 import { Button } from "@/components/ui/button";
 import { advisorLogout } from '@/services/advisor/AuthServices'
 import { userLogout } from '@/services/user/AuthServices'
-import {DropdownMenu,DropdownMenuContent,DropdownMenuItem,DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from 'react-router-dom'
 import Store from '@/store/store'
 
@@ -33,7 +33,7 @@ const Navbar = () => {
       toastr.success("Logged out successfully!");
       setTimeout(() => {
         window.location.href = role === "advisor" ? "/advisor/login" : "/login";
-      }, 1500); 
+      }, 1500);
     } catch (err) {
       toastr.error("Logout failed. Please try again.");
     } finally {
@@ -74,7 +74,7 @@ const Navbar = () => {
 
           <Button
             variant='outline'
-            onClick={()=>setOpen(true)}
+            onClick={() => setOpen(true)}
           >
             <LogOut className="h-5 w-5 text-red-600" />
           </Button>
@@ -87,8 +87,29 @@ const Navbar = () => {
 
       {/* Mobile menu, only shown when menu is open */}
       {mobileMenuOpen && (
+        <>
+          <NotificationBell />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='outline' size="icon">
+                <User className="h-5 w-5 " />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleProfileClick}>
+                Profile</DropdownMenuItem>
+              {/* <DropdownMenuItem>Settings</DropdownMenuItem> */}
+              {/* <DropdownMenuItem className="text-red-600">Logout</DropdownMenuItem> */}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        <NotificationBell />
+          <Button
+            variant='outline'
+            onClick={() => setOpen(true)}
+          >
+            <LogOut className="h-5 w-5 text-red-600" />
+          </Button>
+        </>
 
       )}
     </nav>
