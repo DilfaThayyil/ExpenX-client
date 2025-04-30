@@ -6,7 +6,7 @@ import toastr from 'toastr';
 import {otpProps} from './types'
 
 
-const OTPVerification:React.FC<otpProps> = ({email,purpose,role}) => {
+const OTPVerification:React.FC<otpProps> = ({email,purpose,role,redirect}) => {
   // const location = useLocation()
   // const formData = location.state?.formData
   // const email = location.state?.email || ''
@@ -73,10 +73,10 @@ const OTPVerification:React.FC<otpProps> = ({email,purpose,role}) => {
       if (res) {
         if (purpose === 'forgotPassword' && res?.message === 'OTP verified successfully') {
           toastr.success('OTP verified successfully');
-          navigate('/resetPassword', { state: { email, role } });
+          navigate(redirect || '/resetPassword', { state: { email, role } });
         } else if (res?.message === 'User registered successfully') {
           toastr.success('User registered successfully');
-          navigate('/login');
+          navigate(redirect || '/login');
         }
       }
     } catch (error: any) {

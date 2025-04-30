@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import SplitExpenseDialog from '@/components/user/splitExpenseDialog';
+import {
+    AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+    AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
+import { createGroup, getUserGroups, addMember, addExpenseInGroup, removeMember, leaveGroup, settleDebt } from '../../services/user/groupServices'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { Users, Plus, ReceiptIndianRupee, Trash2 } from 'lucide-react';
-import Layout from '@/layout/Sidebar';
-import { createGroup, getUserGroups, addMember, addExpenseInGroup } from '../../services/user/userService'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import SplitExpenseDialog from '@/components/user/splitExpenseDialog';
+import { Users, Plus, ReceiptIndianRupee, Trash2, RefreshCcw, LogOut, HandCoins } from 'lucide-react';
+import { Group, Group1, GroupExpense, Settlement } from './types';
 import useShowToast from '@/customHook/showToaster';
-import Store from '../../store/store'
-import {Group,Group1,GroupExpense} from './types'
+import SettleUpDialog from '@/components/user/SettleUpDialog'
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import Layout from '@/layout/Sidebar';
+import Store from '../../store/store';
 
 
 
@@ -22,6 +28,7 @@ const GroupsPage = () => {
     const [loading, setLoading] = useState<boolean>(false)
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [isExpenseDialogOpen, setIsExpenseDialogOpen] = useState(false);
+    const [isSettleUpDialogOpen, setIsSettleUpDialogOpen] = useState(false);
     const [newGroup, setNewGroup] = useState<Group1>({ name: '', members: [] })
     const [groups, setGroups] = useState<Group[]>([])
     const [memberError, setMemberError] = useState('')
@@ -87,10 +94,51 @@ const GroupsPage = () => {
         }
     }
 
+    const handleRemoveMember = async (groupId: string, memberEmail: string) => {
+        try {
+            setLoading(true);
+            const response = await removeMember(groupId, memberEmail);
+            if (response.success) {
+                Toaster('Member removed successfully', 'success');
+                setSelectedGroup(response.group);
+                setRefreshGroups(prev => !prev);
+            } else {
+                Toaster(response.message || 'Failed to remove member', 'error');
+            }
+        } catch (error) {
+            console.error('Error removing member:', error);
+            Toaster('Failed to remove member', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLeaveGroup = async (groupId: string) => {
+        try {
+            setLoading(true);
+            const response = await leaveGroup(groupId, email);
+            if (response.success) {
+                Toaster('You left the group successfully', 'success');
+                setRefreshGroups(prev => !prev);
+                setSelectedGroup(null);
+            } else {
+                Toaster(response.message || 'Failed to leave group', 'error');
+            }
+        } catch (error) {
+            console.error('Error leaving group:', error);
+            Toaster('Failed to leave group', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
     const validateForm = () => {
         const errors: string[] = []
         if (!newGroup.name) errors.push('Name is required')
         if (newGroup.members.length === 0) errors.push('Members are required.')
+            const isCreatorIncluded = newGroup.members.some((mem) => mem === email);
+        if (!isCreatorIncluded) errors.push("Add your email address also");
         return errors
     }
 
@@ -103,8 +151,8 @@ const GroupsPage = () => {
         }
         setLoading(true)
         try {
-            await createGroup(userId, newGroup.name, newGroup.members)
-            Toaster('Group creation successful', 'success')
+            await createGroup(userId, newGroup.name, newGroup.members, email)
+            Toaster('Invitation send to the members', 'success')
             setNewGroup({ name: '', members: [] })
             setIsDialogOpen(false)
             setRefreshGroups(prev => !prev)
@@ -121,12 +169,46 @@ const GroupsPage = () => {
             Toaster("Please select a group first.", "error");
             return;
         }
+        if (!expense.title.trim()) {
+            Toaster("Expense title is required", "error");
+            return;
+        }
+        if (expense.totalAmount <= 0) {
+            Toaster("Amount must be greater than zero", "error");
+            return;
+        }
+        if (!expense.paidBy) {
+            Toaster("Paid by field is required", "error");
+            return;
+        }
+        if (expense.splitMethod === 'custom' || expense.splitMethod === 'percentage') {
+            if (!expense.share) {
+                Toaster("Share information is missing", "error");
+                return;
+            }
+            const sum = (Object.values(expense.share) as number[]).reduce((a, b) => a + b, 0);
+            if (expense.splitMethod === 'custom' && Math.abs(sum - expense.totalAmount) > 0.01) {
+                Toaster("Split amounts must equal the total amount", "error");
+                return;
+            }
+            if (expense.splitMethod === 'percentage' && Math.abs(sum - 100) > 0.01) {
+                Toaster("Percentages must add up to 100%", "error");
+                return;
+            }
+        }
         setLoading(true);
         try {
             const response = await addExpenseInGroup(selectedGroup._id, { ...expense });
             if (response.success) {
                 Toaster(response.message, "success");
-                setRefreshGroups((prev) => !prev);
+                setSelectedGroup(prev => {
+                    if (!prev) return null;
+                    return {
+                        ...prev,
+                        expenses: [...prev.expenses, response.expense]
+                    };
+                });
+                setRefreshGroups(prev => !prev);
                 setIsExpenseDialogOpen(false);
             } else {
                 throw new Error(response.message || "Failed to add expense");
@@ -139,7 +221,33 @@ const GroupsPage = () => {
         }
     };
 
+    const handleSettleUp = async (settlementData: Settlement) => {
+        try {
+            if (!selectedGroup || !selectedGroup._id) {
+                Toaster('No group selected for settlement', 'error');
+                return;
+            }
+            setLoading(true);
+            const response = await settleDebt(selectedGroup._id, settlementData);
+            if (response.success) {
+                Toaster('Settlement recorded successfully', 'success');
+                setSelectedGroup(response.group);
+                setRefreshGroups(prev => !prev);
+                setIsSettleUpDialogOpen(false);
+            } else {
+                Toaster(response.message || 'Failed to record settlement', 'error');
+            }
+        } catch (error) {
+            console.error('Error settling debt:', error);
+            Toaster('Failed to record settlement', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    const handleRefresh = () => {
+        setRefreshGroups(prev => !prev);
+    };
 
     // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     //     const { name, value } = e.target
@@ -156,139 +264,167 @@ const GroupsPage = () => {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">My Groups</h1>
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button className="bg-emerald-600 hover:bg-emerald-700">
-                                <Plus className="mr-2 h-4 w-4" /> Create New Group
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Create New Group</DialogTitle>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                <div className="grid gap-2">
-                                    <label>Group Name</label>
-                                    <Input
-                                        placeholder="Enter group name"
-                                        value={newGroup.name}
-                                        onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <label>Add Members</label>
-                                    <Input
-                                        placeholder="Type email address & press Enter"
-                                        onKeyPress={(e) => {
-                                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault();
-                                                if (emailRegex.test(e.currentTarget.value)) {
-                                                    if (!newGroup.members.includes(e.currentTarget.value)) {
-                                                        setNewGroup((prev) => ({
-                                                            ...prev,
-                                                            members: [...prev.members, e.currentTarget.value],
-                                                        }));
-                                                        setEmailError("")
-                                                        e.currentTarget.value = ''
-                                                    } else {
-                                                        setEmailError("This email is already added");
-                                                    }
-                                                } else {
-                                                    setEmailError("Please enter a valid email");
-                                                }
-                                            }
-                                        }}
-                                    />
-                                    {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
+                    <div className="flex gap-2">
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button variant="outline" size="icon" onClick={handleRefresh}>
+                                        <RefreshCcw className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Refresh Groups</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
 
-                                </div>
-                                <div>
-                                    {newGroup.members.length > 0 && (
-                                        <ul>
-                                            {newGroup.members.map((member, index) => (
-                                                <li key={index} className="flex items-center gap-2">
-                                                    {member}
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => {
+                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button className="bg-emerald-600 hover:bg-emerald-700">
+                                    <Plus className="mr-2 h-4 w-4" /> Create New Group
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Create New Group</DialogTitle>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                    <div className="grid gap-2">
+                                        <label>Group Name</label>
+                                        <Input
+                                            placeholder="Enter group name"
+                                            value={newGroup.name}
+                                            onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <label>Add Members</label>
+                                        <Input
+                                            placeholder="Type email address & press Enter - Remember to include yourself!"
+                                            onKeyPress={(e) => {
+                                                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    if (emailRegex.test(e.currentTarget.value)) {
+                                                        if (!newGroup.members.includes(e.currentTarget.value)) {
                                                             setNewGroup((prev) => ({
                                                                 ...prev,
-                                                                members: prev.members.filter((_, i) => i !== index),
+                                                                members: [...prev.members, e.currentTarget.value],
                                                             }));
-                                                        }}
-                                                    >
-                                                        <Trash2 />
-                                                    </Button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
-                            </div>
-                            <Button
-                                onClick={handleCreateGroup}
-                                className="w-full bg-emerald-600 hover:bg-emerald-700"
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <div className="flex items-center">
-                                        <span className="animate-spin mr-2">◌</span>
-                                        Creating...
-                                    </div>
-                                ) : (
-                                    'Create Group'
-                                )}
-                            </Button>
+                                                            if (!newGroup.members.includes(email)) {
+                                                                setEmailError("Remember to include yourself email address");
+                                                            } else {
+                                                                setEmailError("");
+                                                            }
 
-                        </DialogContent>
-                    </Dialog>
+                                                            e.currentTarget.value = '';
+                                                        } else {
+                                                            setEmailError("This email is already added");
+                                                        }
+                                                    } else {
+                                                        setEmailError("Please enter a valid email");
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                        {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
+
+                                    </div>
+                                    <div>
+                                        {newGroup.members.length > 0 && (
+                                            <ul>
+                                                {newGroup.members.map((member, index) => (
+                                                    <li key={index} className="flex items-center gap-2">
+                                                        {member}
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                setNewGroup((prev) => ({
+                                                                    ...prev,
+                                                                    members: prev.members.filter((_, i) => i !== index),
+                                                                }));
+                                                            }}
+                                                        >
+                                                            <Trash2 />
+                                                        </Button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                </div>
+                                <Button
+                                    onClick={handleCreateGroup}
+                                    className="w-full bg-emerald-600 hover:bg-emerald-700"
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <div className="flex items-center">
+                                            <span className="animate-spin mr-2">◌</span>
+                                            Creating...
+                                        </div>
+                                    ) : (
+                                        'Create Group'
+                                    )}
+                                </Button>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
                 </div>
 
                 {/* Main Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left Column - Groups List */}
                     <div className="space-y-4">
-                        {groups.map((group) => (
-                            <Card
-                                key={group._id}
-                                className={`cursor-pointer transition-all hover:shadow-md ${selectedGroup?._id === group._id ? 'ring-2 ring-emerald-500' : ''
-                                    }`}
-                                onClick={() => setSelectedGroup(group)}
-                            >
-                                <CardContent className="p-6">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h3 className="text-lg font-semibold">{group.name}</h3>
-                                        {/* <Badge variant={group.balance < 0 ? "destructive" : "secondary"}>
-                                            {group.balance < 0 ? "You owe" : "You're owed"} ${Math.abs(group.balance)}
-                                        </Badge> */}
-                                    </div>
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <div className="flex -space-x-2">
-                                            {group.members?.slice(0, 3).map((member) => (
-                                                <Avatar key={member.email} className="border-2 border-white">
-                                                    <AvatarImage src={member.avatar} alt={member.name} />
-                                                    <AvatarFallback>{member.name}</AvatarFallback>
-                                                </Avatar>
-                                            ))}
-                                            {group.members?.length > 3 && (
-                                                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium border-2 border-white">
-                                                    +{group.members.length - 3}
-                                                </div>
+                        {groups.length > 0 ? (
+                            groups.map((group) => (
+                                <Card
+                                    key={group._id}
+                                    className={`cursor-pointer transition-all hover:shadow-md ${selectedGroup?._id === group._id ? 'ring-2 ring-emerald-500' : ''
+                                        }`}
+                                    onClick={() => setSelectedGroup(group)}
+                                >
+                                    <CardContent className="p-6">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="text-lg font-semibold">{group.name}</h3>
+                                            {group.createdBy === email && (
+                                                <Badge variant="outline" className="bg-emerald-50 text-emerald-700">Owner</Badge>
                                             )}
+                                            {/* <Badge variant={group.balance < 0 ? "destructive" : "secondary"}>
+                                                {group.balance < 0 ? "You owe" : "You're owed"} ${Math.abs(group.balance)}
+                                            </Badge> */}
                                         </div>
-                                        <span className="text-sm text-gray-600 ml-2">
-                                            {group.memberCount} members
-                                        </span>
-                                    </div>
-                                    <div className="text-sm text-gray-600">
-                                        <p>Total Expenses: ₹{group.expenses.reduce((sum, expense) => sum + expense.totalAmount, 0)}</p>
-                                        <p className="mt-1">{group.expenses.length > 0 ? group.expenses[group.expenses.length - 1].title : "No expenses yet"}</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <div className="flex -space-x-2">
+                                                {group.members?.slice(0, 3).map((member) => (
+                                                    <Avatar key={member.email} className="border-2 border-white">
+                                                        <AvatarImage src={member.avatar} alt={member.name} />
+                                                        <AvatarFallback>{member.name}</AvatarFallback>
+                                                    </Avatar>
+                                                ))}
+                                                {group.members?.length > 3 && (
+                                                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium border-2 border-white">
+                                                        +{group.members.length - 3}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <span className="text-sm text-gray-600 ml-2">
+                                                {group.members.length} members
+                                            </span>
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            <p>Total Expenses: ₹{group.expenses.reduce((sum, expense) => sum + expense.totalAmount, 0).toFixed(2)}</p>
+                                            <p className="mt-1">{group.expenses.length > 0 ? group.expenses[group.expenses.length - 1].title : "No expenses yet"}</p>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))
+                        ) : (
+                            <div className="text-center p-6 bg-gray-50 rounded-lg">
+                                <p className="text-gray-600">No groups yet. Create your first group!</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Center Column - Group Details */}
@@ -297,18 +433,43 @@ const GroupsPage = () => {
                             <Card>
                                 <CardHeader className="flex flex-row items-center justify-between">
                                     <CardTitle>{selectedGroup.name}</CardTitle>
+                                    <div className="flex gap-2">
+                                        {selectedGroup.createdBy === email ? (
+                                            <Badge variant="outline" className="bg-emerald-50 text-emerald-700">Owner</Badge>
+                                        ) : (
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button variant="outline" size="sm">
+                                                        <LogOut className="h-4 w-4 mr-2" /> Leave Group
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            This will remove you from the group. Any outstanding balances should be settled before leaving.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                        <AlertDialogAction onClick={() => handleLeaveGroup(selectedGroup._id)}>Confirm</AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        )}
+                                    </div>
                                 </CardHeader>
                                 <CardContent>
                                     {/* Members List */}
                                     <div className="mb-6">
                                         <h3 className="text-lg font-semibold mb-4">Members</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {selectedGroup.members.map((member) => {
+                                            {selectedGroup?.members.map((member) => {
                                                 const totalPaid = selectedGroup.expenses
                                                     .filter((expense) => expense.paidBy === member.email)
                                                     .reduce((sum, expense) => sum + expense.totalAmount, 0);
                                                 const totalOwed = selectedGroup.expenses.reduce((sum, expense) => {
-                                                    const split = expense?.splits?.find((s: { user: string; }) => s.user === member.email);
+                                                    const split = expense?.splits?.find((s) => s.user === member.email);
                                                     return sum + (split ? split.amountOwed : 0);
                                                 }, 0);
                                                 return (
@@ -316,40 +477,99 @@ const GroupsPage = () => {
                                                         <div className="flex items-center gap-3">
                                                             <Avatar>
                                                                 <AvatarImage src={member.avatar} alt={member.name} />
-                                                                <AvatarFallback>{member.name}</AvatarFallback>
+                                                                <AvatarFallback>{member.name[0]}</AvatarFallback>
                                                             </Avatar>
                                                             <div>
                                                                 <p className="font-medium">{member.name}</p>
-                                                                <p className="text-sm text-gray-600">Paid: ₹{totalPaid}</p>
-                                                                <p className="text-sm text-gray-600">Owed: ₹{Math.ceil(totalOwed)}</p>
+                                                                <p className="text-sm text-gray-600">Paid: ₹{totalPaid.toFixed(2)}</p>
+                                                                <p className="text-sm text-gray-600">Owed: ₹{Math.ceil(totalOwed).toFixed(2)}</p>
                                                             </div>
                                                         </div>
-                                                        <Badge variant={totalPaid < totalOwed ? "destructive" : "secondary"}>
-                                                            {totalPaid < totalOwed ? "Owes" : "Owed"} ₹{Math.ceil(totalPaid - totalOwed)}
-                                                        </Badge>
+                                                        <div className="flex flex-col gap-2">
+                                                            <Badge variant={totalPaid < totalOwed ? "destructive" : "secondary"}>
+                                                                {totalPaid < totalOwed ? "Owes" : "Owed"} ₹{Math.abs(totalPaid - totalOwed).toFixed(2)}
+                                                            </Badge>
+
+                                                            {/* Remove member button (only visible to owner and not for self) */}
+                                                            {selectedGroup.createdBy === email && member.email !== email && (
+                                                                <AlertDialog>
+                                                                    <AlertDialogTrigger asChild>
+                                                                        <Button variant="outline" size="sm" className="text-red-500 border-red-200 hover:bg-red-50">
+                                                                            <Trash2 className="h-3 w-3 mr-1" /> Remove
+                                                                        </Button>
+                                                                    </AlertDialogTrigger>
+                                                                    <AlertDialogContent>
+                                                                        <AlertDialogHeader>
+                                                                            <AlertDialogTitle>Remove member</AlertDialogTitle>
+                                                                            <AlertDialogDescription>
+                                                                                Are you sure you want to remove {member.name}? Any outstanding balances should be settled first.
+                                                                            </AlertDialogDescription>
+                                                                        </AlertDialogHeader>
+                                                                        <AlertDialogFooter>
+                                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                            <AlertDialogAction onClick={() => handleRemoveMember(selectedGroup._id, member.email)}>
+                                                                                Remove
+                                                                            </AlertDialogAction>
+                                                                        </AlertDialogFooter>
+                                                                    </AlertDialogContent>
+                                                                </AlertDialog>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 );
                                             })}
-                                            <input
-                                                type="text"
-                                                placeholder="Enter email address"
-                                                value={member}
-                                                onChange={(e) => setMember(e.target.value)}
-                                                className={`border ${memberError ? "border-red-500" : "border-gray-300"} rounded px-2 py-1`}
-                                            />
-                                            {memberError && <p className="text-red-500 text-sm">{memberError}</p>}
 
-                                            <Button variant="outline" className="h-full" onClick={handleAddMember} disabled={loading}>
-                                                {loading ? (
-                                                    <div className="flex items-center">
-                                                        <span className="animate-spin mr-2">◌</span>
-                                                        Adding...
-                                                    </div>
-                                                ) : (
-                                                    <>
-                                                        <Users className="mr-2 h-4 w-4" /> Add Member
-                                                    </>
+                                            {/* Add member section */}
+                                            <div className="col-span-1 md:col-span-2 mt-4">
+                                                <div className="flex gap-2">
+                                                    <Input
+                                                        type="text"
+                                                        placeholder="Enter email address to add member"
+                                                        value={member}
+                                                        onChange={(e) => {
+                                                            setMember(e.target.value);
+                                                            setMemberError("");
+                                                        }}
+                                                        className={`${memberError ? "border-red-500" : "border-gray-300"}`}
+                                                    />
+                                                    <Button variant="outline" onClick={handleAddMember} disabled={loading}>
+                                                        {loading ? (
+                                                            <div className="flex items-center">
+                                                                <span className="animate-spin mr-2">◌</span>
+                                                                Adding...
+                                                            </div>
+                                                        ) : (
+                                                            <>
+                                                                <Users className="mr-2 h-4 w-4" /> Add
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                                {memberError && (
+                                                    <p className="text-red-500 text-sm mt-1">{memberError}</p>
                                                 )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Actions Section */}
+                                    <div className="mb-6">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h3 className="text-lg font-semibold">Actions</h3>
+                                        </div>
+                                        <div className="flex gap-4">
+                                            <Button
+                                                onClick={() => setIsExpenseDialogOpen(true)}
+                                                className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                                            >
+                                                <ReceiptIndianRupee className="mr-2 h-4 w-4" /> Add Expense
+                                            </Button>
+                                            <Button
+                                                onClick={() => setIsSettleUpDialogOpen(true)}
+                                                className="flex-1"
+                                                variant="outline"
+                                            >
+                                                <HandCoins className="mr-2 h-4 w-4" /> Settle Up
                                             </Button>
                                         </div>
                                     </div>
@@ -357,51 +577,109 @@ const GroupsPage = () => {
                                     <div className="mb-6">
                                         <div className="flex justify-between items-center mb-4">
                                             <h3 className="text-lg font-semibold">Recent Expenses</h3>
-                                            <Button onClick={() => setIsExpenseDialogOpen(true)}>
-                                                <ReceiptIndianRupee className="mr-2 h-4 w-4" /> Add Expense
-                                            </Button>
-
-                                            <SplitExpenseDialog
-                                                isOpen={isExpenseDialogOpen}
-                                                onClose={() => setIsExpenseDialogOpen(false)}
-                                                group={selectedGroup}
-                                                onSubmit={handleAddExpense}
-                                                loading={loading}
-                                            />
                                         </div>
-                                        <Table>
-                                            <TableHeader>
-                                                <TableRow>
-                                                    <TableHead>Date</TableHead>
-                                                    <TableHead>Title</TableHead>
-                                                    <TableHead>Paid By</TableHead>
-                                                    <TableHead className="text-right">Amount</TableHead>
-                                                </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {selectedGroup.expenses.map((expense) => (
-                                                    <TableRow key={expense.id}>
-                                                        <TableCell>{expense.date}</TableCell>
-                                                        <TableCell>{expense.title}</TableCell>
-                                                        <TableCell>{expense.paidBy}</TableCell>
-                                                        <TableCell className="text-right">
-                                                        ₹{expense.totalAmount}
-                                                        </TableCell>
+                                        {selectedGroup.expenses.length > 0 ? (
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        <TableHead>Date</TableHead>
+                                                        <TableHead>Title</TableHead>
+                                                        <TableHead>Paid By</TableHead>
+                                                        <TableHead className="text-right">Amount</TableHead>
                                                     </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {selectedGroup.expenses.map((expense, index) => {
+                                                        const paidByUser = selectedGroup.members.find(m => m.email === expense.paidBy);
+                                                        return (
+                                                            <TableRow key={expense.id || index}>
+                                                                <TableCell>{expense.date}</TableCell>
+                                                                <TableCell>{expense.title}</TableCell>
+                                                                <TableCell>{paidByUser ? paidByUser.name : expense.paidBy}</TableCell>
+                                                                <TableCell className="text-right">
+                                                                    ₹{expense.totalAmount.toFixed(2)}
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        );
+                                                    })}
+                                                </TableBody>
+                                            </Table>
+                                        ) : (
+                                            <div className="text-center p-6 bg-gray-50 rounded-lg">
+                                                <p className="text-gray-600">No expenses added yet.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Settlements Table */}
+                                    <div>
+                                        <h3 className="text-lg font-semibold mb-4">Recent Settlements</h3>
+                                        {selectedGroup.settlements && selectedGroup.settlements.length > 0 ? (
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        <TableHead>Date</TableHead>
+                                                        <TableHead>From</TableHead>
+                                                        <TableHead>To</TableHead>
+                                                        <TableHead className="text-right">Amount</TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {selectedGroup.settlements.map((settlement, index) => {
+                                                        const fromUser = selectedGroup.members.find(m => m.email === settlement.from);
+                                                        const toUser = selectedGroup.members.find(m => m.email === settlement.to);
+                                                        return (
+                                                            <TableRow key={index}>
+                                                                <TableCell>{settlement.date}</TableCell>
+                                                                <TableCell>{fromUser ? fromUser.name : settlement.from}</TableCell>
+                                                                <TableCell>{toUser ? toUser.name : settlement.to}</TableCell>
+                                                                <TableCell className="text-right">₹{settlement.amount.toFixed(2)}</TableCell>
+                                                            </TableRow>
+                                                        );
+                                                    })}
+                                                </TableBody>
+                                            </Table>
+                                        ) : (
+                                            <div className="text-center p-6 bg-gray-50 rounded-lg">
+                                                <p className="text-gray-600">No settlements recorded yet.</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </CardContent>
                             </Card>
                         </div>
                     ) : (
                         <div className="lg:col-span-2">
-                            <p className="text-gray-600">Select a group to see details.</p>
+                            <div className="text-center p-12 bg-gray-50 rounded-lg">
+                                <h3 className="text-lg font-medium mb-2">Select a group to see details</h3>
+                                <p className="text-gray-600">Or create a new group to get started</p>
+                            </div>
                         </div>
                     )}
                 </div>
             </div>
+
+            {/* Split Expense Dialog */}
+            <SplitExpenseDialog
+                isOpen={isExpenseDialogOpen}
+                onClose={() => setIsExpenseDialogOpen(false)}
+                group={selectedGroup}
+                onSubmit={handleAddExpense}
+                loading={loading}
+            />
+
+            {/* Settle Up Dialog */}
+            {selectedGroup && (
+                <SettleUpDialog
+                    isOpen={isSettleUpDialogOpen}
+                    onClose={() => setIsSettleUpDialogOpen(false)}
+                    group={selectedGroup}
+                    onSubmit={handleSettleUp}
+                    loading={loading}
+                    currentUserEmail={email}
+                />
+            )}
+
         </Layout>
     );
 };

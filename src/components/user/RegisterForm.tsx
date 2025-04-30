@@ -9,6 +9,8 @@ import { isValidateEmail, isValidatePassword, } from '../../utility/validator';
 import useShowToast from '../../customHook/showToaster';
 import OTPVerification from './Otp';
 import {Link} from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom';
+
 
 
 const RegisterPage = () => {
@@ -23,7 +25,8 @@ const RegisterPage = () => {
     password: '',
     confirmPassword: '',
   });
-
+  const [params] = useSearchParams();
+  const redirect = params.get("redirect");  
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [lastSubmittedValues, setLastSubmittedValues] = useState({
     username: '',
@@ -137,7 +140,7 @@ const RegisterPage = () => {
   };
 
   if (otpSent) {
-    return <OTPVerification email={formData.email} purpose='register' role='user' />
+    return <OTPVerification email={formData.email} purpose='register' role='user' redirect={redirect}/>
   }
 
   return (

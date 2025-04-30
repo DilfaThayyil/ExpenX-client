@@ -18,12 +18,14 @@ export interface Expense {
 export interface Group {
   _id: string;
   name: string;
+  createdBy: string;
   totalExpenses: number;
   memberCount: number;
   balance: number;
   lastActivity: string;
   members: GroupMember[];
   expenses: GroupExpense[];
+  settlements: Settlement[];
 }
 export interface GroupMember {
   name: string;
@@ -123,3 +125,10 @@ export interface Translations {
 export interface WalletType {
   balance: number;
 };
+
+export interface Settlement {
+  from: string;
+  to: string;
+  amount: number;
+  date: string;
+}

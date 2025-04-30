@@ -13,6 +13,13 @@ export const NotFound = () => {
             >
                 Go Home
             </button>
+            <p>or</p>
+            <button 
+                onClick={() => navigate("/login")} 
+                className="px-6 py-3 bg-emerald-600 text-white rounded-lg shadow-md hover:bg-emerald-700 transition"
+            >
+                Login
+            </button>
         </div>
     );
 };
