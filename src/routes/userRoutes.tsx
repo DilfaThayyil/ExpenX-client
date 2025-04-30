@@ -13,17 +13,17 @@ import UserProtectedRoute from './UserProtectedRoutes'
 import Advisors from '@/pages/user/Advisors'
 import UserWallet from '@/pages/user/Wallet'
 import WithNavbar from '@/layout/withNav'
+import AcceptInvite from '@/pages/user/acceptInvite';
 
 const UserRoutes = () => {
     return (
         <Routes>
             <Route path="*" element={<NotFound />} />
             <Route path="" element={<LandingPage />} />
-            {/* <Route element={<PublicRoute />}>  */}
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
-            {/* </Route> */}
             <Route path="resetPassword" element={<ResetPassword />} />
+            <Route path="accept-invite" element={<AcceptInvite/>}/>
             <Route element={<UserProtectedRoute />}>
                 <Route element={<WithNavbar />}>
                     <Route path="home" element={<DashboardPage />} />

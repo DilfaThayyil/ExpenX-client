@@ -16,6 +16,7 @@ const SplitExpenseDialog: React.FC<SplitExpenseDialogProps> = ({
     onSubmit,
     loading
 }) => {
+    if(!group)return null;
     const [splitType, setSplitType] = useState('equal');
     const [shares, setShares] = useState<Record<string, number>>({});
     const [expense, setExpense] = useState<GroupExpense>({

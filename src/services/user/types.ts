@@ -34,3 +34,9 @@ export interface DashboardData {
         progress: number;
     };
 }
+export interface Settlement {
+    from: string;
+    to: string;  
+    amount: number;
+    date: string;
+}

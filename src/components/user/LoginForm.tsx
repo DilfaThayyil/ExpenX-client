@@ -11,6 +11,7 @@ import GoogleAuth from './GoogleAuth';
 import FormInput from '../InputField';
 import Store from '@/store/store';
 import {Link} from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom';
 
 
 const LoginPage = () => {
@@ -22,6 +23,8 @@ const LoginPage = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -67,7 +70,13 @@ const LoginPage = () => {
       if (response.message) {
         Store.getState().setUser(response.user2);
         toastr.success(response.message);
-        setTimeout(() => navigate("/home"), 1000);
+        setTimeout(() => {
+        if (redirect) {
+          navigate(decodeURIComponent(redirect));
+        } else {
+          navigate("/home");
+        }
+      }, 1000);
       } else if (response.error) {
         toastr.error(response.error || "Login failed");
       }
