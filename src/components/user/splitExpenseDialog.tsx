@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { GroupExpense } from '@/components/user/types'
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { GroupExpense } from '@/components/user/types'
 import { SplitExpenseDialogProps } from './types'
+
 
 
 const SplitExpenseDialog: React.FC<SplitExpenseDialogProps> = ({
@@ -16,9 +18,10 @@ const SplitExpenseDialog: React.FC<SplitExpenseDialogProps> = ({
     onSubmit,
     loading
 }) => {
-    if(!group)return null;
+    if (!group) return null;
     const [splitType, setSplitType] = useState('equal');
     const [shares, setShares] = useState<Record<string, number>>({});
+    const [validationError, setValidationError] = useState<string>('');
     const [expense, setExpense] = useState<GroupExpense>({
         date: new Date().toLocaleDateString(),
         title: '',
@@ -52,9 +55,14 @@ const SplitExpenseDialog: React.FC<SplitExpenseDialogProps> = ({
 
     const handleSplitTypeChange = (value: string) => {
         setSplitType(value);
+        setValidationError('')
         if (value === 'equal' && expense.totalAmount) {
             setShares(calculateEqualShares(expense.totalAmount));
         } else {
+            const newShares: Record<string, number> = {};
+            group.members.forEach(member => {
+                newShares[member.email] = 0;
+            });
             setShares({});
         }
         setExpense(prev => ({ ...prev, splitMethod: value }));
@@ -81,19 +89,59 @@ const SplitExpenseDialog: React.FC<SplitExpenseDialogProps> = ({
         });
     };
 
+    useEffect(() => {
+        validateShares();
+    }, [shares, splitType, expense.totalAmount]);
+
     const validateShares = () => {
-        if (splitType === 'equal') return true;
-
-        const totalAmount = expense.totalAmount;
-        if (isNaN(totalAmount)) return false;
-
-        const shareSum = Object.values(shares).reduce((sum, share) => sum + (share || 0), 0);
-
-        if (splitType === 'percentage') {
-            return Math.abs(shareSum - 100) < 0.01;
-        } else {
-            return Math.abs(shareSum - totalAmount) < 0.01;
+        if (splitType === 'equal') {
+            setValidationError('');
+            return true;
         }
+        const totalAmount = expense.totalAmount;
+        if (isNaN(totalAmount) || totalAmount <= 0) {
+            setValidationError('Please enter a valid amount first');
+            return false;
+        }
+        const hasEmptyShares = group.members.some(member =>
+            shares[member.email] === undefined || shares[member.email] === 0
+        );
+        if (hasEmptyShares) {
+            setValidationError('Please assign a value to all members');
+            return false;
+        }
+        const shareSum = Object.values(shares).reduce((sum, share) => sum + (share || 0), 0);
+        if (splitType === 'percentage') {
+            if (Math.abs(shareSum - 100) < 0.01) {
+                setValidationError('');
+                return true;
+            } else if (shareSum < 100) {
+                setValidationError(`Current total: ${shareSum.toFixed(1)}%. Percentages must add up to 100%`);
+                return false;
+            } else {
+                setValidationError(`Current total: ${shareSum.toFixed(1)}%. Percentages must add up to 100%`);
+                return false;
+            }
+        } else {
+            if (Math.abs(shareSum - totalAmount) < 0.01) {
+                setValidationError('');
+                return true;
+            } else if (shareSum < totalAmount) {
+                setValidationError(`Current total: ₹${shareSum.toFixed(2)}. Remaining: ₹${(totalAmount - shareSum).toFixed(2)}`);
+                return false;
+            } else {
+                setValidationError(`Current total: ₹${shareSum.toFixed(2)}. Exceeds by: ₹${(shareSum - totalAmount).toFixed(2)}`);
+                return false;
+            }
+        }
+    };
+    const isFormValid = () => {
+        return (
+            expense.title && 
+            expense.totalAmount > 0 && 
+            expense.paidBy && 
+            validationError === ''
+        );
     };
 
     return (
@@ -162,6 +210,11 @@ const SplitExpenseDialog: React.FC<SplitExpenseDialogProps> = ({
                     {splitType !== 'equal' && expense.totalAmount && (
                         <Card className="p-4">
                             <h4 className="font-medium mb-4">Split Shares</h4>
+                            {validationError && (
+                                <Alert variant="destructive" className="mb-4 bg-red-50 text-red-800 border border-red-200">
+                                    <AlertDescription>{validationError}</AlertDescription>
+                                </Alert>
+                            )}
                             <div className="space-y-3">
                                 {group.members.map(member => (
                                     <div key={member.email} className="flex items-center gap-4">
@@ -178,7 +231,7 @@ const SplitExpenseDialog: React.FC<SplitExpenseDialogProps> = ({
                                         />
                                         <span className="w-1/3">
                                             {splitType === 'percentage'
-                                                ? `$${((shares[member.email] || 0) * expense.totalAmount / 100).toFixed(2)}` // 💡 Correct calculation
+                                                ? `₹${((shares[member.email] || 0) * expense.totalAmount / 100).toFixed(2)}`
                                                 : `${((shares[member.email] || 0) / expense.totalAmount * 100).toFixed(1)}%`
                                             }
                                         </span>
@@ -191,7 +244,7 @@ const SplitExpenseDialog: React.FC<SplitExpenseDialogProps> = ({
                     <Button
                         type="submit"
                         className="w-full"
-                        disabled={loading || !expense.title || !expense.totalAmount || !expense.paidBy || !validateShares()}
+                        disabled={loading || !isFormValid()}
                     >
                         {loading ? 'Adding...' : 'Add Split Expense'}
                     </Button>

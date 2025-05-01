@@ -6,4 +6,5 @@ export const SERVERSECRET = import.meta.env.VITE_SERVERSECRET;
 export const GOOGLECLIENTID=import.meta.env.VITE_GOOGLECLIENTID
 export const GOOGLECLIENTSECRET=import.meta.env.VITE_GOOGLECLIENTSECRET
 export const STRIPE_PUBLISHABLE_KEY=import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
-export const NODE_ENV = import.meta.env.NODE_ENV
+export const NODE_ENV = import.meta.env.VITE_NODE_ENV
+export const CURRENCY = import.meta.env.VITE_CURRENCY
