@@ -53,9 +53,9 @@ export const removeMember = async (groupId: string, memberEmail: string) => {
     }
 };
 
-export const leaveGroup = async (groupId: string, userEmail: string) => {
+export const leaveGroup = async (groupId: string, userEmail: string,userId:string) => {
     try {
-        const response = await axiosInstance.post(`${BASEURL}/leaveGroup/${groupId}`, { userEmail });
+        const response = await axiosInstance.post(`${BASEURL}/leaveGroup/${groupId}`, { userEmail,userId });
         return response.data;
     } catch (err) {
         throw err;

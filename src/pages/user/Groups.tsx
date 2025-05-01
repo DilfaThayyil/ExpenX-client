@@ -53,9 +53,10 @@ const GroupsPage = () => {
                     console.error('Invalid response format:', response)
                     Toaster('Error fetching groups: Invalid format', 'error')
                 }
-            } catch (error) {
+            } catch (error:any) {
                 console.error('Error fetching groups', error)
-                // Toaster('errrr fetching groups', 'error')
+                if(error.response.data.message==='No groups found for this user')
+                setGroups([])
             }
         }
         fetchGroups()
@@ -116,17 +117,17 @@ const GroupsPage = () => {
     const handleLeaveGroup = async (groupId: string) => {
         try {
             setLoading(true);
-            const response = await leaveGroup(groupId, email);
+            const response = await leaveGroup(groupId, email,userId);
             if (response.success) {
-                Toaster('You left the group successfully', 'success');
+                Toaster(response.message, 'success');
                 setRefreshGroups(prev => !prev);
                 setSelectedGroup(null);
             } else {
                 Toaster(response.message || 'Failed to leave group', 'error');
             }
-        } catch (error) {
-            console.error('Error leaving group:', error);
-            Toaster('Failed to leave group', 'error');
+        } catch (error:any) {
+            console.error(error)
+            Toaster(error.response.data.message || 'Failed to leave group', 'error');
         } finally {
             setLoading(false);
         }
@@ -388,8 +389,8 @@ const GroupsPage = () => {
                                     <CardContent className="p-6">
                                         <div className="flex items-center justify-between mb-4">
                                             <h3 className="text-lg font-semibold">{group.name}</h3>
-                                            {group.createdBy === email && (
-                                                <Badge variant="outline" className="bg-emerald-50 text-emerald-700">Owner</Badge>
+                                            {group.createdBy === userId && (
+                                                <Badge variant="outline" className="bg-emerald-50 text-emerald-700">Admin</Badge>
                                             )}
                                             {/* <Badge variant={group.balance < 0 ? "destructive" : "secondary"}>
                                                 {group.balance < 0 ? "You owe" : "You're owed"} ${Math.abs(group.balance)}
