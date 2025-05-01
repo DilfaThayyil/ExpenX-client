@@ -4,12 +4,10 @@ import { toast } from "react-hot-toast";
 import { acceptGroupInvite } from '@/services/user/groupServices'
 
 const AcceptInvite = () => {
-    console.log("Entered acceptInvite page....")
     const [params] = useSearchParams();
     const navigate = useNavigate();
     const groupId = params.get("groupId");
     const email = params.get("email");
-    console.log("groupId , email : ", groupId, " , ", email)
     useEffect(() => {
         const acceptInvite = async () => {
             if (!groupId || !email) {
