@@ -224,7 +224,7 @@ const SettleUpDialog: React.FC<SettleUpDialogProps> = ({ isOpen, onClose, group,
                                 <span className="font-medium">{recommendedSettlement.fromName || recommendedSettlement.from}</span>
                                 {' '}pays{' '}
                                 <span className="font-medium">{recommendedSettlement.toName || recommendedSettlement.to}</span>
-                                {' '}<span className="font-bold">${recommendedSettlement.amount.toFixed(2)}</span>
+                                {' '}<span className="font-bold">₹{recommendedSettlement.amount.toFixed(2)}</span>
                             </p>
                             <button
                                 type="button"
@@ -283,7 +283,7 @@ const SettleUpDialog: React.FC<SettleUpDialogProps> = ({ isOpen, onClose, group,
                     {/* Amount Field */}
                     <div>
                         <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
-                            Amount ($)
+                            Amount (₹)
                         </label>
                         <input
                             id="amount"

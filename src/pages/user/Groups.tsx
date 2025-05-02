@@ -53,10 +53,10 @@ const GroupsPage = () => {
                     console.error('Invalid response format:', response)
                     Toaster('Error fetching groups: Invalid format', 'error')
                 }
-            } catch (error:any) {
+            } catch (error: any) {
                 console.error('Error fetching groups', error)
-                if(error.response.data.message==='No groups found for this user')
-                setGroups([])
+                if (error.response.data.message === 'No groups found for this user')
+                    setGroups([])
             }
         }
         fetchGroups()
@@ -100,15 +100,15 @@ const GroupsPage = () => {
             setLoading(true);
             const response = await removeMember(groupId, memberEmail);
             if (response.success) {
-                Toaster('Member removed successfully', 'success');
+                Toaster(response.message, 'success');
                 setSelectedGroup(response.group);
                 setRefreshGroups(prev => !prev);
             } else {
                 Toaster(response.message || 'Failed to remove member', 'error');
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error removing member:', error);
-            Toaster('Failed to remove member', 'error');
+            Toaster(error.response.data.message || 'failed to remove the member', 'error');
         } finally {
             setLoading(false);
         }
@@ -117,7 +117,7 @@ const GroupsPage = () => {
     const handleLeaveGroup = async (groupId: string) => {
         try {
             setLoading(true);
-            const response = await leaveGroup(groupId, email,userId);
+            const response = await leaveGroup(groupId, email, userId);
             if (response.success) {
                 Toaster(response.message, 'success');
                 setRefreshGroups(prev => !prev);
@@ -125,7 +125,7 @@ const GroupsPage = () => {
             } else {
                 Toaster(response.message || 'Failed to leave group', 'error');
             }
-        } catch (error:any) {
+        } catch (error: any) {
             console.error(error)
             Toaster(error.response.data.message || 'Failed to leave group', 'error');
         } finally {
@@ -138,7 +138,7 @@ const GroupsPage = () => {
         const errors: string[] = []
         if (!newGroup.name) errors.push('Name is required')
         if (newGroup.members.length === 0) errors.push('Members are required.')
-            const isCreatorIncluded = newGroup.members.some((mem) => mem === email);
+        const isCreatorIncluded = newGroup.members.some((mem) => mem === email);
         if (!isCreatorIncluded) errors.push("Add your email address also");
         return errors
     }
@@ -206,7 +206,7 @@ const GroupsPage = () => {
                     if (!prev) return null;
                     return {
                         ...prev,
-                        expenses: [...prev.expenses, response.expense]
+                        expenses: [...prev.expenses, response.groups.expenses]
                     };
                 });
                 setRefreshGroups(prev => !prev);
@@ -216,7 +216,7 @@ const GroupsPage = () => {
             }
         } catch (error: any) {
             console.error("Error adding expense:", error);
-            Toaster(error.message || "Something went wrong", "error");
+            Toaster(error.response.data.message || "Something went wrong", "error");
         } finally {
             setLoading(false);
         }
@@ -435,8 +435,8 @@ const GroupsPage = () => {
                                 <CardHeader className="flex flex-row items-center justify-between">
                                     <CardTitle>{selectedGroup.name}</CardTitle>
                                     <div className="flex gap-2">
-                                        {selectedGroup.createdBy === email ? (
-                                            <Badge variant="outline" className="bg-emerald-50 text-emerald-700">Owner</Badge>
+                                        {selectedGroup.createdBy === userId ? (
+                                            <Badge variant="outline" className="bg-emerald-50 text-emerald-700">Admin</Badge>
                                         ) : (
                                             <AlertDialog>
                                                 <AlertDialogTrigger asChild>
@@ -473,6 +473,17 @@ const GroupsPage = () => {
                                                     const split = expense?.splits?.find((s) => s.user === member.email);
                                                     return sum + (split ? split.amountOwed : 0);
                                                 }, 0);
+                                                const settlementsPaid = selectedGroup.settlements
+                                                    ? selectedGroup.settlements
+                                                        .filter(settlement => settlement.from === member.email)
+                                                        .reduce((sum, settlement) => sum + settlement.amount, 0)
+                                                    : 0;
+                                                const settlementsReceived = selectedGroup.settlements
+                                                    ? selectedGroup.settlements
+                                                        .filter(settlement => settlement.to === member.email)
+                                                        .reduce((sum, settlement) => sum + settlement.amount, 0)
+                                                    : 0;
+                                                const balance = totalPaid - totalOwed + settlementsReceived - settlementsPaid;
                                                 return (
                                                     <div key={member.email} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                                         <div className="flex items-center gap-3">
@@ -484,19 +495,26 @@ const GroupsPage = () => {
                                                                 <p className="font-medium">{member.name}</p>
                                                                 <p className="text-sm text-gray-600">Paid: ₹{totalPaid.toFixed(2)}</p>
                                                                 <p className="text-sm text-gray-600">Owed: ₹{Math.ceil(totalOwed).toFixed(2)}</p>
+                                                                {(settlementsPaid > 0 || settlementsReceived > 0) && (
+                                                                    <p className="text-sm text-gray-600">
+                                                                        Settlements: ₹{(settlementsReceived - settlementsPaid).toFixed(2)}
+                                                                    </p>
+                                                                )}
                                                             </div>
                                                         </div>
                                                         <div className="flex flex-col gap-2">
-                                                            <Badge variant={totalPaid < totalOwed ? "destructive" : "secondary"}>
-                                                                {totalPaid < totalOwed ? "Owes" : "Owed"} ₹{Math.abs(totalPaid - totalOwed).toFixed(2)}
+                                                            {/* {selectedGroup?.createdBy === userId && member.email === email && (
+                                                                <Badge variant="outline" className="bg-emerald-50 text-emerald-700">Admin</Badge>
+                                                            )} */}
+                                                            <Badge variant={balance < 0 ? "destructive" : "secondary"}>
+                                                                {balance < 0 ? "Owes" : "Owed"} ₹{Math.abs(balance).toFixed(2)}
                                                             </Badge>
 
-                                                            {/* Remove member button (only visible to owner and not for self) */}
-                                                            {selectedGroup.createdBy === email && member.email !== email && (
+                                                            {selectedGroup.createdBy === userId && member.email !== email && (
                                                                 <AlertDialog>
                                                                     <AlertDialogTrigger asChild>
                                                                         <Button variant="outline" size="sm" className="text-red-500 border-red-200 hover:bg-red-50">
-                                                                            <Trash2 className="h-3 w-3 mr-1" /> Remove
+                                                                            <Trash2 className="h-3 w-3 mr-1" />
                                                                         </Button>
                                                                     </AlertDialogTrigger>
                                                                     <AlertDialogContent>
@@ -598,7 +616,7 @@ const GroupsPage = () => {
                                                                 <TableCell>{expense.title}</TableCell>
                                                                 <TableCell>{paidByUser ? paidByUser.name : expense.paidBy}</TableCell>
                                                                 <TableCell className="text-right">
-                                                                    ₹{expense.totalAmount.toFixed(2)}
+                                                                    ₹{expense?.totalAmount?.toFixed(2)}
                                                                 </TableCell>
                                                             </TableRow>
                                                         );
