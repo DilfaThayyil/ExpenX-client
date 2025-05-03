@@ -1,15 +1,26 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { X } from "lucide-react";
 import { message } from "antd";
 import { reportAdvisor } from "@/services/user/userService";
-import {IReportModalProps,IReportData} from './types'
+import { IReportModalProps, IReportData } from './types'
 
 
 const REPORT_REASONS = ["Spam", "Inappropriate Content", "Harassment", "Other"];
 
-const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, userId, setReport, slotId }) => {
+const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, userId, setReport, slotId, advisorReport }) => {
     const [reason, setReason] = useState<string>("");
     const [customReason, setCustomReason] = useState<string>("");
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (advisorReport) {
+            setReason(advisorReport.reason);
+            setCustomReason(advisorReport.customReason || "");
+        } else {
+            setReason("");
+            setCustomReason("");
+        }
+    }, [advisorReport]);
 
     const handleSubmitReport = async () => {
         if (!advisorId) {
@@ -25,7 +36,8 @@ const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, 
             message.error("Please enter a custom reason.");
             return;
         }
-
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         try {
             const reportData: IReportData = {
                 userId,
@@ -34,7 +46,7 @@ const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, 
                 status: "pending",
                 customReason: reason === "Other" ? customReason : undefined,
             };
-            const response = await reportAdvisor(slotId,reportData);
+            const response = await reportAdvisor(slotId, reportData);
             setReport(response.report);
             message.success(response.message);
             setReason("");
@@ -43,6 +55,8 @@ const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, 
         } catch (err) {
             console.error(err);
             message.error("Error submitting report.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -59,7 +73,6 @@ const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, 
                     </button>
                 </div>
 
-                {/* Dropdown for selecting a reason */}
                 <label className="block text-gray-700 dark:text-gray-300 mb-2">Select a reason:</label>
                 <select
                     className="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-red-400 focus:border-transparent transition duration-200"
@@ -74,7 +87,6 @@ const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, 
                     ))}
                 </select>
 
-                {/* Custom reason text area (only visible if "Other" is selected) */}
                 {reason === "Other" && (
                     <div className="mt-4">
                         <label className="block text-gray-700 dark:text-gray-300 mb-2">Custom reason:</label>
@@ -91,9 +103,11 @@ const ReportModal: React.FC<IReportModalProps> = ({ isOpen, onClose, advisorId, 
                 <div className="mt-5 flex justify-end">
                     <button
                         onClick={handleSubmitReport}
-                        className="bg-red-500 text-white px-5 py-2 rounded-lg shadow-md hover:bg-red-600 transition-all duration-300"
+                        disabled={isSubmitting}
+                        className={`bg-red-500 text-white px-5 py-2 rounded-lg shadow-md transition-all duration-300 ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-red-600"
+                            }`}
                     >
-                        Submit Report
+                        {isSubmitting ? "Submitting..." : "Submit Report"}
                     </button>
                 </div>
             </div>

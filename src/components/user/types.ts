@@ -69,7 +69,7 @@ export interface Group {
 export interface SplitExpenseDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    group: Group;
+    group: Group|null;
     onSubmit: (expense: GroupExpense) => void;
     loading: boolean;
 }

@@ -31,6 +31,7 @@ export interface IReportModalProps {
     userId: string;
     setReport: (report: IReportData) => void;
     slotId: string
+    advisorReport: IReportData|null
 }
 
 export interface IReportData {

@@ -32,13 +32,13 @@ const SlotManage: React.FC = () => {
   const fetchSlot = async () => {
     try {
       const response = await fetchSlots(advisor._id, currentPage, ITEMS_PER_PAGE,debouncedQuery);
+      console.log("res-fetchSlots : ",response)
       const { slots, totalPages } = response.data;
       setSlots(slots);
       setFilteredSlots(slots);
       setTotalPages(totalPages);
     } catch (err) {
       console.error(err);
-      // Toaster('Failed to fetch slots', 'error');
     }
   };
 
@@ -46,11 +46,9 @@ const SlotManage: React.FC = () => {
     fetchSlot();
   }, [currentPage,debouncedQuery]);
 
-  // Apply filters and search
   const applyFilters = useCallback(() => {
     let filtered = [...slots];
 
-    // Apply search query
     if (inputValue.trim()) {
       const query = inputValue.toLowerCase();
       filtered = filtered.filter(slot => 
@@ -61,17 +59,14 @@ const SlotManage: React.FC = () => {
       );
     }
 
-    // Apply status filter
     if (filterStatus !== "All") {
       filtered = filtered.filter(slot => slot.status === filterStatus);
     }
 
-    // Apply location filter
     if (filterLocation !== "All") {
       filtered = filtered.filter(slot => slot.location === filterLocation);
     }
 
-    // Apply date range filter
     if (startDateFilter) {
       filtered = filtered.filter(slot => new Date(slot.date) >= new Date(startDateFilter));
     }
@@ -108,9 +103,9 @@ const SlotManage: React.FC = () => {
       setSlots([...slots, response.Slot]);
       setFilteredSlots([...filteredSlots, response.Slot]);
       setIsCreateModalOpen(false);
-    } catch (err) {
+    } catch (err:any) {
       console.error(err);
-      Toaster('Failed to create slot', 'error');
+      Toaster(err.response.data.message, 'error');
     }
   };
 
