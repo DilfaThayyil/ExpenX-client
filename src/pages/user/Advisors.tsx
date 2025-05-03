@@ -18,7 +18,6 @@ const Advisors: React.FC = () => {
     });
     const [loading, setLoading] = useState(true);
 
-    // Fetch advisors from the backend
     useEffect(() => {
         const fetchAdvisors = async () => {
             try {
@@ -70,7 +69,6 @@ const Advisors: React.FC = () => {
                                     >
                                         <img
                                             src={advisor.profilePic || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80'}
-                                            alt={advisor.username}
                                             className="w-32 h-32 rounded-full object-cover border-2 border-gray-300"
                                         />
                                         <h3 className="text-lg font-semibold mt-2">{advisor.username}</h3>

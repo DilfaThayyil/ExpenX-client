@@ -80,9 +80,17 @@ export const paymentInitiate = async (slotId: string, userId: string, advisorId:
   }
 }
 
-export const fetchSlotsByUser = async (userId: string, page: number, limit: number) => {
+export const fetchSlotsByUser = async (userId: string, page: number, limit: number, search: string, filterStatus?: string,
+  filterLocation?: string,
+  startDate?: string,
+  endDate?: string) => {
   try {
-    const response = await axiosInstance.get(`${BASEURL}/fetchSlotsByUser/${userId}?page=${page}&limit=${limit}`)
+    const response = await axiosInstance.get(`${BASEURL}/fetchSlotsByUser/${userId}`, {
+      params: { page, limit, search, status: filterStatus !== "All" ? filterStatus : undefined,
+        location: filterLocation !== "All" ? filterLocation : undefined,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined }
+    })
     return response.data
   } catch (err) {
     throw err

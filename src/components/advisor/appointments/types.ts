@@ -21,6 +21,7 @@ export interface Booking {
     endTime: string;
     startTime: string;
     bookedBy: {
+        profilePic: string | undefined;
         _id: string; username: string; email: string
     };
     _id: string;
