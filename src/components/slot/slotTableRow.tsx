@@ -20,7 +20,7 @@ const SlotTableRow: React.FC<SlotTableRowProps> = ({ slot, onBookSlot, onOpenRep
     <tr className="hover:shadow-md transition-shadow bg-white rounded-lg border border-gray-200 my-3">
       <td className="px-6 py-4 text-sm text-gray-700 flex items-center gap-3">
         <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-          <span className="text-gray-600 font-medium">{slot.advisorId.username.charAt(0)}</span>
+          <span className="text-gray-600 font-medium">{slot?.advisorId?.username?.charAt(0) || '👤'}</span>
         </div>
         {slot.advisorId.username}
       </td>
