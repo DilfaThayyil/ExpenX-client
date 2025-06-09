@@ -49,16 +49,6 @@ const SlotManage: React.FC = () => {
   const applyFilters = useCallback(() => {
     let filtered = [...slots];
 
-    if (inputValue.trim()) {
-      const query = inputValue.toLowerCase();
-      filtered = filtered.filter(slot => 
-        (slot.description && slot.description.toLowerCase().includes(query)) ||
-        slot.date.toLowerCase().includes(query) ||
-        slot.startTime.toLowerCase().includes(query) ||
-        slot.fee.toString().includes(query)
-      );
-    }
-
     if (filterStatus !== "All") {
       filtered = filtered.filter(slot => slot.status === filterStatus);
     }
@@ -149,7 +139,7 @@ const SlotManage: React.FC = () => {
             <div className="relative flex-grow">
               <input
                 type="text"
-                placeholder="Search by date, time, fee, or description..."
+                placeholder="Search by description..."
                 value={inputValue}
                 onChange={handleChange}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
