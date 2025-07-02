@@ -7,7 +7,6 @@ import {AdminNavbar} from '@/layout/AdminNav'
 const Advisors = () => {
   const Toast = useShowToast();
 
-  // Define the columns for the advisors listing
   const columns = [
     { header: "Name", accessor: (item: any) => item.username },
     { header: "Email", accessor: (item: any) => item.email },
@@ -21,7 +20,6 @@ const Advisors = () => {
     },
   ];
 
-  // Define actions for blocking/unblocking advisors
   const actions = (item: any) => (
     item.isBlock ? (
       <button
@@ -40,7 +38,6 @@ const Advisors = () => {
     )
   );
 
-  // Function to handle blocking/unblocking advisors
   const handleUser = async (action: string, email: string) => {
     try {
       const response = await manageUser(action, "advisor", email);

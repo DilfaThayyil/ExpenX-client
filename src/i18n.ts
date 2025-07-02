@@ -6,21 +6,21 @@ import enTranslations from './locales/en.json';
 import esTranslations from './locales/es.json';
 
 i18n
-  .use(LanguageDetector) // Detects browser language
-  .use(initReactI18next) // Initializes i18next for React
+  .use(LanguageDetector)
+  .use(initReactI18next)
   .init({
     resources: {
       en: { translation: enTranslations },
       es: { translation: esTranslations }
     },
-    fallbackLng: 'en', // Default language
-    debug: process.env.NODE_ENV === 'development', // Enable debug mode only in development
+    fallbackLng: 'en',
+    debug: process.env.NODE_ENV === 'development',
     detection: {
-      order: ['querystring', 'localStorage', 'navigator'], // Define language detection order
-      caches: ['localStorage'] // Cache detected language
+      order: ['querystring', 'localStorage', 'navigator'],
+      caches: ['localStorage'] 
     },
     interpolation: {
-      escapeValue: false // React already escapes values
+      escapeValue: false
     }
   });
 

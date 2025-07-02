@@ -197,7 +197,6 @@ const SettleUpDialog: React.FC<SettleUpDialogProps> = ({ isOpen, onClose, group,
                     <DialogTitle>Settle Up</DialogTitle>
                 </DialogHeader>
 
-                {/* Balances Section */}
                 <div className="mb-4">
                     <h3 className="text-lg font-medium mb-2">Current Balances</h3>
                     <div className="max-h-40 overflow-y-auto">
@@ -215,7 +214,6 @@ const SettleUpDialog: React.FC<SettleUpDialogProps> = ({ isOpen, onClose, group,
                     </div>
                 </div>
 
-                {/* Recommended Settlement Section */}
                 {recommendedSettlement && (
                     <div className="mb-4 p-3 bg-blue-50 rounded-md border border-blue-200">
                         <h3 className="text-md font-medium mb-2">Recommended Settlement</h3>
@@ -238,7 +236,6 @@ const SettleUpDialog: React.FC<SettleUpDialogProps> = ({ isOpen, onClose, group,
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* From Field */}
                     <div>
                         <label htmlFor="from" className="block text-sm font-medium text-gray-700 mb-1">
                             Payer
@@ -259,7 +256,6 @@ const SettleUpDialog: React.FC<SettleUpDialogProps> = ({ isOpen, onClose, group,
                         {errors.from && <p className="mt-1 text-sm text-red-600">{errors.from}</p>}
                     </div>
 
-                    {/* To Field */}
                     <div>
                         <label htmlFor="to" className="block text-sm font-medium text-gray-700 mb-1">
                             Receiver
@@ -280,7 +276,6 @@ const SettleUpDialog: React.FC<SettleUpDialogProps> = ({ isOpen, onClose, group,
                         {errors.to && <p className="mt-1 text-sm text-red-600">{errors.to}</p>}
                     </div>
 
-                    {/* Amount Field */}
                     <div>
                         <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
                             Amount (₹)
@@ -297,7 +292,6 @@ const SettleUpDialog: React.FC<SettleUpDialogProps> = ({ isOpen, onClose, group,
                         {errors.amount && <p className="mt-1 text-sm text-red-600">{errors.amount}</p>}
                     </div>
 
-                    {/* Date Field */}
                     <div>
                         <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
                             Date
@@ -311,7 +305,6 @@ const SettleUpDialog: React.FC<SettleUpDialogProps> = ({ isOpen, onClose, group,
                         />
                     </div>
 
-                    {/* Form Actions */}
                     <div className="flex justify-end space-x-3 pt-2">
                         <button
                             type="button"

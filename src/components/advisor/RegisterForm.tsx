@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Briefcase, CheckCircle2 } from 'lucide-react';
-// import { useNavigate } from 'react-router-dom';
 import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
 import FormInput from '../InputField';
@@ -21,7 +20,6 @@ import {FormData} from './types'
 
 
 const AdvisorRegister: React.FC = () => {
-  // const navigate = useNavigate();
   const Toaster = useShowToast();
 
   const [formData, setFormData] = useState<FormData>({
@@ -127,7 +125,6 @@ const AdvisorRegister: React.FC = () => {
       if (res.message === 'OTP sent successfully') {
         toastr.success('OTP sent successfully');
         setOtpSent(true);
-        // navigate('/advisor/otp', { state: { formData } });
       } else {
         toastr.error('Failed to send OTP');
       }

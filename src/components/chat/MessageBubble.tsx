@@ -9,7 +9,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const isSender = message.senderId === sender._id;
   const fileUrl = message.url || message.fileUrl;
   
-  // Determine file type and name if not provided
   const getFileType = () => {
     if (message.fileType) return message.fileType;
     if (!fileUrl) return null;
@@ -39,10 +38,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
           isSender ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'
         }`}
       >
-        {/* Text message */}
         {message.text && <p className="mb-2">{message.text}</p>}
         
-        {/* File content based on type */}
         {fileUrl && (
           <div className="mt-2">
             {fileType === 'image' && (
@@ -102,7 +99,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
           </div>
         )}
         
-        {/* Timestamp */}
         <span className={`text-xs block mt-1 text-right ${
           isSender ? 'text-blue-100' : 'text-gray-600'
         }`}>

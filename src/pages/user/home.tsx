@@ -51,7 +51,6 @@ const DashboardPage: React.FC = () => {
   return (
     <Layout role='user'>
       <div className="min-h-screen bg-gray-50 p-6">
-        {/* Header */}
         <Header username={user.username} />
 
         <Button

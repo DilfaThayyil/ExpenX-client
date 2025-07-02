@@ -75,22 +75,18 @@ export default function DashboardPage() {
       <div className="p-6 space-y-6 w-full min-h-screen" style={{ backgroundColor: moneyColors.bg.muted }}>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
 
-        {/* Stats Overview Cards */}
         <StatsCards stats={stats} />
 
-        {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           <RevenueChart timeframe={timeframe} setTimeframe={setTimeframe} revenueData={revenueData} />
           <GoalProgressChart timeframe={timeframe} setTimeframe={setTimeframe} goalProgress={goalProgress}/>
         </div>
 
-        {/* Client Info Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           <AppointmentsList advisorId={advisor._id} />
           <ClientActivities advisorId={advisor._id}/>
         </div>
 
-        {/* Client Stats Table */}
         {/* <ClientPerformance /> */}
       </div>
     </Layout>

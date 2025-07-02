@@ -101,17 +101,14 @@ const Clients: React.FC = () => {
 
   return (
     <Layout role="advisor">
-      {/* If showChat is true, show full-screen chat */}
       {showChat ? (
         <div className="fixed inset-0 bg-white z-50 flex flex-col">
-          {/* Close Button */}
           <button
             onClick={() => setShowChat(false)}
             className="absolute top-4 right-4 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
           >
             <X size={20} />
           </button>
-          {/* Full-Screen Chat Window */}
           <ChatWindow receivers={clientList} />
         </div>
       ) : (
@@ -138,7 +135,6 @@ const Clients: React.FC = () => {
             </div>
           </h1>
           
-          {/* Search Bar */}
           <div className="bg-white p-4 rounded-lg shadow-md mb-4">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -154,7 +150,6 @@ const Clients: React.FC = () => {
             </div>
           </div>
 
-          {/* Filters Collapsible Panel */}
           {showFilters && (
             <div className="bg-white p-4 rounded-lg shadow-md mb-4 transition-all duration-300">
               <div className="flex justify-between items-center mb-3">
@@ -167,7 +162,6 @@ const Clients: React.FC = () => {
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Status Filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Appointment Status</label>
                   <select
@@ -182,7 +176,6 @@ const Clients: React.FC = () => {
                   </select>
                 </div>
 
-                {/* Payment Status Filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
                   <select
@@ -196,7 +189,6 @@ const Clients: React.FC = () => {
                   </select>
                 </div>
 
-                {/* Location Filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Location Type</label>
                   <select
@@ -213,7 +205,6 @@ const Clients: React.FC = () => {
             </div>
           )}
 
-          {/* Results Count and Stats */}
           <div className="flex justify-between items-center mb-4">
             <p className="text-sm text-gray-600">
               Showing {filteredAppointments.length} of {bookedAppointments.length} appointments
@@ -229,7 +220,6 @@ const Clients: React.FC = () => {
             <BookedAppointmentsTable appointments={filteredAppointments} />
           </div>
 
-          {/* Empty State */}
           {filteredAppointments.length === 0 && (
             <div className="text-center py-8 bg-white rounded-lg mt-4">
               <p className="text-gray-500">No appointments match your filters</p>
@@ -242,7 +232,6 @@ const Clients: React.FC = () => {
             </div>
           )}
 
-          {/* Pagination Component */}
           {filteredAppointments.length > 0 && (
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
           )}

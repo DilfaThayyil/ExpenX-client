@@ -94,9 +94,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Stats Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Total Users Card */}
           <div className="bg-white rounded-lg shadow-md p-6 transform hover:scale-105 transition-transform">
             <div className="flex items-center justify-between">
               <div>
@@ -109,7 +107,6 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Total Payments Card */}
           <div className="bg-white rounded-lg shadow-md p-6 transform hover:scale-105 transition-transform">
             <div className="flex items-center justify-between">
               <div>
@@ -122,7 +119,6 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Average Expense Card */}
           <div className="bg-white rounded-lg shadow-md p-6 transform hover:scale-105 transition-transform">
             <div className="flex items-center justify-between">
               <div>
@@ -135,7 +131,6 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Total Revenue Card */}
           <div className="bg-white rounded-lg shadow-md p-6 transform hover:scale-105 transition-transform">
             <div className="flex items-center justify-between">
               <div>
@@ -149,9 +144,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Monthly Trends Chart */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-lg font-semibold mb-4">Monthly Trends</h2>
             <div className="h-80">
@@ -187,7 +180,6 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Category Distribution Chart */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-lg font-semibold mb-4">Expense Categories</h2>
             <div className="h-80">
@@ -212,7 +204,6 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* User Growth Chart */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-semibold mb-4">User Growth</h2>
           <div className="h-80">

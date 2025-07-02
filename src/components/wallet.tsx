@@ -32,7 +32,6 @@ export const WalletComponent = ({ transactions, wallet, loading }: WalletCompone
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {/* Wallet Balance */}
                         <div className="md:col-span-2 bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-xl p-5 text-white shadow-lg relative overflow-hidden flex flex-col items-center justify-center h-full">
                             <div className="absolute top-0 right-0 opacity-10">
                                 <CreditCard className="h-32 w-32" />
@@ -58,7 +57,6 @@ export const WalletComponent = ({ transactions, wallet, loading }: WalletCompone
                             </div>
                         </div>
 
-                        {/* Recent Transactions */}
                         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col">
                             <h4 className="font-medium text-gray-800 mb-3">Recent Transactions</h4>
                             <div className="flex-1 space-y-3 overflow-y-auto max-h-60">

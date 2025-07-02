@@ -48,7 +48,6 @@ const Advisors: React.FC = () => {
                 ) : (
                     <>
 
-                        {/* Advisor Carousel */}
                         <Swiper
                             spaceBetween={20}
                             slidesPerView={1}
@@ -77,7 +76,6 @@ const Advisors: React.FC = () => {
                             ))}
                         </Swiper>
 
-                        {/* Selected Advisor Profile */}
                         <AdvisorProfile
                             advisor={selectedAdvisor}
                             currentUserId={""}

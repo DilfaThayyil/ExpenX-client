@@ -146,7 +146,6 @@ const RegisterPage = () => {
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full mx-auto space-y-8 bg-white p-8 rounded-xl shadow-lg border border-emerald-100">
-        {/* Header */}
         <div className="text-center">
           <div className="flex justify-center items-center gap-2">
             <Wallet className="h-12 w-12 text-emerald-600" />
@@ -156,7 +155,6 @@ const RegisterPage = () => {
           </div>
         </div>
 
-        {/* Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {otpSent && (
             <div className="flex items-center justify-center text-sm text-green-600 bg-green-50 p-2 rounded">
@@ -213,7 +211,6 @@ const RegisterPage = () => {
             />
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
@@ -228,12 +225,10 @@ const RegisterPage = () => {
           </button>
         </form>
 
-        {/* Google Login */}
         <div className="flex justify-center mt-4">
           <GoogleAuth role={'user'} />
         </div>
 
-        {/* Login Link */}
         <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{' '}
           <Link to="/login">

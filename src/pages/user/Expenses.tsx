@@ -243,11 +243,9 @@ const Expenses = () => {
     return (
         <Layout role='user'>
             <div className="min-h-screen bg-gray-50 p-6">
-                {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-4">Expense Tracker</h1>
 
-                    {/* Filters */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <Select onValueChange={(value) => setSelectedDateRange(value)}>
                             <SelectTrigger>
@@ -286,9 +284,7 @@ const Expenses = () => {
                     </div>
                 </div>
 
-                {/* Main Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Left Column - Expense List */}
                     <div className="lg:col-span-2 space-y-6">
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between">
@@ -400,9 +396,7 @@ const Expenses = () => {
                         </div>
                     </div>
 
-                    {/* Right Column - Summary and Charts */}
                     <div className="space-y-6">
-                        {/* Summary Card */}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Expense Summary</CardTitle>

@@ -20,7 +20,6 @@ const Pagination: React.FC<PaginationProps> = ({
   return (
     <div className="flex flex-col items-center space-y-4 mt-4">
       <div className="inline-flex items-center space-x-2">
-        {/* Previous Button */}
         <button
           onClick={handlePrevious}
           className={`px-4 py-2 rounded-l-lg text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 ${
@@ -31,7 +30,6 @@ const Pagination: React.FC<PaginationProps> = ({
           Prev
         </button>
 
-        {/* Page Numbers */}
         {pageNumbers.map((page) => (
           <button
             key={page}
@@ -46,7 +44,6 @@ const Pagination: React.FC<PaginationProps> = ({
           </button>
         ))}
 
-        {/* Next Button */}
         <button
           onClick={handleNext}
           className={`px-4 py-2 rounded-r-lg text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 ${

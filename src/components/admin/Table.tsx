@@ -1,7 +1,7 @@
 interface TableProps<T> {
   data: T[];
   columns: { header: string; accessor: (item: T) => React.ReactNode }[];
-  actions?: (item: T) => React.ReactNode; // <-- Add this line
+  actions?: (item: T) => React.ReactNode;
 }
 
 const Table = <T,>({ data, columns, actions }: TableProps<T>) => {

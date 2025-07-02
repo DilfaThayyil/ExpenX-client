@@ -22,7 +22,6 @@ const AdvisorRoutes = () => {
             {/* <Route element={<PublicRoute/>}> */}
             <Route path="register" element={<AdvisorRegister />} />
             <Route path="login" element={<AdvisorLogin />} />
-            {/* </Route> */}
             <Route path="resetPassword" element={<ResetPassword />} />
             <Route element={<AdvisorProtectedRoute />}>
                 <Route element={<WithNavbar />}>

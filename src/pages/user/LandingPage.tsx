@@ -20,7 +20,6 @@ const LandingPage = () => {
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-200`}>
-      {/* Use the Navbar component */}
       <Navbar
         darkMode={darkMode}
         onToggleDarkMode={toggleDarkMode}
@@ -28,7 +27,6 @@ const LandingPage = () => {
         logoText="ExpenX"
       />
 
-      {/* Hero Section */}
       <section id="hero" className={`${darkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50'} transition-colors duration-200`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
@@ -50,7 +48,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
       <section id="features" className={`py-20 px-4 sm:px-6 lg:px-8 ${darkMode ? 'bg-gray-900' : 'bg-white'} transition-colors duration-200`}>
         <div className="max-w-7xl mx-auto">
           <h2 className={`text-3xl font-bold text-center mb-12 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -97,8 +94,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Rest of the sections remain the same */}
-      {/* Chat Preview Section */}
       <section className={`py-20 px-4 sm:px-6 lg:px-8 ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-colors duration-200`}>
         <div className="max-w-7xl mx-auto">
           <h2 className={`text-3xl font-bold text-center mb-12 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -129,7 +124,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Benefits Section */}
       <section id='whyExpenX' className={`py-20 px-4 sm:px-6 lg:px-8 ${darkMode ? 'bg-gray-900' : 'bg-white'} transition-colors duration-200`}>
         <div className="max-w-7xl mx-auto">
           <h2 className={`text-3xl font-bold text-center mb-12 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -167,7 +161,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer id='about' className={`${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-900 text-gray-300'} py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200`}>
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>

@@ -23,7 +23,6 @@ const AdvisorProfile: React.FC<AdvisorProfileProps> = ({
             />
           </div>
           
-          {/* Advisor Details */}
           <div className="advisor-details mt-4 md:mt-10 flex-1">
             <h1 className="text-3xl font-bold text-gray-800">{advisor.username}</h1>
             
@@ -37,9 +36,7 @@ const AdvisorProfile: React.FC<AdvisorProfileProps> = ({
         </div>
       </div>
       
-      {/* Main Content Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Left Column - Bio and Specialties */}
         <div className="md:col-span-1">
           {/* <div className="bg-gray-50 rounded-lg p-6 shadow-sm mb-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
@@ -73,7 +70,6 @@ const AdvisorProfile: React.FC<AdvisorProfileProps> = ({
           </div>
         </div>
         
-        {/* Right Column - Bio and Reviews */}
         <div className="md:col-span-2">
           {/* <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">About</h3>
@@ -82,7 +78,6 @@ const AdvisorProfile: React.FC<AdvisorProfileProps> = ({
             </p>
           </div> */}
           
-          {/* Reviews Section with subtle card styling */}
           <div className="advisor-reviews-section bg-white rounded-lg p-6 shadow-sm">
             <ReviewsList 
               advisorId={advisor._id}
