@@ -118,7 +118,6 @@ const Profile = () => {
   return (
     <Layout role='user'>
       <div className="container mx-auto p-4 max-w-6xl">
-        {/* Profile Completion Alert */}
         <Alert className="mb-6">
           <AlertDescription className="flex items-center justify-between">
             <span>Profile Completion: {calculateProfileCompletion()}%</span>
@@ -127,7 +126,6 @@ const Profile = () => {
         </Alert>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* User Information Card */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Profile Information</CardTitle>
@@ -137,21 +135,18 @@ const Profile = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center space-y-4">
-                {/* Profile Image with Edit Icon */}
                 <div className="relative">
                   <img
                     src={previewPic}
                     alt="Profile"
                     className="h-24 w-24 rounded-full object-cover"
                   />
-                  {/* Edit Icon */}
                   <button
                     onClick={() => document.getElementById('fileInput')?.click()}
                     className="absolute bottom-0 right-0 p-2 bg-emerald-800 text-white rounded-full shadow-md"
                   >
                     <UploadCloud className="h-5 w-5" />
                   </button>
-                  {/* Hidden File Input */}
                   <input
                     id="fileInput"
                     type="file"
@@ -161,7 +156,6 @@ const Profile = () => {
                   />
                 </div>
 
-                {/* Other user info sections */}
                 <div className="w-full space-y-4">
                   <div className="flex items-center space-x-2">
                     <User className="h-4 w-4 text-gray-500" />
@@ -192,7 +186,6 @@ const Profile = () => {
         </div>
         
 
-        {/* Edit Profile Drawer */}
         {isDrawerOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
             <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-lg p-6 overflow-y-auto">

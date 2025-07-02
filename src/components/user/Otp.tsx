@@ -31,7 +31,6 @@ const OTPVerification:React.FC<otpProps> = ({email,purpose,role,redirect}) => {
       newOtp[index] = value;
       setOtp(newOtp);
 
-      // Auto-focus next input
       if (value && index < 3) {
         inputs.current[index + 1]?.focus();
       }
@@ -80,7 +79,6 @@ const OTPVerification:React.FC<otpProps> = ({email,purpose,role,redirect}) => {
         }
       }
     } catch (error: any) {
-      // Check for specific error messages
       if (error.response?.status === 404) {
         toastr.error('No OTP record found for this email.');
       } else if (error.response?.status === 400) {
@@ -88,7 +86,6 @@ const OTPVerification:React.FC<otpProps> = ({email,purpose,role,redirect}) => {
       } else if (error.response?.status === 410) {
         toastr.error('The OTP has expired. Please request a new one.');
       } else {
-        // Generic fallback error
         toastr.error(error.response?.data?.message || 'Failed to verify OTP');
       }
       console.error('Error verifying OTP:', error);
@@ -107,7 +104,6 @@ const OTPVerification:React.FC<otpProps> = ({email,purpose,role,redirect}) => {
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full mx-auto space-y-8 bg-white p-8 rounded-xl shadow-lg border border-emerald-100">
-        {/* Logo and Title */}
         <div className="text-center">
           <div className="flex justify-center items-center gap-2">
             <Wallet className="h-12 w-12 text-emerald-600" />
@@ -126,7 +122,6 @@ const OTPVerification:React.FC<otpProps> = ({email,purpose,role,redirect}) => {
           </p>
         </div>
 
-        {/* OTP Input */}
         <div className="mt-8">
           <div className="flex justify-center gap-4">
             {otp.map((digit, index) => (
@@ -164,7 +159,6 @@ const OTPVerification:React.FC<otpProps> = ({email,purpose,role,redirect}) => {
           </div>
         </div>
 
-        {/* Verify Button */}
         <div className="mt-8">
           <button
             onClick={handleOtpSubmit}

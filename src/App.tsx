@@ -11,7 +11,7 @@ const GOOGLECLIENTID = import.meta.env.VITE_GOOGLECLIENTID;
 const App = () => {
   return (
     <GoogleOAuthProvider clientId={GOOGLECLIENTID}>
-      <NotificationProvider> {/* Wrap the entire Routes in NotificationProvider */}
+      <NotificationProvider> 
         <Routes>
           <Route path="/*" element={<UserRoutes />} />
           <Route path="/advisor/*" element={<AdvisorRoutes />} />

@@ -14,7 +14,6 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
     const { clearAdminEmail } = useAdminStore.getState();
 
-    // Prevent infinite refresh loop
     if (originalRequest?.url?.includes("/admin/refresh-token")) {
       console.warn("🛑 Refresh token request failed. Preventing infinite loop.");
       return Promise.reject(error);
@@ -48,7 +47,6 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(error);
       }
 
-      // Try to refresh token
       try {
         await axiosInstance.post(`/admin/refresh-token`);
         return axiosInstance(originalRequest);

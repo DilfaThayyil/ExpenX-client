@@ -1,6 +1,3 @@
-/* Add to your global CSS or create a reviews.css file */
-
-/* Reviews list styling */
 .reviews-container {
     width: 100%;
   }
@@ -46,7 +43,6 @@
     background-color: #118663;
   }
   
-  /* Review items */
   .review-item {
     background-color: #f9fafb;
     border-radius: 0.5rem;
@@ -131,7 +127,6 @@
     color: #dc2626;
   }
   
-  /* Replies */
   .replies-section {
     margin-top: 1rem;
     padding-top: 1rem;
@@ -162,7 +157,6 @@
     font-size: 0.9375rem;
   }
   
-  /* Forms */
   .review-form-container, .reply-form {
     background-color: #f9fafb;
     border-radius: 0.5rem;
@@ -241,7 +235,6 @@
     margin-top: 1rem;
   }
   
-  /* Star Rating */
   .star-rating {
     display: flex;
     gap: 0.25rem;

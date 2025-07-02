@@ -34,7 +34,6 @@ export function AppSidebar({ menuItems, role }: AppSidebarProps) {
 
   return (
     <Sidebar collapsible="icon">
-      {/* ExpenX Logo */}
       <div className="flex items-center justify-center p-6 border-b border-gray-200">
         <img
           src={expenxLogo}
@@ -52,7 +51,6 @@ export function AppSidebar({ menuItems, role }: AppSidebarProps) {
 
       <SidebarContent className="mt-6">
 
-        {/* Menu Items */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -86,10 +84,8 @@ export function AppSidebar({ menuItems, role }: AppSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Footer Section */}
       <SidebarFooter className="mt-auto px-8 py-6 border-t border-gray-200">
         <div className="flex items-center justify-between">
-          {/* User Info */}
           <SidebarMenuButton className="flex items-center space-x-4 text-lg font-semibold text-gray-700 dark:text-gray-300">
             {!isCollapsed && (
               <>

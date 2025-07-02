@@ -41,9 +41,7 @@ export default function AdvisorWallet() {
         <Layout role='advisor'>
             <div className="container mx-auto p-4 max-w-6xl">
                 <div className="">
-                    {/* Advisor Wallet */}
                     <WalletComponent transactions={transactions} loading={loading} wallet={wallet}/>
-
                 </div>
             </div>
         </Layout>

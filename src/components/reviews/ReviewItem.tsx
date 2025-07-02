@@ -152,7 +152,6 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
         </>
       )}
       
-      {/* Replies section */}
       {review.replies && review.replies.length > 0 && (
         <div className="replies-section">
           <h4>Replies</h4>

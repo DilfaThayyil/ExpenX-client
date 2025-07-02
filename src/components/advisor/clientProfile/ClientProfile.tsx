@@ -98,7 +98,6 @@ const ClientProfilePage = () => {
             <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6">
                 <ClientHeader client={client} lastMeeting={lastMeeting} nextMeeting={nextMeeting} />
 
-                {/* Main Content with Tabs */}
                 <Tabs defaultValue="transactions" className="w-full">
                     <div className="mb-6 overflow-x-auto">
                         <TabsList className="bg-white dark:bg-slate-800 p-1 rounded-lg shadow-sm">
@@ -123,7 +122,6 @@ const ClientProfilePage = () => {
                         </TabsList>
                     </div>
 
-                    {/* Overview Tab */}
                     <TabsContent value="transactions" className="mt-0">
                         <RecentTransactions clientId={clientId} />
                     </TabsContent>

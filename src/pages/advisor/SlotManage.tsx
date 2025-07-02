@@ -134,7 +134,6 @@ const SlotManage: React.FC = () => {
             <Calendar className="mr-3 text-blue-600" /> Slot Management
           </h1>
           
-          {/* Search and Filter UI */}
           <div className="flex flex-col md:flex-row gap-3 mb-6">
             <div className="relative flex-grow">
               <input
@@ -156,7 +155,6 @@ const SlotManage: React.FC = () => {
             </button>
           </div>
           
-          {/* Expanded Filters */}
           {showFilters && (
             <div className="bg-gray-50 p-4 rounded-md mb-6 border border-gray-200">
               <div className="flex flex-col md:flex-row gap-4 mb-4">
@@ -227,7 +225,6 @@ const SlotManage: React.FC = () => {
             <Plus className="mr-2" /> Create New Slot
           </button>
 
-          {/* Slot Creation Modal */}
           {isCreateModalOpen && (
             <SlotCreationModal
               onClose={() => {
@@ -240,14 +237,12 @@ const SlotManage: React.FC = () => {
             />
           )}
 
-          {/* Results Summary */}
           <div className="text-sm text-gray-600 mb-4">
             Showing {filteredSlots.length} {filteredSlots.length === 1 ? 'slot' : 'slots'}
             {(inputValue || filterStatus !== "All" || filterLocation !== "All" || startDateFilter || endDateFilter) && 
               ' with applied filters'}
           </div>
 
-          {/* Slots Table */}
           <div className="bg-white shadow-md rounded-lg">
             <SlotTable
               slots={filteredSlots}
@@ -259,7 +254,6 @@ const SlotManage: React.FC = () => {
             />
           </div>
 
-          {/* Show pagination when not filtered */}
           {(inputValue === '' && filterStatus === "All" && filterLocation === "All" && !startDateFilter && !endDateFilter) && (
             <div className="mt-6">
               <Pagination

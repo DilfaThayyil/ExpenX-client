@@ -41,7 +41,6 @@ const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({ categories, loadi
                 <Tooltip formatter={(value) => [`₹${value}`, 'Amount']} />
               </PieChart>
             </ResponsiveContainer>
-            {/* ✅ Scrollable list for categories */}
             <div className="mt-4 space-y-2 max-h-32 overflow-y-auto border-t-2">
               {categories.map((category) => (
                 <div key={category.category} className="flex items-center justify-between">

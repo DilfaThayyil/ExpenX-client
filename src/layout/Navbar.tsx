@@ -42,10 +42,8 @@ const Navbar = () => {
   };
   return (
     <nav className="bg-white dark:bg-gray-800 shadow-sm h-10 px-4 flex items-center justify-between">
-      {/* Logo and site name */}
       <div className="flex items-center space-x-2">
       </div>
-      {/* Mobile menu button */}
       <button
         className="md:hidden text-gray-600 dark:text-gray-200 focus:outline-none"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -53,10 +51,8 @@ const Navbar = () => {
         {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
 
-      {/* Desktop menu */}
       <div className="hidden md:flex items-center space-x-6">
         <div className="flex items-center space-x-4">
-          {/* Notifications */}
           <NotificationBell />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -80,12 +76,9 @@ const Navbar = () => {
           </Button>
           <LogoutDialog open={open} onClose={() => setOpen(false)} onConfirm={handleConfirmLogout} />
 
-          {/* Profile */}
-
         </div>
       </div>
 
-      {/* Mobile menu, only shown when menu is open */}
       {mobileMenuOpen && (
         <>
           <NotificationBell />

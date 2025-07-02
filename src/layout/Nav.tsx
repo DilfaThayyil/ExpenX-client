@@ -22,7 +22,6 @@ const Navbar: React.FC<NavbarProps> = ({
             <span className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>{logoText}</span>
           </div>
 
-          {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
             <a href="#features" className={`${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
               {t('nav.features')}
@@ -35,9 +34,7 @@ const Navbar: React.FC<NavbarProps> = ({
             </a>
           </div>
 
-          {/* Right side items */}
           <div className="hidden md:flex items-center gap-4">
-            {/* Language toggle */}
             <button
               onClick={onToggleLanguage}
               className={`p-2 rounded-full ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
@@ -47,7 +44,6 @@ const Navbar: React.FC<NavbarProps> = ({
               <span className="ml-1 text-sm">{i18n.language.toUpperCase()}</span>
             </button>
 
-            {/* Dark mode toggle */}
             <button
               onClick={onToggleDarkMode}
               className={`p-2 rounded-full ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
@@ -69,7 +65,6 @@ const Navbar: React.FC<NavbarProps> = ({
 
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden flex items-center gap-2">
             <button
               onClick={onToggleLanguage}
@@ -98,7 +93,6 @@ const Navbar: React.FC<NavbarProps> = ({
         </nav>
       </div>
 
-      {/* Mobile menu, show/hide based on menu state */}
       {mobileMenuOpen && (
         <div className={`md:hidden ${darkMode ? 'bg-gray-800' : 'bg-white'} py-2 px-4`}>
           <div className="space-y-1">

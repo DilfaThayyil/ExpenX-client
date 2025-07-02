@@ -262,7 +262,6 @@ const GroupsPage = () => {
     return (
         <Layout role='user'>
             <div className="min-h-screen bg-muted  p-6 border rounded-2xl">
-                {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">My Groups</h1>
                     <div className="flex gap-2">
@@ -374,9 +373,7 @@ const GroupsPage = () => {
                     </div>
                 </div>
 
-                {/* Main Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Left Column - Groups List */}
                     <div className="space-y-4">
                         {groups.length > 0 ? (
                             groups.map((group) => (
@@ -428,7 +425,6 @@ const GroupsPage = () => {
                         )}
                     </div>
 
-                    {/* Center Column - Group Details */}
                     {selectedGroup ? (
                         <div className="lg:col-span-2 space-y-6">
                             <Card>
@@ -461,7 +457,6 @@ const GroupsPage = () => {
                                     </div>
                                 </CardHeader>
                                 <CardContent>
-                                    {/* Members List */}
                                     <div className="mb-6">
                                         <h3 className="text-lg font-semibold mb-4">Members</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -538,7 +533,6 @@ const GroupsPage = () => {
                                                 );
                                             })}
 
-                                            {/* Add member section */}
                                             <div className="col-span-1 md:col-span-2 mt-4">
                                                 <div className="flex gap-2">
                                                     <Input
@@ -571,7 +565,6 @@ const GroupsPage = () => {
                                         </div>
                                     </div>
 
-                                    {/* Actions Section */}
                                     <div className="mb-6">
                                         <div className="flex justify-between items-center mb-4">
                                             <h3 className="text-lg font-semibold">Actions</h3>
@@ -592,7 +585,6 @@ const GroupsPage = () => {
                                             </Button>
                                         </div>
                                     </div>
-                                    {/* Expenses Table */}
                                     <div className="mb-6">
                                         <div className="flex justify-between items-center mb-4">
                                             <h3 className="text-lg font-semibold">Recent Expenses</h3>
@@ -630,7 +622,6 @@ const GroupsPage = () => {
                                         )}
                                     </div>
 
-                                    {/* Settlements Table */}
                                     <div>
                                         <h3 className="text-lg font-semibold mb-4">Recent Settlements</h3>
                                         {selectedGroup.settlements && selectedGroup.settlements.length > 0 ? (
@@ -678,7 +669,6 @@ const GroupsPage = () => {
                 </div>
             </div>
 
-            {/* Split Expense Dialog */}
             <SplitExpenseDialog
                 isOpen={isExpenseDialogOpen}
                 onClose={() => setIsExpenseDialogOpen(false)}
@@ -687,7 +677,6 @@ const GroupsPage = () => {
                 loading={loading}
             />
 
-            {/* Settle Up Dialog */}
             {selectedGroup && (
                 <SettleUpDialog
                     isOpen={isSettleUpDialogOpen}
