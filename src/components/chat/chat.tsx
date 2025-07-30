@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom'
 import { Search, MoreVertical, Paperclip, Mic, Send } from 'lucide-react';
 import Store from '@/store/store'
 import { MessageBubble } from './MessageBubble';
@@ -33,9 +34,11 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
   const [currentRoomId, setCurrentRoomId] = useState<string>('');
   const [socketInitialized, setSocketInitialized] = useState<boolean>(false);
   const [showMobileChat, setShowMobileChat] = useState(false);
+  const [lastMessages, setLastMessages] = useState<Map<string, Message>>(new Map());
   const filteredContacts = receivers.filter(contact =>
     contact.username.toLowerCase().includes(searchQuery.toLowerCase())
   )
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!socketInitialized && sender?._id) {
@@ -77,6 +80,12 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     if (!socket || !socketInitialized) return;
 
     const messageListener = (message: Message) => {
+      const otherUserId = message.senderId === sender._id ? message.receiverId : message.senderId;
+      setLastMessages(prev => {
+        const newMap = new Map(prev);
+        newMap.set(otherUserId, message);
+        return newMap;
+      });
 
       if (message.roomId === currentRoomId) {
         setMessages(prev => {
@@ -139,7 +148,13 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
         const sortedMessages = response.sort((a: Message, b: Message) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
-
+        if (sortedMessages.length) {
+          setLastMessages(prev => {
+            const newMap = new Map(prev);
+            newMap.set(activeContact._id, sortedMessages[sortedMessages.length - 1]);
+            return newMap;
+          });
+        }
         setMessages(sortedMessages);
 
         setUnreadMessages(prev => {
@@ -185,7 +200,7 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
       receiverId: activeContact._id,
       roomId,
       text: message,
-      url,
+      fileUrl: url,
       fileType: fileInfo?.type,
       fileName: fileInfo?.name,
       createdAt: new Date().toISOString(),
@@ -193,7 +208,6 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
 
 
     setMessages(prev => [...prev, newMessageObj]);
-
     socket.emit("send_message", newMessageObj);
     setNewMessage('');
   }, [sender, activeContact, socketInitialized]);
@@ -321,6 +335,22 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
     });
   };
 
+  const formatTime = (isoDate: string): string => {
+    const date = new Date(isoDate);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    if (isToday) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    const yesterday = new Date();
+    yesterday.setDate(now.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) {
+      return "Yesterday";
+    }
+    return date.toLocaleDateString([], { day: 'numeric', month: 'short' });
+  };
+
+
   return (
     <div className="flex h-screen bg-gray-100">
       <div className={`${showMobileChat ? 'hidden' : 'w-full'} sm:w-1/3 lg:w-1/4 bg-white border-r border-gray-200 flex flex-col`}>
@@ -340,6 +370,8 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
         <div className="flex-1 overflow-y-auto">
           {filteredContacts.map(contact => {
             const unreadCount = unreadMessages.get(contact._id) || 0;
+            const lastMessage = lastMessages.get(contact._id);
+            const formattedTime = lastMessage?.createdAt ? formatTime(lastMessage.createdAt) : '';
             return (
               <ContactItem
                 key={contact._id}
@@ -351,6 +383,8 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
                     setShowMobileChat(true);
                   }
                 }}
+                lastMessage={lastMessage?.text || (lastMessage?.fileName ? `📄${lastMessage.fileName}` : '')}
+                lastMessageTime={formattedTime}
               >
                 <NewMessageIndicator count={unreadCount} />
               </ContactItem>
@@ -370,10 +404,14 @@ const ChatApp: React.FC<ChatProps> = ({ receivers }) => {
                 >
                   ← Back
                 </button>
-                <div className="relative">
+                <div className="relative"
+                  onClick={() => navigate(`/advisor/clientProfile/${activeContact._id}`)}
+                >
                   <img src={activeContact.profilePic} alt={activeContact.username} className="rounded-full w-10 h-10" />
                 </div>
-                <div className="ml-3">
+                <div className="ml-3"
+                  onClick={() => navigate(`/advisor/clientProfile/${activeContact._id}`)}
+                >
                   <h2 className="text-sm font-semibold">{activeContact.username}</h2>
                   {typingUser && typingUser === activeContact._id && <TypingIndicator />}
                 </div>

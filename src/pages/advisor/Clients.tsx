@@ -209,6 +209,7 @@ const Clients: React.FC = () => {
             <p className="text-sm text-gray-600">
               Showing {filteredAppointments.length} of {bookedAppointments.length} appointments
             </p>
+            <p className="text-sm text-gray-600">Click on the client to see their details</p>
             {(filterStatus !== "All" || filterPayment !== "All" || filterLocation !== "All" || inputValue) && (
               <div className="text-sm text-blue-600">
                 Filters active
