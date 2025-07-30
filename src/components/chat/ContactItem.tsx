@@ -29,7 +29,7 @@ const UnreadBadge = ({ count }: { count: number }) => {
   );
 };
 
-export const ContactItem: React.FC<ContactProps> = ({ contact, active, onClick, children }) => {
+export const ContactItem: React.FC<ContactProps> = ({ contact, active, onClick,lastMessage,lastMessageTime, children }) => {
   return (
     <motion.div
       whileHover={{ backgroundColor: active ? 'rgb(243 244 246)' : 'rgb(243 244 246)' }}
@@ -55,10 +55,10 @@ export const ContactItem: React.FC<ContactProps> = ({ contact, active, onClick, 
       <div className="ml-3 flex-1 overflow-hidden">
         <div className="flex justify-between items-center">
           <h3 className="text-sm font-semibold truncate">{contact.username}</h3>
-          <span className="text-xs text-gray-500">{contact.time}</span>
+          <span className="text-xs text-gray-500">{lastMessageTime}</span>
         </div>
         <div className="flex justify-between items-center mt-0.5">
-          <p className="text-xs text-gray-500 truncate">{contact.lastMessage}</p>
+          <p className="text-xs text-gray-500 truncate">{lastMessage}</p>
           <UnreadBadge count={contact.unread ?? 0} />
         </div>
       </div>

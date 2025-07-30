@@ -32,7 +32,6 @@ const SlotManage: React.FC = () => {
   const fetchSlot = async () => {
     try {
       const response = await fetchSlots(advisor._id, currentPage, ITEMS_PER_PAGE,debouncedQuery);
-      console.log("res-fetchSlots : ",response)
       const { slots, totalPages } = response.data;
       setSlots(slots);
       setFilteredSlots(slots);

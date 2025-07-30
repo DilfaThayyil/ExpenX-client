@@ -22,12 +22,12 @@ export interface ContactProps {
         email: string;
         profilePic: string;
         status?: string;
-        lastMessage?: string;
         unread?: number;
-        time?: string;
     };
     active: boolean;
     onClick: () => void;
+    lastMessage : string;
+    lastMessageTime : string;
     children?: React.ReactNode;
 }
 
